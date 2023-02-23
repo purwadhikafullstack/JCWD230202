@@ -47,7 +47,7 @@ module.exports = (sequelize, DataTypes) => {
 				},
 			},
 			gender: DataTypes.STRING,
-			birthdate: DataTypes.DATEONLY,
+			birthdate: DataTypes.STRING,
 			phone_number: {
 				type: DataTypes.STRING,
 				allowNull: { msg: "User must have a phone number" },

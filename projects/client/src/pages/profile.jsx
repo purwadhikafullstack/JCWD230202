@@ -5,27 +5,17 @@ import { useForm } from "react-hook-form";
 import { FaFemale, FaMale } from "react-icons/fa";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
-// import REST_API from "../support/services/RESTApiService";s
+// import REST_API from "../support/services/RESTApiService";
 
 export default function Profile() {
+	const [date, setdate] = useState();
 	const [show, setshow] = useState({
-		name: false,
-		birthdate: false,
-		gender: false,
-		email: false,
-		phone_number: false,
+		edit: false,
 		changePassword: false,
 		changeAddress: false,
 		changeProfilePic: false,
 	});
 	const [profile, setprofile] = useState({
-		name: "",
-		birthdate: "",
-		gender: "",
-		email: "",
-		phone_number: "",
-	});
-	const [dbprofile, setdbprofile] = useState({
 		name: "",
 		birthdate: "",
 		gender: "",
@@ -39,14 +29,26 @@ export default function Profile() {
 		formState: { errors },
 	} = useForm();
 
-	const onSubmit = (data) => {
-		data.name
-			? setprofile({ ...profile, name: data.name })
-			: data.birthdate
-			? setprofile({ ...profile, birthdate: data.birthdate })
-			: data.email
-			? setprofile({ ...profile, email: data.email })
-			: setprofile({ ...profile, phone_number: data.phone_number });
+	const onSubmit = async (data) => {
+		try {
+			await axios.patch(
+				"http://localhost:8000/user/edit",
+				{
+					name: data.name,
+					birthdate: profile.birthdate,
+					gender: profile.gender,
+					email: data.email,
+					phone_number: data.phone_number,
+				},
+				{
+					headers: {
+						token: "60d910de-9fff-4ee1-902d-6314bae51aae",
+					},
+				}
+			);
+		} catch (error) {
+			console.log(error);
+		}
 	};
 	// const getProfile = async () => {
 	// 	const { data } = await REST_API().get("/user/profile", {
@@ -61,23 +63,8 @@ export default function Profile() {
 	// 		phone: data.data.phone_number,
 	// 	});
 	// };
-	const editProfile = async (dataProfile) => {
-		try {
-			const data = await axios.patch(
-				"http://localhost:8000/user/edit",
-				dataProfile,
-				{
-					headers: {
-						token: "60d910de-9fff-4ee1-902d-6314bae51aae",
-					},
-				}
-			);
-			console.log(data);
-		} catch (error) {
-			console.log(error);
-		}
-	};
 	useEffect(() => {
+		// getProfile();
 		(async () => {
 			const { data } = await axios.get("http://localhost:8000/user/profile", {
 				headers: {
@@ -92,16 +79,8 @@ export default function Profile() {
 				email: data.data.email,
 				phone_number: data.data.phone_number,
 			});
-			setdbprofile({
-				...dbprofile,
-				name: data.data.name,
-				birthdate: data.data.birthdate,
-				gender: data.data.gender,
-				email: data.data.email,
-				phone_number: data.data.phone_number,
-			});
 		})();
-	}, [dbprofile, profile]);
+	}, []);
 	return (
 		<div className="pt-20 flex justify-center font-tokpedFont items-center h-screen">
 			<div className=" max-w-screen-xl w-full grid grid-cols-3 shadow-md h-[600px]">
@@ -137,82 +116,40 @@ export default function Profile() {
 					<table className="w-full mt-5 text-left">
 						<tr>
 							<th className="py-5">Name</th>
-							<td>
-								: {`${profile.name} `}
-								<button
-									onClick={() => setshow({ ...show, name: true })}
-									className="text-red-700 font-semibold"
-								>
-									edit
-								</button>
-							</td>
+							<td>: {`${profile.name} `}</td>
 						</tr>
 						<tr>
 							<th className="py-5">Birthdate</th>
-							<td>
-								: {`${profile.birthdate ? profile.birthdate : " "} `}
-								<button
-									onClick={() => setshow({ ...show, birthdate: true })}
-									className="text-red-700 font-semibold"
-								>
-									edit
-								</button>
-							</td>
+							<td>: {`${profile.birthdate ? profile.birthdate : " "} `}</td>
 						</tr>
 						<tr>
 							<th className="py-5">Gender</th>
-							<td>
-								: {`${profile.gender ? profile.gender : " "} `}
-								<button
-									onClick={() => setshow({ ...show, gender: true })}
-									className="text-red-700 font-semibold"
-								>
-									edit
-								</button>
-							</td>
+							<td>: {`${profile.gender ? profile.gender : " "} `}</td>
 						</tr>
 						<tr>
 							<th className="py-5">Email</th>
-							<td>
-								: {`${profile.email} `}
-								<button
-									onClick={() => setshow({ ...show, email: true })}
-									className="text-red-700 font-semibold"
-								>
-									edit
-								</button>
-							</td>
+							<td>: {`${profile.email} `}</td>
 						</tr>
 						<tr>
 							<th className="py-5">Phone</th>
-							<td>
-								: {`${profile.phone_number} `}
-								<button
-									onClick={() => setshow({ ...show, phone_number: true })}
-									className="text-red-700 font-semibold"
-								>
-									edit
-								</button>
-							</td>
+							<td>: {`${profile.phone_number} `}</td>
 						</tr>
 					</table>
-					<div className="flex justify-end">
-						{JSON.stringify(profile) === JSON.stringify(dbprofile) ? null : (
-							<button
-								onClick={() => editProfile(profile)}
-								className="border border-black p-2 rounded-lg"
-							>
-								Submit Changes
-							</button>
-						)}
+					<div className="flex justify-end space-x-5">
+						<button
+							onClick={() => setshow({ ...show, edit: true })}
+							className="border border-black p-2 rounded-lg bg-red-700 text-white"
+						>
+							Edit profile
+						</button>
 					</div>
 				</div>
 			</div>
 			<Modal
-				show={show.name}
+				show={show.edit}
 				size="md"
 				popup={true}
-				onClose={() => setshow({ ...show, name: false })}
+				onClose={() => setshow({ ...show, edit: false })}
 				id="name modal"
 			>
 				<Modal.Header />
@@ -222,11 +159,11 @@ export default function Profile() {
 						className="space-y-6 px-6 pb-4 sm:pb-6 lg:px-8 xl:pb-8"
 					>
 						<h3 className="text-xl font-medium text-gray-900 dark:text-white">
-							Change your name
+							Change your profile
 						</h3>
-						<div>
+						<div className="space-y-2">
 							<div className="mb-2 block">
-								<Label htmlFor="password" value="Edit your name here" />
+								<Label htmlFor="password" value="Edit your name" />
 							</div>
 							<TextInput
 								type="text"
@@ -234,123 +171,53 @@ export default function Profile() {
 								defaultValue={profile.name}
 								{...register("name")}
 							/>
-						</div>
-						<div className="w-full flex justify-end">
-							<Button
-								type="submit"
-								onClick={() => setshow({ ...show, name: false })}
-							>
-								Submit
-							</Button>
-						</div>
-					</form>
-				</Modal.Body>
-			</Modal>
-			<Modal
-				show={show.birthdate}
-				size="md"
-				popup={true}
-				onClose={() => setshow({ ...show, birthdate: false })}
-				id="birthdate modal"
-			>
-				<Modal.Header />
-				<Modal.Body>
-					<div className="space-y-6 px-6 pb-4 sm:pb-6 lg:px-8 xl:pb-8">
-						<div className="relative max-w-sm">
-							<p className="pb-5 font-semibold text-lg">
-								Select your birthdate
-							</p>
+							<div className="mb-2 block">
+								<Label htmlFor="password" value="Edit your birthdate" />
+							</div>
 							<DatePicker
+								{...register("birthdate")}
 								showMonthDropdown={true}
-								scrollableYearDropdown={true}
 								showYearDropdown={true}
-								onChange={(date) =>
+								scrollableYearDropdown={true}
+								onChange={(date) => {
 									setprofile({
 										...profile,
 										birthdate: date.toISOString().split("T")[0],
-									})
-								}
-								className="w-full rounded-xl"
+									});
+									setdate(date);
+								}}
+								selected={date}
+								className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg w-full"
 							/>
-							<div className="flex absolute bottom-3 right-0 items-center pr-3 pointer-events-none">
-								<svg
-									aria-hidden="true"
-									className="w-5 h-5 text-gray-500 dark:text-gray-400"
-									fill="currentColor"
-									viewBox="0 0 20 20"
-									xmlns="http://www.w3.org/2000/svg"
-								>
-									<path
-										fillRule="evenodd"
-										d="M6 2a1 1 0 00-1 1v1H4a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2h-1V3a1 1 0 10-2 0v1H7V3a1 1 0 00-1-1zm0 5a1 1 0 000 2h8a1 1 0 100-2H6z"
-										clipRule="evenodd"
-									></path>
-								</svg>
-							</div>
-						</div>
-
-						<div className="w-full flex justify-end">
-							<Button onClick={() => setshow({ ...show, birthdate: false })}>
-								Submit
-							</Button>
-						</div>
-					</div>
-				</Modal.Body>
-			</Modal>
-			<Modal
-				show={show.gender}
-				size="md"
-				popup={true}
-				onClose={() => setshow({ ...show, gender: false })}
-				id="gender modal"
-			>
-				<Modal.Header />
-				<Modal.Body>
-					<div className="space-y-6 px-6 pb-4 sm:pb-6 lg:px-8 xl:pb-8">
-						<div className="flex justify-center space-x-14">
-							<button
-								onClick={() => {
-									setshow({ ...show, gender: false });
-									setprofile({ ...profile, gender: "Male" });
-								}}
-								className="space-y-4"
-							>
-								<FaMale className="text-7xl" />
-								<p className="font-semibold">Male</p>
-							</button>
-							<button
-								onClick={() => {
-									setshow({ ...show, gender: false });
-									setprofile({ ...profile, gender: "Female" });
-								}}
-								className="space-y-4"
-							>
-								<FaFemale className="text-7xl" />
-								<p className="font-semibold">Female</p>
-							</button>
-						</div>
-					</div>
-				</Modal.Body>
-			</Modal>
-			<Modal
-				show={show.email}
-				size="md"
-				popup={true}
-				onClose={() => setshow({ ...show, email: false })}
-				id="email modal"
-			>
-				<Modal.Header />
-				<Modal.Body>
-					<form
-						onSubmit={handleSubmit(onSubmit)}
-						className="space-y-6 px-6 pb-4 sm:pb-6 lg:px-8 xl:pb-8"
-					>
-						<h3 className="text-xl font-medium text-gray-900 dark:text-white">
-							Change your email
-						</h3>
-						<div>
 							<div className="mb-2 block">
-								<Label htmlFor="password" value="Edit your email here" />
+								<Label htmlFor="password" value="Select your gender" />
+								<div className="flex justify-evenly py-2">
+									<div className="flex flex-col justify-center items-center">
+										<FaMale
+											values="Male"
+											className={`text-4xl rounded-full ${
+												profile.gender === "Male" ? "bg-blue-200" : null
+											}`}
+											onClick={() => setprofile({ ...profile, gender: "Male" })}
+										/>
+										<p>Male</p>
+									</div>
+									<div className="flex flex-col justify-center items-center">
+										<FaFemale
+											values="Female"
+											className={`text-4xl rounded-full ${
+												profile.gender === "Female" ? "bg-blue-200" : null
+											}`}
+											onClick={() =>
+												setprofile({ ...profile, gender: "Female" })
+											}
+										/>
+										<p>Female</p>
+									</div>
+								</div>
+							</div>
+							<div className="mb-2 block">
+								<Label htmlFor="password" value="Edit your email" />
 							</div>
 							<TextInput
 								type="text"
@@ -364,42 +231,9 @@ export default function Profile() {
 									},
 								})}
 							/>
-							<h2 className="pt-5 text-lg font-semibold text-red-700">
-								{errors.email?.message}
-							</h2>
-						</div>
-						<div className="w-full flex justify-end">
-							<Button
-								type="submit"
-								onClick={() =>
-									errors.email ? null : setshow({ ...show, email: false })
-								}
-							>
-								Submit
-							</Button>
-						</div>
-					</form>
-				</Modal.Body>
-			</Modal>
-			<Modal
-				show={show.phone_number}
-				size="md"
-				popup={true}
-				onClose={() => setshow({ ...show, phone_number: false })}
-				id="phone modal"
-			>
-				<Modal.Header />
-				<Modal.Body>
-					<form
-						onSubmit={handleSubmit(onSubmit)}
-						className="space-y-6 px-6 pb-4 sm:pb-6 lg:px-8 xl:pb-8"
-					>
-						<h3 className="text-xl font-medium text-gray-900 dark:text-white">
-							Change your phone number
-						</h3>
-						<div>
+							<p>{errors.email?.message}</p>
 							<div className="mb-2 block">
-								<Label htmlFor="password" value="Edit your phone number here" />
+								<Label htmlFor="password" value="Edit your phone number" />
 							</div>
 							<TextInput
 								type="text"
@@ -412,116 +246,12 @@ export default function Profile() {
 									},
 								})}
 							/>
-							<h2 className="pt-5 text-lg font-semibold text-red-700">
-								{errors.phone_number?.message}
-							</h2>
+							<p>{errors.phone_number?.message}</p>
 						</div>
 						<div className="w-full flex justify-end">
-							<Button
-								type="submit"
-								onClick={() =>
-									errors.phone_number
-										? null
-										: setshow({ ...show, phone_number: false })
-								}
-							>
-								Submit
-							</Button>
+							<Button type="submit">Submit</Button>
 						</div>
 					</form>
-				</Modal.Body>
-			</Modal>
-			<Modal
-				show={show.changePassword}
-				size="md"
-				popup={true}
-				onClose={() => setshow({ ...show, changePassword: false })}
-				id="change password modal"
-			>
-				<Modal.Header />
-				<Modal.Body>
-					<div className="space-y-6 px-6 pb-4 sm:pb-6 lg:px-8 xl:pb-8">
-						<h3 className="text-xl font-medium text-gray-900 dark:text-white">
-							Sign in to our platform
-						</h3>
-						<div>
-							<div className="mb-2 block">
-								<Label htmlFor="email" value="Your email" />
-							</div>
-							<TextInput placeholder="name@company.com" required={true} />
-						</div>
-						<div>
-							<div className="mb-2 block">
-								<Label htmlFor="password" value="Your password" />
-							</div>
-							<TextInput type="password" required={true} />
-						</div>
-						<div className="w-full">
-							<Button>Log in to your account</Button>
-						</div>
-					</div>
-				</Modal.Body>
-			</Modal>
-			<Modal
-				show={show.changeAddress}
-				size="md"
-				popup={true}
-				onClose={() => setshow({ ...show, changeAddress: false })}
-				id="address modal"
-			>
-				<Modal.Header />
-				<Modal.Body>
-					<div className="space-y-6 px-6 pb-4 sm:pb-6 lg:px-8 xl:pb-8">
-						<h3 className="text-xl font-medium text-gray-900 dark:text-white">
-							Sign in to our platform
-						</h3>
-						<div>
-							<div className="mb-2 block">
-								<Label htmlFor="email" value="Your email" />
-							</div>
-							<TextInput placeholder="name@company.com" required={true} />
-						</div>
-						<div>
-							<div className="mb-2 block">
-								<Label htmlFor="password" value="Your password" />
-							</div>
-							<TextInput type="password" required={true} />
-						</div>
-						<div className="w-full">
-							<Button>Log in to your account</Button>
-						</div>
-					</div>
-				</Modal.Body>
-			</Modal>
-			<Modal
-				show={show.changeAddress}
-				size="md"
-				popup={true}
-				onClose={() => setshow({ ...show, changeAddress: false })}
-				id="address modal"
-			>
-				<Modal.Header />
-				<Modal.Body>
-					<div className="space-y-6 px-6 pb-4 sm:pb-6 lg:px-8 xl:pb-8">
-						<h3 className="text-xl font-medium text-gray-900 dark:text-white">
-							Sign in to our platform
-						</h3>
-						<div>
-							<div className="mb-2 block">
-								<Label htmlFor="email" value="Your email" />
-							</div>
-							<TextInput placeholder="name@company.com" required={true} />
-						</div>
-						<div>
-							<div className="mb-2 block">
-								<Label htmlFor="password" value="Your password" />
-							</div>
-							<TextInput type="password" required={true} />
-						</div>
-						<div className="w-full">
-							<Button>Log in to your account</Button>
-						</div>
-					</div>
 				</Modal.Body>
 			</Modal>
 		</div>
