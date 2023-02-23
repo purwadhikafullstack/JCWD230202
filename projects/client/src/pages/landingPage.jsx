@@ -3,39 +3,36 @@ import { useState } from "react";
 import anjing from "../support/assets/carousel/anjing.jpg";
 import axios from "axios";
 import { useEffect } from "react";
+import REST_API from "../support/services/RESTApiService";
 
 export default function LandingPage() {
 	const [product, setproduct] = useState();
 	const [page, setpage] = useState();
 	const [selectedpage, setselectedpage] = useState();
-
 	const [category, setcategory] = useState();
+
 	const getCategory = async () => {
-		try {
-			const { data } = await axios.get(
-				"http://localhost:5000/product/category"
-			);
-			setcategory(data.data);
-		} catch (error) {
-			console.log(error);
-		}
+		const { data } = await REST_API().get("/product/category");
+		setcategory(data.data);
 	};
 	const getTotalPage = async (branch) => {
 		try {
 			const { data } = await axios.get(
-				`http://localhost:5000/product/totalPage?branch=${branch}`
+				`http://localhost:8000/product/totalPage?branch=${branch}`
 			);
 			const totalPage = [];
 			for (let i = 1; i <= data.data / 10; i++) {
 				totalPage.push(i);
 			}
 			setpage(totalPage);
-		} catch (error) {}
+		} catch (error) {
+			console.log(error);
+		}
 	};
 	const getAllProduct = async (page) => {
 		try {
 			const { data } = await axios.get(
-				`http://localhost:5000/product?page=${page}`
+				`http://localhost:8000/product?page=${page}`
 			);
 			setproduct(data.data);
 			setselectedpage(page);
@@ -50,20 +47,21 @@ export default function LandingPage() {
 		getCategory();
 	}, []);
 	return (
-		<div className="pt-20 max-w-screen-xl mx-auto ">
+		<div className="pt-20 max-w-screen-xl mx-auto font-tokpedFont">
 			<div className="flex justify-center">
-				<img src={anjing} alt="banner" />
+				<img src={anjing} alt="banner" className="h-[500px] shadow-xl" />
 			</div>
 			<div className="flex justify-evenly py-10">
 				{category
 					? category.map((value, index) => {
 							return (
-								<button key={index}>
+								<button key={index} className="space-y-2">
 									<img
 										src={value.img}
 										alt={value.name}
-										className="h-32 w-32 border-black border-[2px] rounded-full"
+										className="h-32 w-32 rounded-full overflow-visible shadow-lg"
 									/>
+									<p className="font-semibold">{value.name}</p>
 								</button>
 							);
 					  })
@@ -75,10 +73,10 @@ export default function LandingPage() {
 							return (
 								<div
 									key={index}
-									className="flex flex-col shadow-md justify-between w-full max-w-sms h-96 bg-white border border-gray-200 rounded-lg dark:bg-gray-800 dark:border-gray-700"
+									className="flex flex-col shadow-md justify-between w-full max-w-sms h-80 bg-white border border-gray-200 rounded-lg dark:bg-gray-800 dark:border-gray-700"
 								>
 									<img
-										className="p-8 rounded-t-lg"
+										className="rounded-t-lg h-44"
 										src={value.product.img}
 										alt="product"
 									/>
@@ -88,7 +86,7 @@ export default function LandingPage() {
 										</h5>
 										<h4>Toko {value.branch.location}</h4>
 										<div className="flex items-center justify-between">
-											<span className="text-xl font-bold text-gray-900 dark:text-white">
+											<span className="text-lg font-bold text-gray-900 dark:text-white">
 												Rp. {value.product.price.toLocaleString()}
 											</span>
 											<button className="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">
@@ -111,7 +109,7 @@ export default function LandingPage() {
 											<button
 												onClick={() => getAllProduct(value)}
 												className={`px-3 py-2 leading-tight text-gray-500 bg-white border border-gray-300 ${
-													selectedpage === index + 1 ? "bg-blue-200" : null
+													selectedpage === value ? "bg-red-200" : null
 												} hover:bg-gray-100 hover:text-gray-700 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white`}
 											>
 												{value}

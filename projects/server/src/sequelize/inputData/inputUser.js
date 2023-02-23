@@ -4,25 +4,25 @@ const db = require("../models");
 	await db.user.bulkCreate([
 		{
 			name: "nathan",
-			email: "nathan@gmail.com",
+			email: "nathan1@gmail.com",
 			password: "asdfasdf12341234",
 			phone_number: 123412341,
 		},
 		{
 			name: "nathan",
-			email: "nathan@gmail.com",
+			email: "nathan2@gmail.com",
 			password: "asdfasdf12341234",
 			phone_number: 123412341,
 		},
 		{
 			name: "nathan",
-			email: "nathan@gmail.com",
+			email: "nathan3@gmail.com",
 			password: "asdfasdf12341234",
 			phone_number: 123412341,
 		},
 		{
 			name: "nathan",
-			email: "nathan@gmail.com",
+			email: "nathan4@gmail.com",
 			password: "asdfasdf12341234",
 			phone_number: 123412341,
 		},

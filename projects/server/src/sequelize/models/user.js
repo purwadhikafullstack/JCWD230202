@@ -49,7 +49,7 @@ module.exports = (sequelize, DataTypes) => {
 			gender: DataTypes.STRING,
 			birthdate: DataTypes.DATEONLY,
 			phone_number: {
-				type: DataTypes.INTEGER,
+				type: DataTypes.STRING,
 				allowNull: { msg: "User must have a phone number" },
 				validate: {
 					notEmpty: { msg: "Users password must not be empty" },
@@ -62,8 +62,8 @@ module.exports = (sequelize, DataTypes) => {
 				defaultValue: "user",
 			},
 			status: {
-				type: DataTypes.BOOLEAN,
-				defaultValue: false,
+				type: DataTypes.STRING,
+				defaultValue: "Unverified",
 			},
 		},
 		{

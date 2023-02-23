@@ -6,13 +6,15 @@ import Profile from "./pages/profile";
 
 function App() {
 	return (
-		<div className="relative">
+		<>
 			<NavigationBar />
-			<Routes>
-				<Route path="/home" element={<LandingPage />} />
-				<Route path="/profile" element={<Profile />} />
-			</Routes>
-		</div>
+			<div className="relative">
+				<Routes>
+					<Route path="/home" element={<LandingPage />} />
+					<Route path="/profile" element={<Profile />} />
+				</Routes>
+			</div>
+		</>
 	);
 }
 
