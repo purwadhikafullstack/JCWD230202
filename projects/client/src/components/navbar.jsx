@@ -6,7 +6,7 @@ import { Link, useNavigate } from "react-router-dom";
 export default function NavigationBar() {
 	const navigate = useNavigate();
 	return (
-		<div className="grid grid-cols-12 fixed py-3 px-8 shadow-md max-w-screen w-full bg-white">
+		<div className="grid grid-cols-12 fixed py-3 px-8 shadow-md max-w-screen w-full bg-white z-50">
 			<button
 				onClick={() => navigate("/home")}
 				className=" col-span-2 font-mandalaFont font-extrabold text-xl xl:text-4xl"
@@ -26,13 +26,12 @@ export default function NavigationBar() {
 				</button>
 			</div>
 			{localStorage.getItem("token") ? (
-				<Link
-					to={"/profile"}
-					className="col-span-2 flex items-center justify-end space-x-4"
-				>
-					<CgProfile className="text-2xl" />
-					<h2 className=" font-tokpedFont font-semibold">Veanus Nathan</h2>
-				</Link>
+				<div className="col-span-2 flex items-center justify-end space-x-4">
+					<Link to={"/profile"} className="flex space-x-3">
+						<CgProfile className="text-2xl" />
+						<h2 className=" font-tokpedFont font-semibold">Veanus Nathan</h2>
+					</Link>
+				</div>
 			) : (
 				<div className="col-span-2 grid grid-cols-2 gap-4">
 					<button className="border-[2px] rounded-lg px-2 py-1">
