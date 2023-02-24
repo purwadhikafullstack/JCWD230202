@@ -10,6 +10,8 @@ import UpdatePassword from "./pages/newpass";
 import Register from "./pages/register";
 import Activation from "./pages/activation";
 import ForgotPass from "./pages/forgotpass";
+import Dashboard from "./pages/dashboard";
+import SalesReport from "./components/salesReport";
 
 function App() {
 	const location = useLocation();
@@ -56,6 +58,10 @@ function App() {
 					<Route path="/register" element={<Register />} />
 					<Route path="/activation/:uid" element={<Activation />} />
 					<Route path="/forgotpassword" element={<ForgotPass />} />
+					<Route path="/" element={<Dashboard />}>
+						<Route path="/admin" element={<Overview />} />
+						<Route path="/sales-report" element={<SalesReport />} />
+					</Route>
 				</Routes>
 			</div>
 		</>
