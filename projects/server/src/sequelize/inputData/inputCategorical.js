@@ -98,7 +98,37 @@ const branch = async () => {
 	});
 };
 
+const user = async () => {
+	await db.user.bulkCreate([
+		{
+			name: "aswin",
+			email: "aswin05.aw@gmail.com",
+			password: "Aswin123456",
+			phone_number: "087805667895",
+			role: "super admin",
+			status: "Active",
+		},
+		{
+			name: "ashfi",
+			email: "ashfimzk@gmail.com",
+			password: "Ashfi123456",
+			phone_number: "085156004326",
+			role: "super admin",
+			status: "Active",
+		},
+		{
+			name: "nathan",
+			email: "veanusnathan.work@gmail.com",
+			password: "Nathan123456",
+			phone_number: "082246704951",
+			role: "super admin",
+			status: "Active",
+		},
+	]);
+};
+
 category();
 unit();
 discount();
 branch();
+user();
