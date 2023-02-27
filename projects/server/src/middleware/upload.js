@@ -21,8 +21,10 @@ const uploadImage = (req, res, next) => {
 			return res.status(413).send({
 				isError: true,
 				message: error.message,
-				data: null,
+				data: error,
 			});
 		}
 	});
 };
+
+module.exports = uploadImage;

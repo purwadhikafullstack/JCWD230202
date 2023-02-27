@@ -1,16 +1,21 @@
 import React, { useEffect, useState } from "react";
-import { Modal, Label, TextInput, Button } from "flowbite-react";
+import { Modal, Label, TextInput, Button, Spinner } from "flowbite-react";
 import axios from "axios";
 import { useForm } from "react-hook-form";
 import { FaFemale, FaMale } from "react-icons/fa";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
+import toast, { Toaster } from "react-hot-toast";
+import { useNavigate } from "react-router-dom";
 // import REST_API from "../support/services/RESTApiService";
 
 export default function Profile() {
+	const navigate = useNavigate();
 	const [date, setdate] = useState();
+	const [img, setimg] = useState();
 	const [show, setshow] = useState({
 		edit: false,
+		loading: false,
 		changePassword: false,
 		changeAddress: false,
 		changeProfilePic: false,
@@ -21,6 +26,7 @@ export default function Profile() {
 		gender: "",
 		email: "",
 		phone_number: "",
+		profile_picture: "",
 	});
 
 	const {
@@ -30,24 +36,32 @@ export default function Profile() {
 	} = useForm();
 
 	const onSubmit = async (data) => {
+		setshow({ ...show, loading: true });
 		try {
 			await axios.patch(
 				"http://localhost:8000/user/edit",
 				{
 					name: data.name,
-					birthdate: profile.birthdate,
-					gender: profile.gender,
 					email: data.email,
 					phone_number: data.phone_number,
+					gender: profile.gender,
+					birthdate: data.birthdate,
 				},
 				{
 					headers: {
-						token: "60d910de-9fff-4ee1-902d-6314bae51aae",
+						token: localStorage.getItem("token"),
 					},
 				}
 			);
+			toast.success("Profile updated");
+			setshow({ ...show, edit: false });
+			getProfile();
 		} catch (error) {
-			console.log(error);
+			toast.error("Something went wrong");
+		} finally {
+			setshow({ ...show, loading: false });
+			setshow({ ...show, disable: false });
+			navigate("/profile");
 		}
 	};
 	// const getProfile = async () => {
@@ -63,30 +77,66 @@ export default function Profile() {
 	// 		phone: data.data.phone_number,
 	// 	});
 	// };
+	const getProfile = async () => {
+		const { data } = await axios.get("http://localhost:8000/user/profile", {
+			headers: {
+				token: localStorage.getItem("token"),
+			},
+		});
+		setprofile({
+			...profile,
+			name: data.data.name,
+			birthdate: data.data.birthdate,
+			gender: data.data.gender,
+			email: data.data.email,
+			phone_number: data.data.phone_number,
+			profile_picture: data.data.img,
+		});
+	};
+
+	const validateImage = (e) => {
+		try {
+			if (e.target.files > 1) throw { message: "Select 1 Image only!" };
+
+			if (e.target.files[0].size > 1000000)
+				throw { message: `${e.target.files[0].name} more than 1MB` };
+			setimg(e.target.files[0]);
+		} catch (error) {
+			console.log(error);
+			toast.error("Upload image failed");
+		}
+	};
+
+	const onSubmitPP = async () => {
+		const fd = new FormData();
+		console.log(fd);
+		try {
+			console.log(img);
+			fd.append("image", img);
+			console.log(fd);
+			// await axios.post("http://localhost:8000/user/profile/picture", fd, {
+			// 	headers: { token: localStorage.getItem("token") },
+			// });
+			toast("Profile picture updated");
+		} catch (error) {
+			console.log(error);
+			toast.error("Upload image failed");
+		}
+	};
 	useEffect(() => {
 		// getProfile();
-		(async () => {
-			const { data } = await axios.get("http://localhost:8000/user/profile", {
-				headers: {
-					token: "60d910de-9fff-4ee1-902d-6314bae51aae",
-				},
-			});
-			setprofile({
-				...profile,
-				name: data.data.name,
-				birthdate: data.data.birthdate,
-				gender: data.data.gender,
-				email: data.data.email,
-				phone_number: data.data.phone_number,
-			});
-		})();
+		getProfile();
 	}, []);
 	return (
 		<div className="pt-20 flex justify-center font-tokpedFont items-center h-screen">
 			<div className=" max-w-screen-xl w-full grid grid-cols-3 shadow-md h-[600px]">
 				<div className=" col-span-1 shadow-md m-5">
 					<div className="flex justify-center p-5">
-						<img src="" alt="Profile" className="h-80 w-80 shadow-md" />
+						<img
+							src={`http://localhost:8000/Public/${profile.profile_picture}`}
+							alt="Profile"
+							className="h-80 w-80 shadow-md"
+						/>
 					</div>
 					<div className="flex flex-col justify-center py-3 px-5 space-y-5">
 						<button
@@ -168,6 +218,9 @@ export default function Profile() {
 							<TextInput
 								type="text"
 								required={true}
+								onChange={(e) =>
+									setprofile({ ...profile, name: e.target.value })
+								}
 								defaultValue={profile.name}
 								{...register("name")}
 							/>
@@ -175,7 +228,6 @@ export default function Profile() {
 								<Label htmlFor="password" value="Edit your birthdate" />
 							</div>
 							<DatePicker
-								{...register("birthdate")}
 								showMonthDropdown={true}
 								showYearDropdown={true}
 								scrollableYearDropdown={true}
@@ -223,6 +275,9 @@ export default function Profile() {
 								type="text"
 								required={true}
 								defaultValue={profile.email}
+								onChange={(e) =>
+									setprofile({ ...profile, email: e.target.value })
+								}
 								{...register("email", {
 									pattern: {
 										value:
@@ -239,6 +294,9 @@ export default function Profile() {
 								type="text"
 								required={true}
 								defaultValue={profile.phone_number}
+								onChange={(e) =>
+									setprofile({ ...profile, phone_number: e.target.value })
+								}
 								{...register("phone_number", {
 									pattern: {
 										value: /^[0-9]*$/,
@@ -249,11 +307,57 @@ export default function Profile() {
 							<p>{errors.phone_number?.message}</p>
 						</div>
 						<div className="w-full flex justify-end">
-							<Button type="submit">Submit</Button>
+							{show.loading ? (
+								<button>
+									<Spinner aria-label="Default status example" />
+								</button>
+							) : (
+								<Button type="submit">Submit</Button>
+							)}
 						</div>
 					</form>
 				</Modal.Body>
 			</Modal>
+			<Modal
+				show={show.changeProfilePic}
+				size="md"
+				popup={true}
+				onClose={() => setshow({ ...show, changeProfilePic: false })}
+				id="name modal"
+			>
+				<Modal.Header />
+				<Modal.Body>
+					<div className="space-y-6 px-6 pb-4 sm:pb-6 lg:px-8 xl:pb-8">
+						<h3 className="text-xl font-medium text-gray-900 dark:text-white">
+							Change your profile picture
+						</h3>
+						<div className="space-y-2">
+							<div className="mb-2 block">
+								<Label htmlFor="password" value="Upload image" />
+							</div>
+							<input
+								type="file"
+								name="myImage"
+								accept="image/png, image/gif, image/jpeg, image/jpg"
+								onChange={(e) => validateImage(e)}
+								className="rounded-lg bg-slate-500 text-white"
+							/>
+							<p className="text-xs">Upload image with .jpg, .png, .jpeg</p>
+							<p className="text-xs">Max size 1MB</p>
+						</div>
+						<div className="w-full flex justify-end">
+							{show.loading ? (
+								<button>
+									<Spinner aria-label="Default status example" />
+								</button>
+							) : (
+								<Button onClick={() => onSubmitPP()}>Submit</Button>
+							)}
+						</div>
+					</div>
+				</Modal.Body>
+			</Modal>
+			<Toaster />
 		</div>
 	);
 }

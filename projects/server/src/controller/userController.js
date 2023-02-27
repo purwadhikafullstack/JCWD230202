@@ -1,15 +1,15 @@
 const db = require("../sequelize/models");
 const HTTPStatus = require("../helper/HTTPStatus");
-// Import Hashing 
-const {hashPassword, matchPassword} = require('../lib/hash')
+// Import Hashing
+const { hashPassword, matchPassword } = require("../lib/hash");
 // Import JWT
-const {createToken} = require('../lib/jwt')
+const { createToken } = require("../lib/jwt");
 // Import FileSystem
-const fs = require("fs").promises
+const fs = require("fs").promises;
 // Import Transporter
-const transporter = require('../helper/transporter')
+const transporter = require("../helper/transporter");
 // Import Handlebars
-const handlebars = require('handlebars')
+const handlebars = require("handlebars");
 
 module.exports = {
 	getUser: async (req, res) => {
@@ -312,5 +312,42 @@ module.exports = {
 				data: null,
 			});
 		}
+	},
+	editProfilePic: async (req, res) => {
+		const { token } = req.headers;
+		console.log(token);
+		console.log(req.files);
+
+		// try {
+		// 	let oldPath = await db.user.findOne({
+		// 		where: {
+		// 			uid: token,
+		// 		},
+		// 	});
+		// 	await user.update(
+		// 		{
+		// 			img: req.files.images[0].path,
+		// 		},
+		// 		{
+		// 			where: {
+		// 				uid: token,
+		// 			},
+		// 		}
+		// 	);
+		// 	deleteFiles({ images: oldPath.img });
+
+		// 	res.status(201).send({
+		// 		isError: false,
+		// 		message: "Update Products Success!",
+		// 		data: null,
+		// 	});
+		// } catch (error) {
+		// 	deleteFiles(req.files);
+		// 	res.status(201).send({
+		// 		isError: true,
+		// 		message: error.message,
+		// 		data: error,
+		// 	});
+		// }
 	},
 };
