@@ -15,10 +15,9 @@ function Activation() {
 
 	let onSubmit = async () => {
 		try {
-			let { data } = await axios.patch(
-				`http://localhost:8000/user/activation/uid`,
-				{ uid: location.pathname.slice(12) }
-			);
+			let { data } = await axios.patch(`http://localhost:8000/user/activation/uid`, {
+				uid: location.pathname.slice(12),
+			});
 
 			setTimeout(() => {
 				Navigate("/home");
@@ -32,9 +31,7 @@ function Activation() {
 	return (
 		<div className=" max-h-screen overflow-hidden ">
 			<div className=" mt-[20px] flex content-center justify-center">
-				<h1 className=" font-bold text-4xl font-mandalaFont text-red-700 ">
-					tokonglomerat
-				</h1>
+				<h1 className=" font-bold text-4xl font-mandalaFont text-red-700 ">tokonglomerat</h1>
 			</div>
 			<div className=" flex content-center justify-center max-w-sm h-screen xl:max-w-screen-2xl mx-auto">
 				<div className=" xl:flex-row xl:block">
@@ -50,8 +47,7 @@ function Activation() {
 					</p>
 
 					<p className="flex items-center justify-center font-tokpedFont ml-[15px] mt-[13px] text-[#6d7588] text-[13px]">
-						Join and feel the convenience of making transactions at
-						Tokonglomerat
+						Join and feel the convenience of making transactions at Tokonglomerat
 					</p>
 				</div>
 				<Toaster />

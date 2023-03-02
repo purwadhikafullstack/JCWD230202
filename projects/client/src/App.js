@@ -12,6 +12,10 @@ import Activation from "./pages/activation";
 import ForgotPass from "./pages/forgotpass";
 import Dashboard from "./pages/dashboard";
 import SalesReport from "./components/salesReport";
+import ProductCategory from "./pages/product_category";
+import Checkout from "./pages/checkout";
+import Cart from "./pages/cart";
+
 
 function App() {
 	const location = useLocation();
@@ -62,6 +66,9 @@ function App() {
 						<Route path="/admin" element={<Overview />} />
 						<Route path="/sales-report" element={<SalesReport />} />
 					</Route>
+					<Route path="/category/:product" element={<ProductCategory/>}/>
+					<Route path="/checkout/:cart" element={<Checkout/>}/>
+					<Route path="/cart/:id" element={<Cart/>}/>
 				</Routes>
 			</div>
 		</>
