@@ -17,9 +17,7 @@ export default function LandingPage() {
 	};
 	const getTotalPage = async (branch) => {
 		try {
-			const { data } = await axios.get(
-				`http://localhost:8000/product/totalPage?branch=${branch}`
-			);
+			const { data } = await axios.get(`http://localhost:8000/product/totalPage?branch=${branch}`);
 			const totalPage = [];
 			for (let i = 1; i <= data.data / 10; i++) {
 				totalPage.push(i);
@@ -31,9 +29,7 @@ export default function LandingPage() {
 	};
 	const getAllProduct = async (page) => {
 		try {
-			const { data } = await axios.get(
-				`http://localhost:8000/product?page=${page}`
-			);
+			const { data } = await axios.get(`http://localhost:8000/product?page=${page}`);
 			setproduct(data.data);
 			setselectedpage(page);
 		} catch (error) {
@@ -56,12 +52,18 @@ export default function LandingPage() {
 					? category.map((value, index) => {
 							return (
 								<button key={index} className="space-y-2">
-									<img
-										src={value.img}
-										alt={value.name}
-										className="h-32 w-32 rounded-full overflow-visible shadow-lg"
-									/>
-									<p className="font-semibold">{value.name}</p>
+									<a
+										href={`/category/category=${value.id}&branch=${
+											product ? product[0].branch.id : ""
+										}`}
+									>
+										<img
+											src={value.img}
+											alt={value.name}
+											className="h-32 w-32 border-black border-[2px] rounded-full"
+										/>
+										<p className="font-semibold font-mandalaFont text-xl">{value.name}</p>
+									</a>
 								</button>
 							);
 					  })
@@ -75,11 +77,7 @@ export default function LandingPage() {
 									key={index}
 									className="flex flex-col shadow-md justify-between w-full max-w-sms h-80 bg-white border border-gray-200 rounded-lg dark:bg-gray-800 dark:border-gray-700"
 								>
-									<img
-										className="rounded-t-lg h-44"
-										src={value.product.img}
-										alt="product"
-									/>
+									<img className="rounded-t-lg h-44" src={value.product.img} alt="product" />
 									<div className="px-5 pb-5">
 										<h5 className="text-lg font-semibold tracking-tight text-gray-900 dark:text-white">
 											{value.product.name}

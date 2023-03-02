@@ -6,17 +6,16 @@ import LoadingSpin from "react-loading-spin";
 import axios from "axios";
 import { toast, Toaster } from "react-hot-toast";
 function UpdatePassword() {
-	
 	const [showPassword, setshowPassword] = useState(false);
 	const [showconfPass, setshowconfPass] = useState(false);
 	const [message, setmessage] = useState();
 	const [disable, setdisable] = useState(false);
 	const [msg, setmsg] = useState();
-	
+
 	const Navigate = useNavigate();
 
-	const pass = useRef()
-	const confPass = useRef()
+	const pass = useRef();
+	const confPass = useRef();
 
 	const location = useLocation();
 
@@ -24,14 +23,15 @@ function UpdatePassword() {
 		try {
 			setdisable(true);
 
-			let { data } = await axios.patch(
-				"http://localhost:8000/user/reset-password/uid",
-				{ uid: location.pathname.slice(16), password: pass.current.value, confPassword: confPass.current.value }
-			);
+			let { data } = await axios.patch("http://localhost:8000/user/reset-password/uid", {
+				uid: location.pathname.slice(16),
+				password: pass.current.value,
+				confPassword: confPass.current.value,
+			});
 
 			toast.success(data.message);
-			pass.current.value = ''
-			confPass.current.value = ''
+			pass.current.value = "";
+			confPass.current.value = "";
 
 			setTimeout(() => {
 				Navigate("/login");
@@ -47,11 +47,7 @@ function UpdatePassword() {
 			setmessage("Please input your new password");
 		} else if (value.length < 8) {
 			setmessage("Password less than 8 character, please input more");
-		} else if (
-			!/^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*[a-zA-Z])([a-zA-Z0-9]+)$/.test(
-				value
-			)
-		) {
+		} else if (!/^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*[a-zA-Z])([a-zA-Z0-9]+)$/.test(value)) {
 			setmessage("Password must contain number and capital");
 		} else {
 			setmessage("");
@@ -62,11 +58,7 @@ function UpdatePassword() {
 			setmsg("Please input your confirm password");
 		} else if (value.length < 8) {
 			setmsg("Password less than 8 character, please input more");
-		} else if (
-			!/^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*[a-zA-Z])([a-zA-Z0-9]+)$/.test(
-				value
-			)
-		) {
+		} else if (!/^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*[a-zA-Z])([a-zA-Z0-9]+)$/.test(value)) {
 			setmsg("Password must contain number and capital");
 		} else {
 			setmsg("");
@@ -95,10 +87,7 @@ function UpdatePassword() {
 						</h1>
 
 						<div className="flex flex-col relative my-5 items-start gap-y-3">
-							<label
-								htmlFor="password"
-								className="text-sm font-medium cursor-pointer"
-							>
+							<label htmlFor="password" className="text-sm font-medium cursor-pointer">
 								New Password
 							</label>
 
@@ -114,25 +103,16 @@ function UpdatePassword() {
 							</div>
 							<div className=" text-2xl absolute right-5 top-12">
 								{showPassword ? (
-									<AiFillEye
-										onClick={() =>
-											setshowPassword((showPassword) => !showPassword)
-										}
-									/>
+									<AiFillEye onClick={() => setshowPassword((showPassword) => !showPassword)} />
 								) : (
 									<AiFillEyeInvisible
-										onClick={() =>
-											setshowPassword((showPassword) => !showPassword)
-										}
+										onClick={() => setshowPassword((showPassword) => !showPassword)}
 									/>
 								)}
 							</div>
 						</div>
 						<div className="flex flex-col relative items-start gap-y-3">
-							<label
-								htmlFor="password"
-								className="text-sm font-medium cursor-pointer"
-							>
+							<label htmlFor="password" className="text-sm font-medium cursor-pointer">
 								Confirm Password
 							</label>
 
@@ -142,21 +122,16 @@ function UpdatePassword() {
 								type={showconfPass ? "text" : "password"}
 								className="w-full p-4 bg-transparent border border-gray-200 rounded-lg outline-red-700"
 								placeholder="Confirm your new password"
-							/><div className=" text-red-700 font-tokpedFont text-sm font-semibold ">
-							{msg ? msg : null}
-						</div>
+							/>
+							<div className=" text-red-700 font-tokpedFont text-sm font-semibold ">
+								{msg ? msg : null}
+							</div>
 							<div className=" text-2xl absolute right-5 top-12">
 								{showconfPass ? (
-									<AiFillEye
-										onClick={() =>
-											setshowconfPass((showconfPass) => !showconfPass)
-										}
-									/>
+									<AiFillEye onClick={() => setshowconfPass((showconfPass) => !showconfPass)} />
 								) : (
 									<AiFillEyeInvisible
-										onClick={() =>
-											setshowconfPass((showconfPassword) => !showconfPassword)
-										}
+										onClick={() => setshowconfPass((showconfPassword) => !showconfPassword)}
 									/>
 								)}
 							</div>
@@ -169,11 +144,7 @@ function UpdatePassword() {
 							className="inline-flex w-full items-center justify-center mt-8 px-8 py-4 font-sans font-semibold tracking-wide hover:bg-gray-300 text-white bg-red-700 rounded-lg h-[60px]"
 						>
 							{disable ? (
-								<LoadingSpin
-									size={"30px"}
-									primaryColor={"red"}
-									secondaryColor={"gray"}
-								/>
+								<LoadingSpin size={"30px"} primaryColor={"red"} secondaryColor={"gray"} />
 							) : (
 								"Submit"
 							)}

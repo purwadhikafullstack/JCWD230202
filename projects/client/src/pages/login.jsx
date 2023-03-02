@@ -44,9 +44,7 @@ function Login() {
 	let onValidateEmail = (value) => {
 		if (value === "") {
 			seterrEmail("Please input your email");
-		} else if (
-			!/^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$/i.test(value)
-		) {
+		} else if (!/^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$/i.test(value)) {
 			seterrEmail("Format Email Invalid");
 		} else {
 			seterrEmail("");
@@ -57,11 +55,7 @@ function Login() {
 			seterrPass("Please input your password");
 		} else if (value.length < 8) {
 			seterrPass("Password less than 8 character, please input more");
-		} else if (
-			!/^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*[a-zA-Z])([a-zA-Z0-9]+)$/.test(
-				value
-			)
-		) {
+		} else if (!/^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*[a-zA-Z])([a-zA-Z0-9]+)$/.test(value)) {
 			seterrPass("Password must contain number and capital");
 		} else {
 			seterrPass("");
@@ -90,10 +84,7 @@ function Login() {
 						</h1>
 
 						<div className="flex flex-col items-start mb-5 gap-y-3">
-							<label
-								htmlFor="email"
-								className="text-sm font-medium cursor-pointer"
-							>
+							<label htmlFor="email" className="text-sm font-medium cursor-pointer">
 								Email
 							</label>
 							<input
@@ -109,10 +100,7 @@ function Login() {
 							</div>
 						</div>
 						<div className="flex flex-col relative items-start gap-y-3">
-							<label
-								htmlFor="password"
-								className="text-sm font-medium cursor-pointer"
-							>
+							<label htmlFor="password" className="text-sm font-medium cursor-pointer">
 								Password
 							</label>
 
@@ -129,16 +117,10 @@ function Login() {
 							</div>
 							<div className=" text-2xl absolute right-5 top-12">
 								{showPassword ? (
-									<AiFillEye
-										onClick={() =>
-											setshowPassword((showPassword) => !showPassword)
-										}
-									/>
+									<AiFillEye onClick={() => setshowPassword((showPassword) => !showPassword)} />
 								) : (
 									<AiFillEyeInvisible
-										onClick={() =>
-											setshowPassword((showPassword) => !showPassword)
-										}
+										onClick={() => setshowPassword((showPassword) => !showPassword)}
 									/>
 								)}
 							</div>
@@ -156,11 +138,7 @@ function Login() {
 							className="inline-flex w-full items-center justify-center mt-8 px-8 py-4 font-sans font-semibold tracking-wide hover:bg-gray-300 text-white bg-red-700 rounded-lg h-[60px]"
 						>
 							{disable ? (
-								<LoadingSpin
-									size={"30px"}
-									primaryColor={"red"}
-									secondaryColor={"gray"}
-								/>
+								<LoadingSpin size={"30px"} primaryColor={"red"} secondaryColor={"gray"} />
 							) : (
 								"Login"
 							)}
