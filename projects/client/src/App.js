@@ -98,6 +98,10 @@ function App() {
 					<Route path="/" element={<Dashboard />}>
 						{/* <Route path="/admin" element={<Overview />} /> */}
 						<Route path="/sales-report" element={<SalesReport />} />
+						<Route
+							path="/branch-admin-register"
+							element={<BranchAdminRegister />}
+						/>
 					</Route>
 					<Route path="/category/:product" element={<ProductCategory/>}/>
 					<Route path="/checkout/:cart" element={<Checkout/>}/>
