@@ -16,10 +16,9 @@ function ForgotPass() {
 		try {
 			setdisable(true);
 
-			let { data } = await axios.post(
-				"http://localhost:8000/user/forgot-password",
-				{ email: email.current.value }
-			);
+			let { data } = await axios.post("http://localhost:8000/user/forgot-password", {
+				email: email.current.value,
+			});
 			toast.success(data.message);
 			email.current.value = "";
 			setTimeout(() => {
@@ -34,9 +33,7 @@ function ForgotPass() {
 	let onValidateEmail = (value) => {
 		if (value === "") {
 			setmessage("Please input your email");
-		} else if (
-			!/^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$/i.test(value)
-		) {
+		} else if (!/^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$/i.test(value)) {
 			setmessage("Format Email Invalid");
 		} else {
 			setmessage("");
@@ -65,10 +62,7 @@ function ForgotPass() {
 						</h1>
 
 						<div className="flex flex-col items-start mb-5 gap-y-3">
-							<label
-								htmlFor="email"
-								className="text-sm font-medium cursor-pointer"
-							>
+							<label htmlFor="email" className="text-sm font-medium cursor-pointer">
 								Email
 							</label>
 							<input
@@ -90,11 +84,7 @@ function ForgotPass() {
 							className="inline-flex w-full items-center justify-center mt-8 px-8 py-4 font-sans font-semibold tracking-wide hover:bg-gray-300 text-white bg-red-700 rounded-lg h-[60px]"
 						>
 							{disable ? (
-								<LoadingSpin
-									size={"30px"}
-									primaryColor={"red"}
-									secondaryColor={"gray"}
-								/>
+								<LoadingSpin size={"30px"} primaryColor={"red"} secondaryColor={"gray"} />
 							) : (
 								"Submit"
 							)}
