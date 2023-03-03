@@ -1,6 +1,7 @@
 const db = require("../sequelize/models");
-const sequelize = require("sequelize");
+// const sequelize = require("sequelize");
 const { Op } = require("sequelize");
+const { sequelize } = require("../sequelize/models");
 
 module.exports = {
 	salesReport: async (req, res) => {
@@ -150,7 +151,7 @@ module.exports = {
 							data = await db.transaction.findAll({
 								attributes: [
 									"id",
-									'qty',
+									"qty",
 									"user_id",
 									"createdAt",
 									"invoice_no",
@@ -177,7 +178,7 @@ module.exports = {
 							data = await db.transaction.findAll({
 								attributes: [
 									"id",
-									'qty',
+									"qty",
 									"user_id",
 									"createdAt",
 									"invoice_no",
@@ -687,5 +688,103 @@ module.exports = {
 				data,
 			});
 		}
+	},
+
+	adminRegister: async (req, res) => {
+		const t = await sequelize.transaction();
+		try {
+			let { email, password, branch_id } = req.body;
+
+			let token = req.headers;
+
+			let admin = await db.user.findOne(
+				{
+					where: {
+						uid: token.token,
+					},
+				},
+				{ transaction: t }
+			);
+
+			let role = admin.dataValues.role;
+			console.log(role, "role");
+
+			if (role === "super admin") {
+				if (!email.length || !password.length) {
+					return res.status(404).send({
+						isError: true,
+						message: "data not found",
+						data: null,
+					});
+				}
+
+				let resFindBranchById = await db.branch.findOne(
+					{
+						where: {
+							id: branch_id,
+						},
+					},
+					{ transaction: t }
+				);
+
+				let adminBranchLocation = resFindBranchById.dataValues.location;
+
+				var resCreateAdmin = await db.user.create(
+					{
+						name: `branch admin ${adminBranchLocation}`,
+						email,
+						password,
+						role: "branch admin",
+						status: true,
+					},
+					{ transaction: t }
+				);
+
+				let userIdUpdate = resCreateAdmin.id;
+				console.log(userIdUpdate, "tess id");
+
+				await db.branch.update(
+					{
+						user_id: userIdUpdate,
+					},
+					{
+						where: {
+							id: branch_id,
+						},
+						transaction: t,
+					}
+				);
+			}
+
+			t.commit();
+
+			res.status(201).send({
+				isError: false,
+				message: "register success",
+				data: null,
+			});
+		} catch (error) {
+			t.rollback();
+			res.status(404).send({
+				isError: true,
+				message: error.message,
+				data: null,
+			});
+		}
+	},
+
+	getBranchAdmin: async (req, res) => {
+		try {
+			let data = await db.branch.findAll({
+				where: {
+					user_id: null,
+				},
+			});
+			res.status(200).send({
+				isError: false,
+				message: "get branch success",
+				data,
+			});
+		} catch (error) {}
 	},
 };

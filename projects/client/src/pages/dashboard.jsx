@@ -37,152 +37,151 @@ export default function Dashboard(params) {
 						class="h-6 w-6 mr-3 sm:h-6"
 						alt="FlowBite Logo"
 					/>
-					<span class="self-center text-md font-semibold sm:text-xl whitespace-nowrap text-red-700 dark:text-white">
+					<span class="self-center font-mandalaFont text-md font-semibold sm:text-xl whitespace-nowrap text-red-700 dark:text-white">
 						tokonglomerat
 					</span>
 				</a>
 			</nav>
 
-			{
-            admin=== true? 
-            <div
-				id="dropdown"
-				class=" z-30 mt-6 ml-4  bg-white divide-y divide-gray-100 rounded-lg shadow w-44 dark:bg-gray-700 absolute left-0"
-				hidden={navmenu}
-			>
-				<ul
-					class="py-2 text-sm text-gray-700 dark:text-gray-200"
-					aria-labelledby="dropdownDefaultButton"
+			{admin === true ? (
+				<div
+					id="dropdown"
+					class=" z-30 mt-6 ml-4  bg-white divide-y divide-gray-100 rounded-lg shadow w-44 dark:bg-gray-700 absolute left-0"
+					hidden={navmenu}
 				>
-					<li>
-						<a
-							href="#"
-							class="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white"
-						>
-							Overview
-						</a>
-					</li>
-					<li>
-						<a
-							href="#"
-							class="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white"
-						>
-							Branch Admin Register
-						</a>
-					</li>
-               <li>
-						<a
-							href="#"
-							class="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white"
-						>
-							Transaction
-						</a>
-					</li>
-               <li>
-						<a
-							href="#"
-							class="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white"
-						>
-							Sales Report
-						</a>
-					</li>
-               <li>
-						<a
-							href="#"
-							class="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white"
-						>
-							Discount Management
-						</a>
-					</li>
-               <li>
-						<a
-							href="#"
-							class="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white"
-						>
-							Stock History
-						</a>
-					</li>
-					<li>
-						<a
-							href="#"
-							class="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white"
-						>
-							Sign out
-						</a>
-					</li>
-				</ul>
-			</div>
-         :
-         <div
-				id="dropdown"
-				class=" z-30 mt-6 ml-4  bg-white divide-y divide-gray-100 rounded-lg shadow w-44 dark:bg-gray-700 absolute left-0"
-				hidden={navmenu}
-			>
-				<ul
-					class="py-2 text-sm text-gray-700 dark:text-gray-200"
-					aria-labelledby="dropdownDefaultButton"
+					<ul
+						class="py-2 text-sm text-gray-700 dark:text-gray-200"
+						aria-labelledby="dropdownDefaultButton"
+					>
+						<li>
+							<a
+								href="#"
+								class="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white"
+							>
+								Overview
+							</a>
+						</li>
+						<li>
+							<a
+								href="#"
+								class="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white"
+							>
+								Branch Admin Register
+							</a>
+						</li>
+						<li>
+							<a
+								href="#"
+								class="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white"
+							>
+								Transaction
+							</a>
+						</li>
+						<li>
+							<a
+								href="#"
+								class="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white"
+							>
+								Sales Report
+							</a>
+						</li>
+						<li>
+							<a
+								href="#"
+								class="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white"
+							>
+								Discount Management
+							</a>
+						</li>
+						<li>
+							<a
+								href="#"
+								class="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white"
+							>
+								Stock History
+							</a>
+						</li>
+						<li>
+							<a
+								href="#"
+								class="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white"
+							>
+								Sign out
+							</a>
+						</li>
+					</ul>
+				</div>
+			) : (
+				<div
+					id="dropdown"
+					class=" z-30 mt-6 ml-4  bg-white divide-y divide-gray-100 rounded-lg shadow w-44 dark:bg-gray-700 absolute left-0"
+					hidden={navmenu}
 				>
-					<li>
-						<a
-							href="#"
-							class="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white"
-						>
-							Overview
-						</a>
-					</li>
-					<li>
-						<a
-							href="#"
-							class="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white"
-						>
-							Product Management
-						</a>
-					</li>
-               <li>
-						<a
-							href="#"
-							class="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white"
-						>
-							Transaction
-						</a>
-					</li>
-               <li>
-						<a
-							href="#"
-							class="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white"
-						>
-							Sales Report
-						</a>
-					</li>
-               <li>
-						<a
-							href="#"
-							class="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white"
-						>
-							Discount Management
-						</a>
-					</li>
-               <li>
-						<a
-							href="#"
-							class="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white"
-						>
-							Stock History
-						</a>
-					</li>
-					<li>
-						<a
-							href="#"
-							class="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white"
-						>
-							Sign out
-						</a>
-					</li>
-				</ul>
-			</div>
-         }
+					<ul
+						class="py-2 text-sm text-gray-700 dark:text-gray-200"
+						aria-labelledby="dropdownDefaultButton"
+					>
+						<li>
+							<a
+								href="#"
+								class="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white"
+							>
+								Overview
+							</a>
+						</li>
+						<li>
+							<a
+								href="#"
+								class="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white"
+							>
+								Product Management
+							</a>
+						</li>
+						<li>
+							<a
+								href="#"
+								class="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white"
+							>
+								Transaction
+							</a>
+						</li>
+						<li>
+							<a
+								href="#"
+								class="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white"
+							>
+								Sales Report
+							</a>
+						</li>
+						<li>
+							<a
+								href="#"
+								class="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white"
+							>
+								Discount Management
+							</a>
+						</li>
+						<li>
+							<a
+								href="#"
+								class="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white"
+							>
+								Stock History
+							</a>
+						</li>
+						<li>
+							<a
+								href="#"
+								class="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white"
+							>
+								Sign out
+							</a>
+						</li>
+					</ul>
+				</div>
+			)}
 
-			{admin === true ? 
+			{admin === true ? (
 				<aside
 					id="logo-sidebar"
 					class="fixed top-0 left-0 z-50 w-64 h-screen pt-10 max-[640px]:hidden bg-white border-r border-gray-200 sm:translate-x-0 dark:bg-gray-800 dark:border-gray-700"
@@ -200,12 +199,11 @@ export default function Dashboard(params) {
 					</a>
 					<div class="h-full pt-10 px-3 pb-4 overflow-y-auto bg-white dark:bg-gray-800">
 						<div className="w-full flex-row items-center ">
-							
 							<img
 								src="https://www.w3schools.com/howto/img_avatar.png"
 								className="mx-16 rounded-full h-20 w-20"
 							/>
-                     <h1 className="pt-6 text-center mb-6">Hi Super Admin</h1>
+							<h1 className="pt-6 text-center mb-6">Hi Super Admin</h1>
 						</div>
 						<ul class="space-y-2">
 							<li>
@@ -345,7 +343,7 @@ export default function Dashboard(params) {
 						</ul>
 					</div>
 				</aside>
-			 : 
+			) : (
 				<aside
 					id="logo-sidebar"
 					class="fixed top-0 left-0 z-40 w-64 h-screen pt-20 transition-transform -translate-x-full bg-white border-r border-gray-200 sm:translate-x-0 dark:bg-gray-800 dark:border-gray-700"
@@ -491,13 +489,11 @@ export default function Dashboard(params) {
 						</ul>
 					</div>
 				</aside>
-			}
+			)}
 
 			<div class="p-4 h-screen max-[640px]:mt-20 sm:ml-64">
-                <Outlet/>
+				<Outlet />
 			</div>
-         
-    
 		</div>
 	);
 }
