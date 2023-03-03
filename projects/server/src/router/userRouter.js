@@ -4,9 +4,21 @@ const Router = express.Router();
 const { tokenVerify } = require("../middleware/verifyToken");
 const upload = require("../middleware/upload");
 
-Router.get("/profile", userController.getUser);
-Router.patch("/profile/picture", userController.editProfilePic);
-Router.patch("/edit", userController.updateUser);
+Router.get("/profile", tokenVerify, userController.getUser);
+Router.delete("/delete-address/:id", tokenVerify, userController.deleteAddress);
+Router.patch("/main-address/:id", tokenVerify, userController.defaultAddress);
+Router.patch(
+	"/profile/picture",
+	tokenVerify,
+	upload,
+	userController.editProfilePic
+);
+Router.patch(
+	"/profile/change-password",
+	tokenVerify,
+	userController.changePassword
+);
+Router.patch("/edit", tokenVerify, userController.updateUser);
 Router.post("/register", userController.register);
 Router.post("/login", userController.login);
 Router.post("/keep-login", tokenVerify, userController.keepLogin);

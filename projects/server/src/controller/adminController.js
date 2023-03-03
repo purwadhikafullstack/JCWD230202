@@ -150,7 +150,7 @@ module.exports = {
 							data = await db.transaction.findAll({
 								attributes: [
 									"id",
-									'qty',
+									"qty",
 									"user_id",
 									"createdAt",
 									"invoice_no",
@@ -177,7 +177,7 @@ module.exports = {
 							data = await db.transaction.findAll({
 								attributes: [
 									"id",
-									'qty',
+									"qty",
 									"user_id",
 									"createdAt",
 									"invoice_no",
