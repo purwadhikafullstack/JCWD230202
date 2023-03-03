@@ -1,4 +1,5 @@
 import "./App.css";
+import REST_API from "./support/services/RESTApiService";
 import { Routes, Route, useLocation } from "react-router-dom";
 import LandingPage from "./pages/landingPage";
 import NavigationBar from "./components/navbar";
@@ -21,9 +22,36 @@ function App() {
 	const location = useLocation();
 	const [name, setname] = useState("");
 	const [redirect, setredirect] = useState(false);
+	const [profile, setprofile] = useState({
+		name: "",
+		birthdate: "",
+		gender: "",
+		email: "",
+		phone_number: "",
+		profile_picture: "",
+		address: "",
+	});
+	const getProfile = async () => {
+		const { data } = await REST_API({
+			url: "user/profile",
+			method: "GET",
+		});
+
+		setprofile({
+			...profile,
+			name: data.data.name,
+			birthdate: data.data.birthdate,
+			gender: data.data.gender,
+			email: data.data.email,
+			phone_number: data.data.phone_number,
+			profile_picture: data.data.img,
+			address: data.data.user_addresses,
+		});
+	};
 
 	useEffect(() => {
 		// checkIsLogin();
+		getProfile();
 	}, []);
 
 	let checkIsLogin = async () => {
@@ -51,19 +79,24 @@ function App() {
 	return (
 		<>
 			{location.pathname === "/home" || location.pathname === "/profile" ? (
-				<NavigationBar data={{ name }} myFunc={{ onLogout }} />
+				<NavigationBar state={{ name, profile }} Func={{ onLogout }} />
 			) : null}
 			<div className="relative">
 				<Routes>
 					<Route path="/home" element={<LandingPage />} />
-					<Route path="/profile" element={<Profile />} />
+					<Route
+						path="/profile"
+						element={
+							<Profile func={{ getProfile }} state={{ profile, setprofile }} />
+						}
+					/>
 					<Route path="/login" element={<Login />} />
 					<Route path="/updatePassword/:uid" element={<UpdatePassword />} />
 					<Route path="/register" element={<Register />} />
 					<Route path="/activation/:uid" element={<Activation />} />
 					<Route path="/forgotpassword" element={<ForgotPass />} />
 					<Route path="/" element={<Dashboard />}>
-						<Route path="/admin" element={<Overview />} />
+						{/* <Route path="/admin" element={<Overview />} /> */}
 						<Route path="/sales-report" element={<SalesReport />} />
 					</Route>
 					<Route path="/category/:product" element={<ProductCategory/>}/>

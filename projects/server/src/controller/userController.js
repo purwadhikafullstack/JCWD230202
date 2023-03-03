@@ -1,41 +1,63 @@
 const db = require("../sequelize/models");
 const HTTPStatus = require("../helper/HTTPStatus");
-// Import Hashing 
-const {hashPassword, matchPassword} = require('../lib/hash')
+// Import Hashing
+const { hashPassword, matchPassword } = require("../lib/hash");
 // Import JWT
-const {createToken} = require('../lib/jwt')
+const { createToken } = require("../lib/jwt");
 // Import FileSystem
-const fs = require("fs").promises
+const fs = require("fs").promises;
 // Import Transporter
-const transporter = require('../helper/transporter')
+const transporter = require("../helper/transporter");
 // Import Handlebars
-const handlebars = require('handlebars')
+const handlebars = require("handlebars");
+const { where } = require("sequelize");
+const deleteFiles = require("../helper/deleteFiles");
+const { sequelize } = require("../sequelize/models");
 
 module.exports = {
 	getUser: async (req, res) => {
-		const { token } = req.headers;
+		const { uid } = req.uid;
 		try {
-			const data = await db.user.findOne({
-				where: { uid: token },
+			const {
+				name,
+				email,
+				gender,
+				birthdate,
+				phone_number,
+				img,
+				user_addresses,
+			} = await db.user.findOne({
+				where: { uid },
+				include: { model: db.user_address },
 			});
-			const httpStatus = new HTTPStatus(res, data).success("Get user profile");
+			const httpStatus = new HTTPStatus(res, {
+				name,
+				email,
+				gender,
+				birthdate,
+				phone_number,
+				img,
+				user_addresses,
+			}).success("Get user profile");
 			httpStatus.send();
 		} catch (error) {
+			console.log(error);
+
 			res.status(400).send({
-				isError: false,
+				isError: true,
 				message: error.message,
 				data: error,
 			});
 		}
 	},
 	updateUser: async (req, res) => {
-		const { token } = req.headers;
+		const { uid } = req.uid;
 		const { name, birthdate, gender, email, phone_number } = req.body;
 		try {
 			const data = await db.user.update(
 				{ name, birthdate, gender, email, phone_number },
 				{
-					where: { uid: token },
+					where: { uid },
 				}
 			);
 			const httpStatus = new HTTPStatus(res, data).success("Get user profile");
@@ -310,6 +332,118 @@ module.exports = {
 				isError: true,
 				message: error.message,
 				data: null,
+			});
+		}
+	},
+	editProfilePic: async (req, res) => {
+		const { uid } = req.uid;
+
+		try {
+			let { img } = await db.user.findOne({
+				where: {
+					uid,
+				},
+			});
+			await db.user.update(
+				{
+					img: req.files.images[0].path,
+				},
+				{
+					where: {
+						uid,
+					},
+				}
+			);
+
+			deleteFiles(img);
+
+			res.status(201).send({
+				isError: false,
+				message: "Update Products Success!",
+				data: null,
+			});
+		} catch (error) {
+			deleteFiles(req.files);
+			res.status(400).send({
+				isError: true,
+				message: error.message,
+				data: error,
+			});
+		}
+	},
+	changePassword: async (req, res) => {
+		const { uid } = req.uid;
+		const { oldPassword, newPassword } = req.body;
+		try {
+			const data = await db.user.findOne({ where: { uid: token } });
+			if (oldPassword !== data.password) {
+				return res.status(400).send({
+					isError: true,
+					message: "Invalid password",
+					data: null,
+				});
+			}
+			await db.user.update(
+				{ password: newPassword },
+				{ where: { uid: token } }
+			);
+			res.status(201).send({
+				isError: false,
+				message: "Password updated",
+				data: null,
+			});
+		} catch (error) {
+			res.status(400).send({
+				isError: true,
+				message: error.message,
+				data: error,
+			});
+		}
+	},
+	deleteAddress: async (req, res) => {
+		const { id } = req.params;
+		try {
+			await db.user_address.destroy({ where: { id } });
+			res.status(201).send({
+				isError: false,
+				message: "Address deleted",
+				data: null,
+			});
+		} catch (error) {
+			res.status(400).send({
+				isError: true,
+				message: error.message,
+				data: error,
+			});
+		}
+	},
+	defaultAddress: async (req, res) => {
+		const { id } = req.params;
+		const { uid } = req.uid;
+		const t = await sequelize.transaction();
+		try {
+			await db.user_address.update(
+				{ main_address: false },
+				{ where: { main_address: true } },
+				{ transaction: t }
+			);
+			await db.user_address.update(
+				{ main_address: true },
+				{ where: { id } },
+				{ transaction: t }
+			);
+			t.commit();
+			res.status(201).send({
+				isError: false,
+				message: "Default address updated",
+				data: null,
+			});
+		} catch (error) {
+			t.rollback();
+			res.status(400).send({
+				isError: true,
+				message: error.message,
+				data: error,
 			});
 		}
 	},

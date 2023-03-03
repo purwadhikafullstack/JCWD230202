@@ -31,7 +31,7 @@ module.exports = (sequelize, DataTypes) => {
 				},
 			},
 			receiver_phone: {
-				type: DataTypes.INTEGER,
+				type: DataTypes.STRING,
 				allowNull: false,
 				validate: {
 					notNull: { msg: "Receiver must have a phone number" },
