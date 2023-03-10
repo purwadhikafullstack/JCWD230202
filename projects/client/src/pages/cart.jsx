@@ -4,14 +4,17 @@ import { RxMinusCircled } from "react-icons/rx";
 import { RxPlusCircled } from "react-icons/rx";
 import { useEffect, useState } from "react";
 // import { API } from "../support/services/restAPI";
-import axios from 'axios'
+import axios from "axios";
 
 export default function Cart() {
 	const [data, setdata] = useState();
 
 	let onGetCart = async () => {
 		try {
-			let { data } = await axios.post("http://localhost:8000/cart/get", { id: 4, branch_id: 1 });
+			let { data } = await axios.post("http://localhost:8000/cart/get", {
+				id: 4,
+				branch_id: 1,
+			});
 			console.log(data.data);
 			setdata(data.data);
 		} catch (error) {
@@ -21,11 +24,17 @@ export default function Cart() {
 	let updateQuantity = async (value, operation, quantity) => {
 		try {
 			if (operation === "+") {
-				const data = await axios.post("http://localhost:8000/cart/inc", { id: value, quantity: quantity });
+				const data = await axios.post("http://localhost:8000/cart/inc", {
+					id: value,
+					quantity: quantity,
+				});
 				console.log(data);
 				onGetCart();
 			} else if (operation === "-") {
-				const data = await axios.post("http://localhost:8000/cart/dec", { id: value, quantity: quantity });
+				const data = await axios.post("http://localhost:8000/cart/dec", {
+					id: value,
+					quantity: quantity,
+				});
 				console.log(data);
 				onGetCart();
 			}
@@ -42,7 +51,9 @@ export default function Cart() {
 				<NavigationBar />
 			</div>
 			<div className=" max-w-[1120px] mx-auto ">
-				<div className=" pl-5 flex items-end h-[66px] border-b-4 font-bold ">Cart</div>
+				<div className=" pl-5 flex items-end h-[66px] border-b-4 font-bold ">
+					Cart
+				</div>
 
 				<div className="flex px-5 ">
 					<div className=" w-[685px]">
@@ -60,7 +71,11 @@ export default function Cart() {
 												</div>
 												<div className=" h-[156px] flex flex-row pt-5 border-b">
 													<div className=" h-[135px] w-[364px] flex ">
-														<img className=" h-[60px] w-[60px]" src={value.product.img} />
+														<img
+															className=" h-[60px] w-[60px]"
+															src={value.product.img}
+															alt=""
+														/>
 														<div className=" h-[93px] my-[7px] ">
 															<p className=" pl-[15px] font-tokpedFont text-[14px]">
 																{value.product.name}
@@ -82,7 +97,9 @@ export default function Cart() {
 														<div className=" flex items-center pt-4 gap-1">
 															<button
 																disabled={value.qty <= 1 ? true : false}
-																onClick={() => updateQuantity(value.id, "-", value.qty)}
+																onClick={() =>
+																	updateQuantity(value.id, "-", value.qty)
+																}
 															>
 																<RxMinusCircled size={20} />
 															</button>
@@ -92,11 +109,19 @@ export default function Cart() {
 															/>
 															<button
 																disabled={
-																	value.qty >= value.product.branch_products[0].stock ? true : false
+																	value.qty >=
+																	value.product.branch_products[0].stock
+																		? true
+																		: false
 																}
-																onClick={() => updateQuantity(value.id, "+", value.qty)}
+																onClick={() =>
+																	updateQuantity(value.id, "+", value.qty)
+																}
 															>
-																<RxPlusCircled size={20} className=" text-green-500 font-bold " />
+																<RxPlusCircled
+																	size={20}
+																	className=" text-green-500 font-bold "
+																/>
 															</button>
 														</div>
 													</div>
@@ -126,9 +151,13 @@ export default function Cart() {
 						</div>
 						<p className=" mt-4 text-slate-500 text-[11px]">
 							Dengan mengaktifkan asuransi, Saya menyetujui{" "}
-							<p className=" text-red-700">syarat dan ketentuan yang berlaku.</p>
+							<p className=" text-red-700">
+								syarat dan ketentuan yang berlaku.
+							</p>
 						</p>
-						<button className=" mt-6 h-12 w-full text-white bg-red-700 rounded-lg ">Payment</button>
+						<button className=" mt-6 h-12 w-full text-white bg-red-700 rounded-lg ">
+							Payment
+						</button>
 					</div>
 				</div>
 			</div>

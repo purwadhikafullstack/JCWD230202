@@ -1,46 +1,62 @@
 import axios from "axios";
 
 const REST_API = axios.create({
-	baseURL: "http://localhost:8000/",
+	baseURL: "http://localhost:8000",
 	headers: { token: localStorage.getItem("token") },
 });
 
-export default REST_API;
-// const REST_API = () => {
-// 	const defaultHeaders = {
-// 		token: localStorage.getItem("token"), //token
-// 	};
-// 	const get = async (url, headers) => {
+// const REST_API = {
+// 	get: async (url, headers = {}) => {
 // 		try {
-// 			const result = await axios.get(`http://localhost:8000/${url}`, {
-// 				headers: { ...defaultHeaders },
+// 			const { data: result } = await AXIOS({ url, method: "GET", headers });
+// 			return result;
+// 		} catch (error) {
+// 			toast.error(error.message);
+// 			console.log(error);
+// 		}
+// 	},
+// 	post: async (url, data, headers = {}) => {
+// 		try {
+// 			const { data: result } = await AXIOS({
+// 				url,
+// 				data,
+// 				method: "POST",
+// 				headers,
 // 			});
 // 			return result;
 // 		} catch (error) {
+// 			toast.error(error.message);
 // 			console.log(error);
 // 		}
-// 	};
-// 	const post = async (url, payload, headers) => {
+// 	},
+// 	patch: async (url, data, headers) => {
 // 		try {
-// 			const result = await axios.get(`http://localhost:8000/${url}`, payload, {
-// 				headers: { ...defaultHeaders, ...headers },
+// 			const { data: result } = await AXIOS({
+// 				url,
+// 				data,
+// 				method: "PATCH",
+// 				headers,
 // 			});
 // 			return result;
 // 		} catch (error) {
+// 			toast.error(error.message);
 // 			console.log(error);
 // 		}
-// 	};
-// 	const patch = async (url, payload, headers) => {
+// 	},
+// 	delete: async (url, data, headers) => {
 // 		try {
-// 			const result = await axios.get(`http://localhost:8000/${url}`, payload, {
-// 				headers: { ...defaultHeaders, ...headers },
+// 			const { data: result } = await AXIOS({
+// 				url,
+// 				data,
+// 				method: "DELETE",
+// 				headers,
 // 			});
 // 			return result;
 // 		} catch (error) {
+// 			toast.error(error.message);
 // 			console.log(error);
 // 		}
-// 	};
-// 	return { get, post, patch };
+// 	},
 // };
 
-// export default REST_API;
+export default REST_API;

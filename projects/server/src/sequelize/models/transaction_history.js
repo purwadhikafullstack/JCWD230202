@@ -7,19 +7,21 @@ module.exports = (sequelize, DataTypes) => {
 		 * This method is not a part of Sequelize lifecycle.
 		 * The `models/index` file will call this method automatically.
 		 */
-		static associate({ transaction }) {
+		static associate({}) {
 			// define association here
-			this.belongsTo(transaction, { foreignKey: "transaction_id" });
 		}
 	}
 	transaction_history.init(
 		{
 			status: DataTypes.STRING,
+			invoice: DataTypes.STRING,
 		},
 		{
 			sequelize,
 			modelName: "transaction_history",
 			freezeTableName: true,
+			timestamps: true,
+			updatedAt: false,
 		}
 	);
 	return transaction_history;

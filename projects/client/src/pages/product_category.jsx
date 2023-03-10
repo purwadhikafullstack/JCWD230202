@@ -6,7 +6,7 @@ import NavigationBar from "../components/navbar";
 import { SlClose } from "react-icons/sl";
 import LoadingSpin from "react-loading-spin";
 import { toast, Toaster } from "react-hot-toast";
-import axios from 'axios'
+import axios from "axios";
 
 export default function ProductCategory() {
 	const params = useParams();
@@ -25,7 +25,9 @@ export default function ProductCategory() {
 			const { data } = await axios.get(
 				`http://localhost:8000/product/branch_product?category=${params.product
 					.split("&")[0]
-					.slice(-1)}&branch=${params.product.split("&")[1].slice(-1)}&page=${page}`
+					.slice(-1)}&branch=${params.product
+					.split("&")[1]
+					.slice(-1)}&page=${page}`
 			);
 			console.log(data.data);
 			setproduct(data.data);
@@ -55,40 +57,50 @@ export default function ProductCategory() {
 		console.log(branch);
 		console.log(products);
 		try {
-			const { data } = await axios.get(`http://localhost:8000/product/detail?branch=${branch}&product=${products}`);
+			const { data } = await axios.get(
+				`http://localhost:8000/product/detail?branch=${branch}&product=${products}`
+			);
 			console.log(data.data[0].product);
 			console.log(data.data[0].branch);
 			console.log(data.data[0]);
 			setdetail(data.data[0]);
-			setquantity(1)
+			setquantity(1);
 			setshow(true);
 		} catch (error) {
 			console.log(error);
 		}
 	};
 
-	let onGetUnit = async() => {
+	let onGetUnit = async () => {
 		try {
-			const {data} = await axios.get(`http://localhost:8000/product/getallproduct?category=${params.product.split("&")[0].slice(-1)}`)
-			console.log(data.data[0])
-			setunit(data.data[0])
+			const { data } = await axios.get(
+				`http://localhost:8000/product/getallproduct?category=${params.product
+					.split("&")[0]
+					.slice(-1)}`
+			);
+			console.log(data.data[0]);
+			setunit(data.data[0]);
 		} catch (error) {
-			console.log(error)
+			console.log(error);
 		}
-	}
+	};
 
-	let onSubmit = async() => {
+	let onSubmit = async () => {
 		try {
-			setdisable(true)
-			const {data} = await axios.post("http://localhost:8000/cart/add", {qty: quantity, branch_id: detail.branch_id ,user_id:4,product_id: detail.product_id })
-			toast.success(data.message)
+			setdisable(true);
+			const { data } = await axios.post("http://localhost:8000/cart/add", {
+				qty: quantity,
+				branch_id: detail.branch_id,
+				user_id: 4,
+				product_id: detail.product_id,
+			});
+			toast.success(data.message);
 		} catch (error) {
-			toast.error(error.response.data.message)
-		}finally{
-			setdisable(false)
+			toast.error(error.response.data.message);
+		} finally {
+			setdisable(false);
 		}
-	}
-
+	};
 
 	const getCategory = async () => {
 		const { data } = await axios.get("http://localhost:8000/product/category");
@@ -99,7 +111,8 @@ export default function ProductCategory() {
 		onGetData(1);
 		getCategory();
 		onGetPage();
-		onGetUnit()
+		onGetUnit();
+		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, []);
 
 	return (
@@ -122,7 +135,9 @@ export default function ProductCategory() {
 													alt={value.name}
 													className="h-32 w-32 rounded-full overflow-visible shadow-lg"
 												/>
-												<p className="font-semibold font-mandalaFont text-xl">{value.name}</p>
+												<p className="font-semibold font-mandalaFont text-xl">
+													{value.name}
+												</p>
 											</button>
 										</a>
 									);
@@ -130,19 +145,22 @@ export default function ProductCategory() {
 							: null}
 					</div>
 					<div className=" flex justify-end my-5">
-							  <div className=" flex justify-center items-center gap-1 w-[256px] h-10">
-								<p>Sort by</p> <select className=" rounded-md w-[200px]">
-									<option>Price</option>
-									<option>Name</option>
-								</select>
-							  </div>
+						<div className=" flex justify-center items-center gap-1 w-[256px] h-10">
+							<p>Sort by</p>{" "}
+							<select className=" rounded-md w-[200px]">
+								<option>Price</option>
+								<option>Name</option>
+							</select>
+						</div>
 					</div>
 					<div className=" grid grid-cols-4 gap-7">
 						{product
 							? product.map((value, index) => {
 									return (
 										<button
-											onClick={() => onGetDetail(value.branch_id, value.product_id)}
+											onClick={() =>
+												onGetDetail(value.branch_id, value.product_id)
+											}
 											key={index}
 											className="flex flex-col shadow-xl h-full w-full bg-white border border-gray-200 rounded-lg dark:bg-gray-800 dark:border-gray-700"
 										>
@@ -176,7 +194,9 @@ export default function ProductCategory() {
 													<button
 														onClick={() => onGetData(value)}
 														className={`px-3 py-2 leading-tight text-gray-500 bg-white border border-gray-300 ${
-															selectedpage === value ? "!bg-red-700 text-white" : null
+															selectedpage === value
+																? "!bg-red-700 text-white"
+																: null
 														} hover:bg-slate-300  dark:bg-gray-800 dark:border-gray-700 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white`}
 													>
 														{value}
@@ -203,8 +223,13 @@ export default function ProductCategory() {
 					<h1 className=" text-[20px] font-bold  text-orange-700">
 						Rp. {detail ? detail.product.price.toLocaleString() : null}
 					</h1>
-					<h2 className=" mt-1 text-[16px] font-semibold">{detail ? detail.product.name : null}</h2>
-					<p className=" mt-1 text-[12px] text-slate-400 "> per {unit? unit.unit.name : null}</p>
+					<h2 className=" mt-1 text-[16px] font-semibold">
+						{detail ? detail.product.name : null}
+					</h2>
+					<p className=" mt-1 text-[12px] text-slate-400 ">
+						{" "}
+						per {unit ? unit.unit.name : null}
+					</p>
 					<h2 className=" mt-1 text-[16px] font-semibold">Description</h2>
 					<p className=" text-[12px] mt-2 text-slate-400">
 						{detail ? detail.product.description : null}
@@ -264,8 +289,8 @@ export default function ProductCategory() {
 						<div className=" flex justify-center gap-2 border  my-4 rounded-lg w-[102px] font-medium text-sm h-[32px]">
 							<button
 								value={"-"}
-								disabled={quantity <=1? true : false}
-								onClick={() => setquantity(quantity-1)}
+								disabled={quantity <= 1 ? true : false}
+								onClick={() => setquantity(quantity - 1)}
 								className="font-bold"
 							>
 								-
@@ -277,7 +302,7 @@ export default function ProductCategory() {
 							/>
 							<button
 								value={"+"}
-								onClick={() => setquantity(quantity+1)}
+								onClick={() => setquantity(quantity + 1)}
 								className=" text-green-500 font-bold"
 							>
 								+
@@ -285,16 +310,28 @@ export default function ProductCategory() {
 						</div>
 						{detail && detail.stock <= 5 ? (
 							<div className=" flex justify-center items-center ml-4 font-semibold">
-								Stock: <p className="text-orange-700  px-2">{detail.stock} left</p>
+								Stock:{" "}
+								<p className="text-orange-700  px-2">{detail.stock} left</p>
 							</div>
 						) : null}
 					</div>
 
 					<div className="flex mt-5 pb-4">
-						<button type="submit" disabled={disable} onClick={() => onSubmit()} className="font-medium w-full text-sm px-5 py-2.5 rounded-lg text-white bg-red-700 hover:bg-red-800 ">
-							{disable? (
-								<LoadingSpin size={"30px"} primaryColor={"red"} secondaryColor={"gray"}/>
-							) : ("Add to cart")}
+						<button
+							type="submit"
+							disabled={disable}
+							onClick={() => onSubmit()}
+							className="font-medium w-full text-sm px-5 py-2.5 rounded-lg text-white bg-red-700 hover:bg-red-800 "
+						>
+							{disable ? (
+								<LoadingSpin
+									size={"30px"}
+									primaryColor={"red"}
+									secondaryColor={"gray"}
+								/>
+							) : (
+								"Add to cart"
+							)}
 						</button>
 					</div>
 				</div>
@@ -304,7 +341,7 @@ export default function ProductCategory() {
 					</button>
 				</div>
 			</Modal>
-			<Toaster/>
+			<Toaster />
 		</div>
 	);
 }

@@ -52,7 +52,7 @@ module.exports = {
 			});
 		} catch (error) {
 			res.status(400).send({
-				isError: false,
+				isError: true,
 				message: error.message,
 				data: error,
 			});

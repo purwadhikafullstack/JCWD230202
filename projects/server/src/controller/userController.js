@@ -1,18 +1,14 @@
 const db = require("../sequelize/models");
 const HTTPStatus = require("../helper/HTTPStatus");
-// Import Hashing
 const { hashPassword, matchPassword } = require("../lib/hash");
-// Import JWT
 const { createToken } = require("../lib/jwt");
-// Import FileSystem
 const fs = require("fs").promises;
-// Import Transporter
 const transporter = require("../helper/transporter");
-// Import Handlebars
 const handlebars = require("handlebars");
-const { where } = require("sequelize");
+const { Op } = require("sequelize");
 const deleteFiles = require("../helper/deleteFiles");
 const { sequelize } = require("../sequelize/models");
+const { default: axios } = require("axios");
 
 module.exports = {
 	getUser: async (req, res) => {
@@ -37,7 +33,14 @@ module.exports = {
 				birthdate,
 				phone_number,
 				img,
-				user_addresses,
+				user_addresses: {
+					main_address: user_addresses.filter((value) => {
+						return value.main_address === true;
+					}),
+					address: user_addresses.filter((value) => {
+						return value.main_address === false;
+					}),
+				},
 			}).success("Get user profile");
 			httpStatus.send();
 		} catch (error) {
@@ -52,7 +55,7 @@ module.exports = {
 	},
 	updateUser: async (req, res) => {
 		const { uid } = req.uid;
-		const { name, birthdate, gender, email, phone_number } = req.body;
+		const { name, email, phone_number, gender, birthdate } = req.body;
 		try {
 			const data = await db.user.update(
 				{ name, birthdate, gender, email, phone_number },
@@ -375,7 +378,7 @@ module.exports = {
 		const { uid } = req.uid;
 		const { oldPassword, newPassword } = req.body;
 		try {
-			const data = await db.user.findOne({ where: { uid: token } });
+			const data = await db.user.findOne({ where: { uid } });
 			if (oldPassword !== data.password) {
 				return res.status(400).send({
 					isError: true,
@@ -419,7 +422,6 @@ module.exports = {
 	},
 	defaultAddress: async (req, res) => {
 		const { id } = req.params;
-		const { uid } = req.uid;
 		const t = await sequelize.transaction();
 		try {
 			await db.user_address.update(
@@ -436,6 +438,100 @@ module.exports = {
 			res.status(201).send({
 				isError: false,
 				message: "Default address updated",
+				data: null,
+			});
+		} catch (error) {
+			t.rollback();
+			res.status(400).send({
+				isError: true,
+				message: error.message,
+				data: error,
+			});
+		}
+	},
+	rakirProvince: async (req, res) => {
+		try {
+			const { data } = await axios.get(
+				"https://api.rajaongkir.com/starter/province",
+				{ headers: { key: "1625ecd94b7c4d9ecc661a5e0500bf2f" } }
+			);
+			res.status(200).send({
+				isError: false,
+				message: "Rajaongkir Province",
+				data: data.rajaongkir.results,
+			});
+		} catch (error) {
+			res.status(400).send({
+				isError: true,
+				message: error.message,
+				data: error,
+			});
+		}
+	},
+	rakirCity: async (req, res) => {
+		const { province } = req.query;
+		try {
+			if (!province)
+				return res.status(404).send({
+					isError: true,
+					message: "Province_Id Not Found!",
+					data: null,
+				});
+			const { data } = await axios.get(
+				`https://api.rajaongkir.com/starter/city?province=${province}`,
+				{
+					headers: { key: "1625ecd94b7c4d9ecc661a5e0500bf2f" },
+				}
+			);
+			res.status(201).send({
+				isError: false,
+				message: "Rajaongkir City by province",
+				data: data.rajaongkir.results,
+			});
+		} catch (error) {
+			res.status(400).send({
+				isError: true,
+				message: error.message,
+				data: error,
+			});
+		}
+	},
+	addAddress: async (req, res) => {
+		const t = await sequelize.transaction();
+		const { uid } = req.uid;
+		const {
+			province,
+			city,
+			address,
+			receiver_name,
+			receiver_phone,
+			main_address,
+		} = req.body;
+		try {
+			const { id } = await db.user.findOne({ where: { uid } });
+			if (main_address) {
+				await db.user_address.update(
+					{ main_address: false },
+					{ where: { [Op.and]: [{ main_address }, { user_id: id }] } },
+					{ transaction: t }
+				);
+			}
+			await db.user_address.create(
+				{
+					province,
+					city,
+					address,
+					receiver_name,
+					receiver_phone,
+					main_address,
+					user_id: id,
+				},
+				{ transaction: t }
+			);
+			t.commit();
+			res.status(201).send({
+				isError: false,
+				message: "Address added",
 				data: null,
 			});
 		} catch (error) {
