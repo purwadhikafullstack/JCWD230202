@@ -11,13 +11,17 @@ export default function Checkout() {
 			</div>
 			<div className=" mx-auto flex px-5 w-[1120px]">
 				<div className=" w-[685px]">
-					<div className="mt-10 font-tokpedFont text-[20px] font-bold">Checkout</div>
+					<div className="mt-10 font-tokpedFont text-[20px] font-bold">
+						Checkout
+					</div>
 					<div className="flex justify-start h-[31px] items-start border-b mt-[29px] font-tokpedFont font-semibold text-[14px] w-[685px] ">
 						Shipping Address
 					</div>
 					<div className=" h-[109px] border-b">
 						<div className=" pt-3 flex gap-1">
-							<p className=" font-semibold font-tokpedFont text-[13px]">Aswin Wibowo</p>
+							<p className=" font-semibold font-tokpedFont text-[13px]">
+								Aswin Wibowo
+							</p>
 							<p className=" font-tokpedFont text-[13px] ">
 								(jl. layar 1 no. 29, Kelapa Dua, Tangerang)
 							</p>
@@ -25,7 +29,9 @@ export default function Checkout() {
 								Utama
 							</p>
 						</div>
-						<div className=" mt-1 font-tokpedFont font-normal text-[13px]">087805667895</div>
+						<div className=" mt-1 font-tokpedFont font-normal text-[13px]">
+							087805667895
+						</div>
 						<div className=" mt-1 font-tokpedFont text-slate-500 font-normal text-[13px]">
 							jl. layar 1 no.29, kelapa dua, Tangerang
 						</div>
@@ -39,7 +45,9 @@ export default function Checkout() {
 						</button>
 					</div>
 					{/* ORDER START HERE */}
-					<div className=" mt-4 font-tokpedFont font-semibold text-[14px]">Order 1</div>
+					<div className=" mt-4 font-tokpedFont font-semibold text-[14px]">
+						Order 1
+					</div>
 					<div className=" font-tokpedFont h-[380px] pt-4 border-b-4">
 						<div className=" font-semibold text-[14px] h-[46px] flex justify-start items-center ">
 							Toko Jakarta
@@ -49,20 +57,33 @@ export default function Checkout() {
 								<img
 									className=" h-[60px] w-[60px]"
 									src="https://assets.segari.id/products/10002900001_20122022112329.webp"
+									alt=""
 								/>
 								<div className=" h-[93px] my-[7px] ">
-									<p className=" pl-[15px] font-tokpedFont text-[14px]">Pakcoy</p>
-									<p className=" pl-[15px] font-tokpedFont text-[12px]">450 - 550 gram / pack</p>
-									<p className=" pl-[15px] font-semibold font-tokpedFont text-[14px]">Rp. 4,000</p>
+									<p className=" pl-[15px] font-tokpedFont text-[14px]">
+										Pakcoy
+									</p>
+									<p className=" pl-[15px] font-tokpedFont text-[12px]">
+										450 - 550 gram / pack
+									</p>
+									<p className=" pl-[15px] font-semibold font-tokpedFont text-[14px]">
+										Rp. 4,000
+									</p>
 								</div>
 							</div>
 							<div className=" ml-[15px] h-[135px] w-[306px] bore ">
 								<p className=" font-semibold text-[12px] ">Select Courier</p>
 								<button className=" mt-2 pl-2 flex justify-start items-center bg-red-700 text-white w-full rounded-lg h-10">
-									<Dropdown className="w-[294px]" inline={true} label="Shipping Methode">
+									<Dropdown
+										className="w-[294px]"
+										inline={true}
+										label="Shipping Methode"
+									>
 										<DropdownItem className=" flex justify-between h-[60px] mx-[15px] pt-3 border-b ">
 											<div className=" text-left ">
-												<p className=" font-bold font-tokpedFont text-[12px]">POS</p>
+												<p className=" font-bold font-tokpedFont text-[12px]">
+													POS
+												</p>
 												<p className=" font-tokpedFont text-slate-500 text text-[12px]">
 													Estimasi Hari 4-5
 												</p>
@@ -71,7 +92,9 @@ export default function Checkout() {
 										</DropdownItem>
 										<DropdownItem className=" flex justify-between h-[60px] mx-[15px] pt-3 border-b ">
 											<div className=" text-left ">
-												<p className=" font-bold font-tokpedFont text-[12px]">JNE</p>
+												<p className=" font-bold font-tokpedFont text-[12px]">
+													JNE
+												</p>
 												<p className=" font-tokpedFont text-slate-500 text text-[12px]">
 													Estimasi Hari 4-5
 												</p>
@@ -80,7 +103,9 @@ export default function Checkout() {
 										</DropdownItem>
 										<DropdownItem className=" flex justify-between h-[60px] mx-[15px] pt-3 border-b ">
 											<div className=" text-left ">
-												<p className=" font-bold font-tokpedFont text-[12px]">TIKI</p>
+												<p className=" font-bold font-tokpedFont text-[12px]">
+													TIKI
+												</p>
 												<p className=" font-tokpedFont text-slate-500 text text-[12px]">
 													Estimasi Hari 4-5
 												</p>
@@ -98,7 +123,9 @@ export default function Checkout() {
 					</div>
 					{/* ORDER END HERE */}
 					{/* ORDER START HERE */}
-					<div className=" mt-4 font-tokpedFont font-semibold text-[14px]">Order 2</div>
+					<div className=" mt-4 font-tokpedFont font-semibold text-[14px]">
+						Order 2
+					</div>
 					<div className=" font-tokpedFont h-[380px] pt-4 border-b-4">
 						<div className=" font-semibold text-[14px] h-[46px] flex justify-start items-center ">
 							Toko Jakarta
@@ -108,20 +135,33 @@ export default function Checkout() {
 								<img
 									className=" h-[60px] w-[60px]"
 									src="https://assets.segari.id/products/70000600018_27122022104740.webp"
+									alt=""
 								/>
 								<div className=" h-[93px] my-[7px] ">
-									<p className=" pl-[15px] font-tokpedFont text-[14px]">Tahu Cina Manalagi</p>
-									<p className=" pl-[15px] font-tokpedFont text-[12px]">450 - 550 gram / pack</p>
-									<p className=" pl-[15px] font-semibold font-tokpedFont text-[14px]">Rp. 13,400</p>
+									<p className=" pl-[15px] font-tokpedFont text-[14px]">
+										Tahu Cina Manalagi
+									</p>
+									<p className=" pl-[15px] font-tokpedFont text-[12px]">
+										450 - 550 gram / pack
+									</p>
+									<p className=" pl-[15px] font-semibold font-tokpedFont text-[14px]">
+										Rp. 13,400
+									</p>
 								</div>
 							</div>
 							<div className=" ml-[15px] h-[135px] w-[306px] bore ">
 								<p className=" font-semibold text-[12px] ">Select Courier</p>
 								<button className=" mt-2 pl-2 flex justify-start items-center bg-red-700 text-white w-full rounded-lg h-10">
-									<Dropdown className="w-[294px]" inline={true} label="Shipping Methode">
+									<Dropdown
+										className="w-[294px]"
+										inline={true}
+										label="Shipping Methode"
+									>
 										<DropdownItem className=" flex justify-between h-[60px] mx-[15px] pt-3 border-b ">
 											<div className=" text-left ">
-												<p className=" font-bold font-tokpedFont text-[12px]">POS</p>
+												<p className=" font-bold font-tokpedFont text-[12px]">
+													POS
+												</p>
 												<p className=" font-tokpedFont text-slate-500 text text-[12px]">
 													Estimasi Hari 4-5
 												</p>
@@ -130,7 +170,9 @@ export default function Checkout() {
 										</DropdownItem>
 										<DropdownItem className=" flex justify-between h-[60px] mx-[15px] pt-3 border-b ">
 											<div className=" text-left ">
-												<p className=" font-bold font-tokpedFont text-[12px]">JNE</p>
+												<p className=" font-bold font-tokpedFont text-[12px]">
+													JNE
+												</p>
 												<p className=" font-tokpedFont text-slate-500 text text-[12px]">
 													Estimasi Hari 4-5
 												</p>
@@ -139,7 +181,9 @@ export default function Checkout() {
 										</DropdownItem>
 										<DropdownItem className=" flex justify-between h-[60px] mx-[15px] pt-3 border-b ">
 											<div className=" text-left ">
-												<p className=" font-bold font-tokpedFont text-[12px]">TIKI</p>
+												<p className=" font-bold font-tokpedFont text-[12px]">
+													TIKI
+												</p>
 												<p className=" font-tokpedFont text-slate-500 text text-[12px]">
 													Estimasi Hari 4-5
 												</p>
@@ -171,7 +215,9 @@ export default function Checkout() {
 						Dengan mengaktifkan asuransi, Saya menyetujui{" "}
 						<p className=" text-red-700">syarat dan ketentuan yang berlaku.</p>
 					</p>
-					<button className=" mt-6 h-12 w-full text-white bg-red-700 rounded-lg ">Payment</button>
+					<button className=" mt-6 h-12 w-full text-white bg-red-700 rounded-lg ">
+						Payment
+					</button>
 				</div>
 			</div>
 		</div>

@@ -22,6 +22,22 @@ module.exports = (sequelize, DataTypes) => {
 					notEmpty: { msg: "Users address must not be empty" },
 				},
 			},
+			province: {
+				type: DataTypes.STRING,
+				allowNull: false,
+				validate: {
+					notNull: { msg: "User must have an province" },
+					notEmpty: { msg: "Users province must not be empty" },
+				},
+			},
+			city: {
+				type: DataTypes.STRING,
+				allowNull: false,
+				validate: {
+					notNull: { msg: "User must have an city" },
+					notEmpty: { msg: "Users city must not be empty" },
+				},
+			},
 			receiver_name: {
 				type: DataTypes.STRING,
 				allowNull: false,

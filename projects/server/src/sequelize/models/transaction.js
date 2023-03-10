@@ -7,19 +7,19 @@ module.exports = (sequelize, DataTypes) => {
 		 * This method is not a part of Sequelize lifecycle.
 		 * The `models/index` file will call this method automatically.
 		 */
-		static associate({ branch, discount_history, user, transaction_history }) {
+		static associate({ branch, discount_history, user, product }) {
 			// define association here
 			this.belongsTo(branch, { foreignKey: "branch_id" });
 			this.belongsTo(discount_history, { foreignKey: "discount_history_id" });
 			this.belongsTo(user, { foreignKey: "user_id" });
-			this.hasMany(transaction_history, { foreignKey: "transaction_id" });
+			this.belongsTo(product, { foreignKey: "product_id" });
 		}
 	}
 	transaction.init(
 		{
-			qty: DataTypes.INTEGER,
 			product_name: DataTypes.STRING,
-			price: DataTypes.INTEGER,
+			qty: DataTypes.INTEGER,
+			total_price: DataTypes.INTEGER,
 			user_address: DataTypes.TEXT,
 			courier: DataTypes.STRING,
 			status: {
@@ -27,7 +27,7 @@ module.exports = (sequelize, DataTypes) => {
 				defaultValue: "Waiting Payment",
 			},
 			payment_proof: DataTypes.STRING,
-			invoice_no: DataTypes.STRING,
+			invoice: DataTypes.STRING,
 		},
 		{
 			sequelize,

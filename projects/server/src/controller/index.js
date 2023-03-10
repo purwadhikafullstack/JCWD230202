@@ -1,12 +1,13 @@
 const productController = require("./productController");
 const userController = require("./userController");
-const adminController = require('./adminController')
-const cartController = require('./cartController')
+const adminController = require("./adminController");
+const cartController = require("./cartController");
+const transactionController = require("./transactionController");
 
 module.exports = {
-	// export all controller here
 	productController,
 	userController,
 	adminController,
-	cartController
+	cartController,
+	transactionController,
 };

@@ -1,5 +1,13 @@
 import React, { useEffect, useState } from "react";
-import { Modal, Label, TextInput, Button, Spinner } from "flowbite-react";
+import {
+	Modal,
+	Label,
+	TextInput,
+	Button,
+	Spinner,
+	Textarea,
+	Checkbox,
+} from "flowbite-react";
 import { useForm } from "react-hook-form";
 import { FaFemale, FaMale } from "react-icons/fa";
 import DatePicker from "react-datepicker";
@@ -12,64 +20,44 @@ export default function Profile(props) {
 	const navigate = useNavigate();
 	const [date, setdate] = useState();
 	const [img, setimg] = useState();
+	const [rakir, setrakir] = useState({
+		province: null,
+		city: null,
+		main_address: false,
+	});
 	const [show, setshow] = useState({
 		edit: false,
 		loading: false,
 		changePassword: false,
 		changeAddress: false,
 		changeProfilePic: false,
-	});
-	const [profile, setprofile] = useState({
-		name: "",
-		birthdate: "",
-		gender: "",
-		email: "",
-		phone_number: "",
-		profile_picture: "",
-		address: "",
+		addAddress: false,
 	});
 
 	const {
 		register,
 		handleSubmit,
 		formState: { errors },
+		setValue,
 	} = useForm();
-
-	const getProfile = async () => {
-		const { data } = await REST_API({
-			url: "user/profile",
-			method: "GET",
-		});
-
-		setprofile({
-			...profile,
-			name: data.data.name,
-			birthdate: data.data.birthdate,
-			gender: data.data.gender,
-			email: data.data.email,
-			phone_number: data.data.phone_number,
-			profile_picture: data.data.img,
-			address: data.data.user_addresses,
-		});
-	};
 
 	const onSubmit = async (data) => {
 		setshow({ ...show, loading: true });
 		try {
 			await REST_API({
-				url: "user/edit",
+				url: "/user/edit",
 				method: "PATCH",
 				data: {
 					name: data.name,
 					email: data.email,
 					phone_number: data.phone_number,
-					gender: profile.gender,
-					birthdate: data.birthdate,
+					gender: props.state.profile.gender,
+					birthdate: props.state.profile.birthdate,
 				},
 			});
 			toast.success("Profile updated");
 			setshow({ ...show, edit: false });
-			getProfile();
+			props.func.getProfile();
 		} catch (error) {
 			toast.error("Something went wrong");
 		} finally {
@@ -99,7 +87,7 @@ export default function Profile(props) {
 		try {
 			fd.append("images", img);
 			await REST_API({
-				url: "user/profile/picture",
+				url: "/user/profile/picture",
 				method: "PATCH",
 				data: fd,
 			});
@@ -116,7 +104,7 @@ export default function Profile(props) {
 			if (data.newPassword !== data.confirmNewPassword) throw err;
 
 			await REST_API({
-				url: "user/profile/change-password",
+				url: "/user/profile/change-password",
 				method: "PATCH",
 				data: {
 					oldPassword: data.oldPassword,
@@ -136,20 +124,20 @@ export default function Profile(props) {
 	const deleteAddress = async (id) => {
 		try {
 			await REST_API({
-				url: `user/delete-address/${id}`,
+				url: `/user/delete-address/${id}`,
 				method: "DELETE",
 			});
-			getProfile();
+			props.func.getProfile();
 			toast.success("Address deleted");
 		} catch (error) {
 			console.log(error);
 		}
 	};
-	const editAddress = async (data) => {};
+	// const editAddress = async (data) => {};
 	const makeDefault = async (id) => {
 		try {
 			await REST_API({
-				url: `user/main-address/${id}`,
+				url: `/user/main-address/${id}`,
 				method: "PATCH",
 			});
 			props.func.getProfile();
@@ -158,8 +146,53 @@ export default function Profile(props) {
 			console.log(error);
 		}
 	};
+	const rakirProvince = async () => {
+		try {
+			const { data } = await REST_API({
+				url: "/user/rakir-province",
+				method: "GET",
+			});
+			setrakir({ ...rakir, province: data.data });
+		} catch (error) {
+			console.log(error);
+		}
+	};
+	const rakirCity = async (province) => {
+		try {
+			const { data } = await REST_API({
+				url: `/user/rakir-city?province=${province}`,
+				method: "GET",
+			});
+			setrakir({ ...rakir, city: data.data });
+		} catch (error) {
+			console.log(error);
+		}
+	};
+	const onSubmitAddAddress = async (data) => {
+		setshow({ ...show, loading: true });
+		try {
+			await REST_API.post("/user/add-address", {
+				city: data.city,
+				province: data.province,
+				address: data.address,
+				receiver_name: data.receiver_name,
+				receiver_phone: data.receiver_phone,
+				main_address: rakir.main_address,
+			});
+			props.func.getProfile();
+			toast.success("Address added");
+		} catch (error) {
+			console.log(error);
+		} finally {
+			setshow({ ...show, loading: false, addAddress: false });
+		}
+	};
 	useEffect(() => {
-		props.func.getProfile();
+		setValue("name", props.state.profile.name);
+		setValue("email", props.state.profile.email);
+		setValue("phone_number", props.state.profile.phone_number);
+		rakirProvince();
+		// eslint-disable-next-line
 	}, []);
 	return (
 		<div className="pt-20 flex justify-center font-tokpedFont items-center h-screen">
@@ -167,7 +200,11 @@ export default function Profile(props) {
 				<div className=" col-span-1 shadow-md m-5 rounded-lg">
 					<div className="flex justify-center p-5">
 						<img
-							src={`http://localhost:8000/${props.state.profile.profile_picture}`}
+							src={
+								props.state.profile.profile_picture
+									? `http://localhost:8000/${props.state.profile.profile_picture}`
+									: ""
+							}
 							alt="Profile"
 							className="h-80 w-80 shadow-md object-cover"
 						/>
@@ -198,38 +235,36 @@ export default function Profile(props) {
 						<h3 className="text-2xl text-[#6D7588]">Change Profile</h3>
 					</div>
 					<table className="w-full mt-5 text-left text-[#848893]">
-						<tr>
-							<th className="py-5 font-medium">Name</th>
-							<td> {`${props.state.profile.name} `}</td>
-						</tr>
-						<tr>
-							<th className="py-5 font-medium">Birthdate</th>
-							<td>
-								{" "}
-								{`${
-									props.state.profile.birthdate
+						<tbody>
+							<tr>
+								<th className="py-5 font-medium">Name</th>
+								<td>{props.state.profile.name}</td>
+							</tr>
+							<tr>
+								<th className="py-5 font-medium">Birthdate</th>
+								<td>
+									{props.state.profile.birthdate
 										? props.state.profile.birthdate
-										: " "
-								} `}
-							</td>
-						</tr>
-						<tr>
-							<th className="py-5 font-medium">Gender</th>
-							<td>
-								{" "}
-								{`${
-									props.state.profile.gender ? props.state.profile.gender : " "
-								} `}
-							</td>
-						</tr>
-						<tr>
-							<th className="py-5 font-medium">Email</th>
-							<td> {`${props.state.profile.email} `}</td>
-						</tr>
-						<tr>
-							<th className="py-5 font-medium">Phone</th>
-							<td> {`${props.state.profile.phone_number} `}</td>
-						</tr>
+										: " "}
+								</td>
+							</tr>
+							<tr>
+								<th className="py-5 font-medium">Gender</th>
+								<td>
+									{props.state.profile.gender
+										? props.state.profile.gender
+										: " "}
+								</td>
+							</tr>
+							<tr>
+								<th className="py-5 font-medium">Email</th>
+								<td>{props.state.profile.email}</td>
+							</tr>
+							<tr>
+								<th className="py-5 font-medium">Phone</th>
+								<td> {props.state.profile.phone_number}</td>
+							</tr>
+						</tbody>
 					</table>
 					<div className="flex justify-end space-x-5">
 						<button
@@ -265,7 +300,10 @@ export default function Profile(props) {
 								type="text"
 								required={true}
 								onChange={(e) =>
-									props.state.setprofile({ ...profile, name: e.target.value })
+									props.state.setprofile({
+										...props.state.profile,
+										name: e.target.value,
+									})
 								}
 								defaultValue={props.state.profile.name}
 								{...register("name")}
@@ -279,7 +317,7 @@ export default function Profile(props) {
 								scrollableYearDropdown={true}
 								onChange={(date) => {
 									props.state.setprofile({
-										...profile,
+										...props.state.profile,
 										birthdate: date.toISOString().split("T")[0],
 									});
 									setdate(date);
@@ -299,7 +337,10 @@ export default function Profile(props) {
 													: null
 											}`}
 											onClick={() =>
-												props.state.setprofile({ ...profile, gender: "Male" })
+												props.state.setprofile({
+													...props.state.profile,
+													gender: "Male",
+												})
 											}
 										/>
 										<p>Male</p>
@@ -313,7 +354,10 @@ export default function Profile(props) {
 													: null
 											}`}
 											onClick={() =>
-												props.state.setprofile({ ...profile, gender: "Female" })
+												props.state.setprofile({
+													...props.state.profile,
+													gender: "Female",
+												})
 											}
 										/>
 										<p>Female</p>
@@ -328,7 +372,10 @@ export default function Profile(props) {
 								required={true}
 								defaultValue={props.state.profile.email}
 								onChange={(e) =>
-									props.state.setprofile({ ...profile, email: e.target.value })
+									props.state.setprofile({
+										...props.state.profile,
+										email: e.target.value,
+									})
 								}
 								{...register("email", {
 									pattern: {
@@ -348,7 +395,7 @@ export default function Profile(props) {
 								defaultValue={props.state.profile.phone_number}
 								onChange={(e) =>
 									props.state.setprofile({
-										...profile,
+										...props.state.profile,
 										phone_number: e.target.value,
 									})
 								}
@@ -468,6 +515,111 @@ export default function Profile(props) {
 				</Modal.Body>
 			</Modal>
 			<Modal
+				show={show.addAddress}
+				size="md"
+				popup={true}
+				onClose={() => setshow({ ...show, addAddress: false })}
+				id="name modal"
+				className="z-50"
+			>
+				<Modal.Header />
+				<Modal.Body>
+					<form
+						onSubmit={handleSubmit(onSubmitAddAddress)}
+						className="space-y-6 px-6 pb-4 sm:pb-6 lg:px-8 xl:pb-8"
+					>
+						<h3 className="text-xl font-medium text-gray-900 dark:text-white">
+							Add address
+						</h3>
+						<div className="space-y-2">
+							<div className="mb-2 block">
+								<Label htmlFor="password" value="Select province" />
+							</div>
+							<select
+								name="province"
+								className="border-gray-300 rounded-lg bg-gray-50 w-full"
+								onChange={(e) => {
+									rakirCity(e.target.value.split(".")[0]);
+									setValue("province", e.target.value);
+								}}
+							>
+								<option value="selected">Select province</option>
+								{rakir.province?.map((value, index) => {
+									return (
+										<option
+											value={`${value.province_id}.${value.province}`}
+											key={index}
+										>
+											{value.province}
+										</option>
+									);
+								})}
+							</select>
+							<div className="mb-2 block">
+								<Label htmlFor="password" value="Select city" />
+							</div>
+							<select
+								name="city"
+								className="border-gray-300 rounded-lg bg-gray-50 w-full"
+								onChange={(e) => {
+									setValue("city", e.target.value);
+								}}
+							>
+								<option value="selected">Select city</option>
+								{rakir.city?.map((value, index) => {
+									return (
+										<option
+											value={`${value.city_id}.${value.city_name}`}
+											key={index}
+										>
+											{value.type} {value.city_name}
+										</option>
+									);
+								})}
+							</select>
+							<div className="mb-2 block">
+								<Label htmlFor="address" value="Address details" />
+							</div>
+							<Textarea
+								rows="4"
+								type="text"
+								{...register("address")}
+								required={true}
+							/>
+							<div className="mb-2 block">
+								<Label htmlFor="conatcts" value="Contact person" />
+							</div>
+							<TextInput {...register("receiver_name")} />
+							<div className="mb-2 block">
+								<Label htmlFor="conatcts" value="Phone number" />
+							</div>
+							<TextInput {...register("receiver_phone")} />
+							<div className="flex items-center gap-2">
+								<Checkbox
+									id="remember"
+									onChange={() =>
+										setrakir({
+											...rakir,
+											main_address: rakir.main_address ? false : true,
+										})
+									}
+								/>
+								<Label htmlFor="remember">Make main address</Label>
+							</div>
+						</div>
+						<div className="w-full flex justify-end">
+							{show.loading ? (
+								<button>
+									<Spinner aria-label="Default status example" />
+								</button>
+							) : (
+								<Button type="submit">Submit</Button>
+							)}
+						</div>
+					</form>
+				</Modal.Body>
+			</Modal>
+			<Modal
 				show={show.changeAddress}
 				size="3xl"
 				popup={true}
@@ -477,11 +629,38 @@ export default function Profile(props) {
 				<Modal.Header />
 				<Modal.Body>
 					<div className="space-y-6 px-6 pb-4 sm:pb-6 lg:px-8 xl:pb-8">
-						<h3 className="text-xl font-medium text-gray-900 dark:text-white">
-							Manage your addresses
-						</h3>
+						<div className="flex justify-between">
+							<h3 className="text-xl font-medium text-gray-900 dark:text-white">
+								Manage your addresses
+							</h3>
+							<Button
+								color="warning"
+								onClick={() =>
+									setshow({ ...show, addAddress: true, changeAddress: false })
+								}
+							>
+								Add Address
+							</Button>
+						</div>
+						<div className={`p-3 shadow-md rounded-lg space-y-2 bg-red-200`}>
+							<p className="text-lg w-full font-semibold">
+								{props.state.profile.address?.main_address[0].address}
+							</p>
+							<p className="text-md">
+								{props.state.profile.address?.main_address[0].receiver_name}
+							</p>
+							<p className="text-md">
+								{props.state.profile.address?.main_address[0].receiver_phone}
+							</p>
+							<div className="right-2 top-1">
+								<p className="text-sm px-2 bg-green-500 rounded-3xl w-fit">
+									Main Address
+								</p>
+							</div>
+						</div>
+
 						{props.state.profile.address
-							? props.state.profile.address.map((value, index) => {
+							? props.state.profile.address.address.map((value, index) => {
 									return (
 										<div
 											className={`p-3 shadow-md rounded-lg space-y-2 ${

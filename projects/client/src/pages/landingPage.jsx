@@ -13,7 +13,7 @@ export default function LandingPage() {
 
 	const getCategory = async () => {
 		const { data } = await REST_API({
-			url: "product/category",
+			url: "/product/category",
 			method: "GET",
 		});
 		setcategory(data.data);
@@ -21,7 +21,7 @@ export default function LandingPage() {
 	const getTotalPage = async (branch) => {
 		try {
 			const { data } = await REST_API({
-				url: `product/totalPage?branch=${branch}`,
+				url: `/product/totalPage?branch=${branch}`,
 				method: "GET",
 			});
 			setpage(Math.ceil(data.data / 10));
@@ -32,7 +32,7 @@ export default function LandingPage() {
 	const getAllProduct = async (page) => {
 		try {
 			const { data } = await REST_API({
-				url: `product?page=${page}`,
+				url: `/product?page=${page}`,
 				method: "GET",
 			});
 			setproduct(data.data);
@@ -69,9 +69,11 @@ export default function LandingPage() {
 										<img
 											src={value.img}
 											alt={value.name}
-											className="h-32 w-32 border-black border-[2px] rounded-full"
+											className="h-32 w-32 border-[2px] rounded-full overflow-visible"
 										/>
-										<p className="font-semibold font-mandalaFont text-xl">{value.name}</p>
+										<p className="font-semibold font-mandalaFont text-xl">
+											{value.name}
+										</p>
 									</a>
 								</button>
 							);
@@ -86,7 +88,11 @@ export default function LandingPage() {
 									key={index}
 									className="flex flex-col shadow-md justify-between w-full max-w-sms h-80 bg-white border border-gray-200 rounded-lg dark:bg-gray-800 dark:border-gray-700"
 								>
-									<img className="rounded-t-lg h-44" src={value.product.img} alt="product" />
+									<img
+										className="rounded-t-lg h-44"
+										src={value.product.img}
+										alt="product"
+									/>
 									<div className="px-5 pb-5">
 										<h5 className="text-lg font-semibold tracking-tight text-gray-900 dark:text-white">
 											{value.product.name}
@@ -108,7 +114,7 @@ export default function LandingPage() {
 					page
 				</label>
 				<button
-					className="bg-red-500 border-black border-y-[1px] border-l-[1px] p-2 rounded-l-lg"
+					className="bg-red-500  border-y-[1px] border-l-[1px] p-2 rounded-l-lg"
 					onClick={() => getAllProduct(selectedpage - 1)}
 					disabled={parseInt(selectedpage) === 1}
 				>
@@ -116,12 +122,14 @@ export default function LandingPage() {
 				</button>
 				<input
 					type="text"
-					value={selectedpage}
-					onChange={(e) => getAllProduct(e.target.value)}
-					className="w-8 p-1 border-black border-y-[1px]"
+					defaultValue={selectedpage}
+					onChange={(e) =>
+						getAllProduct(e.target.value > page ? page : e.target.value)
+					}
+					className="w-8 p-1 border-0"
 				/>
 				<button
-					className="bg-red-500 border-black border-y-[1px] border-r-[1px] p-2 rounded-r-lg"
+					className="bg-red-500  border-y-[1px] border-r-[1px] p-2 rounded-r-lg"
 					onClick={() => getAllProduct(selectedpage + 1)}
 					disabled={parseInt(selectedpage) === parseInt(page)}
 				>

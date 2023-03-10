@@ -1,6 +1,7 @@
 require("dotenv/config");
 const express = require("express");
 const cors = require("cors");
+const cron = require("node-cron");
 const { join } = require("path");
 
 const PORT = process.env.PORT || 8000;
@@ -24,10 +25,16 @@ app.use("/Public", express.static("Public"));
 const { productRouter } = require("./router");
 const { userRouter } = require("./router");
 const { adminRouter } = require("./router");
+const { transactionRouter } = require("./router");
 
 app.use("/product", productRouter);
 app.use("/user", userRouter);
+app.use("/transaction", transactionRouter);
 app.use("/admin", adminRouter);
+
+// cron.schedule("* * * * *", () => console.log("hello"), {
+// 	timezone: "Asia/Jakarta",
+// });
 
 // ===========================
 // NOTE : Add your routes here

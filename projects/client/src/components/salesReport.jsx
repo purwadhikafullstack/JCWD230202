@@ -53,10 +53,6 @@ function SalesReport() {
 			setDataTransaction(responseTransaction.data.data);
 			setDataProduct(responseProduct.data.data);
 			setDataUser(responseUser.data.data);
-
-			console.log(responseTransaction.data.data, "trans");
-			console.log(responseProduct.data.data);
-			console.log(responseUser.data.data);
 		} catch (error) {
 			console.log(error);
 		}
@@ -93,7 +89,7 @@ function SalesReport() {
 	// };
 
 	useEffect(() => {
-		onGetData(``, "");
+		onGetData("", "");
 	}, []);
 
 	return (
@@ -112,7 +108,6 @@ function SalesReport() {
 							setSelectedDate({ ...selectedDate, from: date });
 						}}
 					/>
-					{console.log(date)}
 					<DatePicker
 						showMonthDropdown={true}
 						showYearDropdown={true}
@@ -131,8 +126,8 @@ function SalesReport() {
 					<button onClick={() => test()}>set date</button>
 
 					<label
-						for="countries"
-						class="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
+						htmlFor="countries"
+						className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
 					>
 						Select an option
 					</label>
@@ -146,9 +141,9 @@ function SalesReport() {
 								e.target.value
 							)
 						}
-						class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+						className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
 					>
-						<option selected>sort by</option>
+						<option defaultValue="">sort by</option>
 						<option value="date-asc">date ascending</option>
 						<option value="date-desc">date descending</option>
 						<option value="income-asc">income ascending</option>
