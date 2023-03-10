@@ -644,13 +644,13 @@ export default function Profile(props) {
 						</div>
 						<div className={`p-3 shadow-md rounded-lg space-y-2 bg-red-200`}>
 							<p className="text-lg w-full font-semibold">
-								{props.state.profile.address?.main_address[0].address}
+								{props.state.profile.address?.main_address[0]?.address}
 							</p>
 							<p className="text-md">
-								{props.state.profile.address?.main_address[0].receiver_name}
+								{props.state.profile.address?.main_address[0]?.receiver_name}
 							</p>
 							<p className="text-md">
-								{props.state.profile.address?.main_address[0].receiver_phone}
+								{props.state.profile.address?.main_address[0]?.receiver_phone}
 							</p>
 							<div className="right-2 top-1">
 								<p className="text-sm px-2 bg-green-500 rounded-3xl w-fit">
