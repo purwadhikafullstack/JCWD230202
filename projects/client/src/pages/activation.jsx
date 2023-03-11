@@ -16,7 +16,7 @@ function Activation() {
 	let onSubmit = async () => {
 		try {
 			 await REST_API({
-				url: "user/activation/uid",
+				url: "/user/activation/uid",
 				method: "PATCH",
 				data: {
 					uid: location.pathname.slice(12),

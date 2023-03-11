@@ -16,7 +16,7 @@ function ForgotPass() {
 		try {
 			setdisable(true);
 			const { data } = await REST_API({
-				url: "user/forgot-password",
+				url: "/user/forgot-password",
 				method: "POST",
 				data: {
 					email: email.current.value,

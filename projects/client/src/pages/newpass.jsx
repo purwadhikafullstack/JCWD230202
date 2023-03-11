@@ -23,7 +23,7 @@ function UpdatePassword() {
 		try {
 			setdisable(true);
 			const { data } = await REST_API({
-				url: "user/reset-password/uid",
+				url: "/user/reset-password/uid",
 				method: "POST",
 				data: {
 					uid: location.pathname.slice(16),
