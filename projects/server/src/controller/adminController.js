@@ -787,4 +787,288 @@ module.exports = {
 			});
 		} catch (error) {}
 	},
+
+	adminLogin: async (req, res) => {
+		try {
+			let { email, password } = req.body;
+
+			if (!email || !password)
+				return res.status(404).send({
+					isError: true,
+					message: "Input must be filled",
+					data: null,
+				});
+
+			let findEmail = await db.user.findOne({
+				where: {
+					email: email,
+				},
+			});
+
+			if (!findEmail.dataValues)
+				return res.status(404).send({
+					isError: true,
+					message: "Email Not Found",
+					data: null,
+				});
+
+			let hashMatchResult = await matchPassword(
+				password,
+				findEmail.dataValues.password
+			);
+
+			if (hashMatchResult === false)
+				return res.status(404).send({
+					isError: true,
+					message: "Wrong Password or Email",
+					data: null,
+				});
+
+			const token = createToken({
+				uid: findEmail.uid,
+			});
+
+			res.status(200).send({
+				isError: false,
+				message: "Login Success",
+				data: {
+					token,
+					findEmail,
+				},
+			});
+		} catch (error) {
+			res.status(404).send({
+				isError: true,
+				message: "Login Failed",
+				data: error.message,
+			});
+		}
+	},
+
+	stockHistory: async (req, res) => {
+		try {
+			let { search, filter, sort } = req.query;
+			console.log(search, filter, sort, "test");
+			const sortBy = sort ? sort.split("-") : "";
+			const filterBy = filter ? filter.split("/") : "";
+			console.log(sortBy);
+			let response;
+			const token = req.uid;
+			let admin_branch_id;
+			console.log(token);
+
+			let admin = await db.user.findOne({
+				where: {
+					uid: token.uid,
+				},
+				include: { model: db.branch, attributes: [["id", "branch_id"]] },
+			});
+			console.log(admin);
+			let role = admin.dataValues.role;
+
+			if (role === "branch admin") {
+				admin_branch_id = admin.dataValues.branches[0].dataValues.branch_id;
+			}
+
+			if (!search) {
+				res.status(200).send({
+					isError: false,
+					message: "Get Data Success",
+					data: null,
+				});
+			}
+
+			if (role === "super admin") {
+				// filter by
+				if (filterBy) {
+					// filter by + sort
+					if (sortBy[0] === "date") {
+						response = await db.stock_history.findAll({
+							include: [
+								{
+									model: db.product,
+									where: {
+										name: {
+											[Op.substring]: search,
+										},
+									},
+								},
+								{
+									model: db.branch,
+								},
+							],
+							where: {
+								createdAt: {
+									[Op.between]: [new Date(filterBy[0]), new Date(filterBy[1])],
+								},
+							},
+							order: [["createdAt", sortBy[1]]],
+						});
+						// filter without sort
+					} else {
+						response = await db.stock_history.findAll({
+							include: [
+								{
+									model: db.product,
+									where: {
+										name: {
+											[Op.substring]: search,
+										},
+									},
+								},
+								{
+									model: db.branch,
+								},
+							],
+							where: {
+								createdAt: {
+									[Op.between]: [new Date(filterBy[0]), new Date(filterBy[1])],
+								},
+							},
+						});
+					}
+				} else {
+					// sort without filter
+					if (sortBy[0] === "date") {
+						response = await db.stock_history.findAll({
+							include: [
+								{
+									model: db.product,
+									where: {
+										name: {
+											[Op.substring]: search,
+										},
+									},
+								},
+								{
+									model: db.branch,
+								},
+							],
+							order: [["createdAt", sortBy[1]]],
+						});
+					} else {
+						// no filter and no sort
+						response = await db.stock_history.findAll({
+							include: [
+								{
+									model: db.product,
+									where: {
+										name: {
+											[Op.substring]: search,
+										},
+									},
+								},
+								{
+									model: db.branch,
+								},
+							],
+						});
+					}
+				}
+			} else {
+				// filter by
+				if (filterBy) {
+					// filter by + sort
+					if (sortBy[0] === "date") {
+						response = await db.stock_history.findAll({
+							include: [
+								{
+									model: db.product,
+									where: {
+										name: {
+											[Op.substring]: search,
+										},
+									},
+								},
+								{
+									model: db.branch,
+								},
+							],
+							where: {
+								createdAt: {
+									[Op.between]: [new Date(filterBy[0]), new Date(filterBy[1])],
+								},
+								branch_id: admin_branch_id,
+							},
+							order: [["createdAt", sortBy[1]]],
+						});
+						// filter without sort
+					} else {
+						response = await db.stock_history.findAll({
+							include: [
+								{
+									model: db.product,
+									where: {
+										name: {
+											[Op.substring]: search,
+										},
+									},
+								},
+								{
+									model: db.branch,
+								},
+							],
+							where: {
+								createdAt: {
+									[Op.between]: [new Date(filterBy[0]), new Date(filterBy[1])],
+								},
+								branch_id: admin_branch_id,
+							},
+						});
+					}
+				} else {
+					// sort without filter
+					if (sortBy[0] === "date") {
+						response = await db.stock_history.findAll({
+							include: [
+								{
+									model: db.product,
+									where: {
+										name: {
+											[Op.substring]: search,
+										},
+									},
+								},
+								{
+									model: db.branch,
+								},
+							],
+							where: {
+								branch_id: admin_branch_id,
+							},
+							order: [["createdAt", sortBy[1]]],
+						});
+					} else {
+						// no filter and no sort
+						response = await db.stock_history.findAll({
+							include: [
+								{
+									model: db.product,
+									where: {
+										name: {
+											[Op.substring]: search,
+										},
+									},
+								},
+								{
+									model: db.branch,
+								},
+							],
+							where: {
+								branch_id: admin_branch_id,
+							},
+						});
+					}
+				}
+			}
+
+			res.status(200).send({
+				isError: false,
+				message: "Get Stock History Success",
+				data: response,
+			});
+		} catch (error) {
+			console.log(error);
+		}
+	},
 };

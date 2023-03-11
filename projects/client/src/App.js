@@ -17,6 +17,8 @@ import Checkout from "./pages/checkout";
 import Cart from "./pages/cart";
 import BranchAdminRegister from "./components/branchAdminRegister";
 import Transaction from "./pages/transaction";
+import LoginAdmin from "./pages/loginAdmin";
+import StockHistory from "./components/stockHistory";
 
 function App() {
 	const [profile, setprofile] = useState({
@@ -96,7 +98,9 @@ function App() {
 							path="branch-admin-register"
 							element={<BranchAdminRegister />}
 						/>
+						<Route path="stock-history" element={<StockHistory />} />
 					</Route>
+					<Route path="/loginAdmin" element={<LoginAdmin />} />
 				</Routes>
 			</div>
 		</>
