@@ -1,9 +1,9 @@
-import axios from "axios";
 import { useRef, useState } from "react";
 import toast, { Toaster } from "react-hot-toast";
 import LoadingSpin from "react-loading-spin";
 import { useNavigate } from "react-router-dom";
 import tokonglomerat from "../support/assets/new_login.png";
+import REST_API from "../support/services/RESTApiService";
 
 function ForgotPass() {
 	const [disable, setdisable] = useState(false);
@@ -15,9 +15,12 @@ function ForgotPass() {
 	let onForgotPass = async () => {
 		try {
 			setdisable(true);
-
-			let { data } = await axios.post("http://localhost:8000/user/forgot-password", {
-				email: email.current.value,
+			const { data } = await REST_API({
+				url: "user/forgot-password",
+				method: "POST",
+				data: {
+					email: email.current.value,
+				},
 			});
 			toast.success(data.message);
 			email.current.value = "";

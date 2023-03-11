@@ -25,7 +25,7 @@ export default function NavigationBar(props) {
 					<BiSearchAlt className="text-2xl text-gray-500 absolute top-2 left-1" />
 				</div>
 				<div className="flex justify-center text-gray-500 gap-7">
-					<button>
+					<button onClick={() => props.state.profile.uid? (navigate("/cart")) : navigate("/login")}>
 						<BiCart className="text-2xl" />
 					</button>
 					<button>
@@ -47,10 +47,10 @@ export default function NavigationBar(props) {
 					</div>
 				) : (
 					<div className="col-span-2 grid grid-cols-2 gap-4">
-						<button className="border-[2px] rounded-lg px-2 py-1">
+						<button onClick={() => navigate("/login")} className="border-[2px] rounded-lg px-2 py-1">
 							<p>Login</p>
 						</button>
-						<button className="border-[2px] rounded-lg px-2 py-1">
+						<button onClick={() => navigate("/register")} className="border-[2px] rounded-lg px-2 py-1">
 							<p>Register</p>
 						</button>
 					</div>

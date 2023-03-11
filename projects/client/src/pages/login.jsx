@@ -1,52 +1,21 @@
 import { useRef, useState } from "react";
 import { AiFillEye, AiFillEyeInvisible } from "react-icons/ai";
 import tokonglomerat from "../support/assets/new_login.png";
-import { toast, Toaster } from "react-hot-toast";
+import {  Toaster } from "react-hot-toast";
 import LoadingSpin from "react-loading-spin";
-import { useNavigate } from "react-router-dom";
-import axios from "axios";
 
-function Login() {
+function Login(props) {
 	const [showPassword, setshowPassword] = useState(false);
 	const [errEmail, seterrEmail] = useState();
 	const [errPass, seterrPass] = useState();
-	const [disable, setdisable] = useState();
-	// const [name, setname] = useState();
-
+	
 	const email = useRef();
 	const password = useRef();
-
-	const Navigate = useNavigate();
-
-	let onLogin = async () => {
-		try {
-			setdisable(true);
-
-			let { data } = await axios.post("http://localhost:8000/user/login", {
-				email: email.current.value,
-				password: password.current.value,
-			});
-			localStorage.setItem("token", `${data.data.token}`);
-			// setname(data.data.name);
-			toast.success(data);
-			email.current.value = "";
-			password.current.value = "";
-			setTimeout(() => {
-				Navigate("/home");
-			}, 3000);
-		} catch (error) {
-			toast.error(error.response.data.message);
-		} finally {
-			setdisable(false);
-		}
-	};
 
 	let onValidateEmail = (value) => {
 		if (value === "") {
 			seterrEmail("Please input your email");
-		} else if (
-			!/^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$/i.test(value)
-		) {
+		} else if (!/^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$/i.test(value)) {
 			seterrEmail("Format Email Invalid");
 		} else {
 			seterrEmail("");
@@ -57,17 +26,12 @@ function Login() {
 			seterrPass("Please input your password");
 		} else if (value.length < 8) {
 			seterrPass("Password less than 8 character, please input more");
-		} else if (
-			!/^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*[a-zA-Z])([a-zA-Z0-9]+)$/.test(
-				value
-			)
-		) {
+		} else if (!/^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*[a-zA-Z])([a-zA-Z0-9]+)$/.test(value)) {
 			seterrPass("Password must contain number and capital");
 		} else {
 			seterrPass("");
 		}
 	};
-
 	return (
 		<div className=" max-h-screen overflow-hidden ">
 			<div className=" flex justify-center content-center mt-[32px] font-bold text-4xl font-mandalaFont text-red-700 ">
@@ -90,10 +54,7 @@ function Login() {
 						</h1>
 
 						<div className="flex flex-col items-start mb-5 gap-y-3">
-							<label
-								htmlFor="email"
-								className="text-sm font-medium cursor-pointer"
-							>
+							<label htmlFor="email" className="text-sm font-medium cursor-pointer">
 								Email
 							</label>
 							<input
@@ -109,10 +70,7 @@ function Login() {
 							</div>
 						</div>
 						<div className="flex flex-col relative items-start gap-y-3">
-							<label
-								htmlFor="password"
-								className="text-sm font-medium cursor-pointer"
-							>
+							<label htmlFor="password" className="text-sm font-medium cursor-pointer">
 								Password
 							</label>
 
@@ -129,16 +87,10 @@ function Login() {
 							</div>
 							<div className=" text-2xl absolute right-5 top-12">
 								{showPassword ? (
-									<AiFillEye
-										onClick={() =>
-											setshowPassword((showPassword) => !showPassword)
-										}
-									/>
+									<AiFillEye onClick={() => setshowPassword((showPassword) => !showPassword)} />
 								) : (
 									<AiFillEyeInvisible
-										onClick={() =>
-											setshowPassword((showPassword) => !showPassword)
-										}
+										onClick={() => setshowPassword((showPassword) => !showPassword)}
 									/>
 								)}
 							</div>
@@ -150,17 +102,13 @@ function Login() {
 							Forgot Password?
 						</a>
 						<button
-							onClick={() => onLogin()}
-							disabled={disable}
+							onClick={() => props.MyFunc.onLogin(email.current.value, password.current.value)}
+							disabled={props.isDisable.disable}
 							type="submit"
 							className="inline-flex w-full items-center justify-center mt-8 px-8 py-4 font-sans font-semibold tracking-wide hover:bg-gray-300 text-white bg-red-700 rounded-lg h-[60px]"
 						>
-							{disable ? (
-								<LoadingSpin
-									size={"30px"}
-									primaryColor={"red"}
-									secondaryColor={"gray"}
-								/>
+							{props.isDisable.disable ? (
+								<LoadingSpin size={"30px"} primaryColor={"red"} secondaryColor={"gray"} />
 							) : (
 								"Login"
 							)}
