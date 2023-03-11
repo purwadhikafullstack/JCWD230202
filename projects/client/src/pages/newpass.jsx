@@ -3,8 +3,8 @@ import tokonglomerat from "../support/assets/new_login.png";
 import { AiFillEye, AiFillEyeInvisible } from "react-icons/ai";
 import { useLocation, useNavigate } from "react-router-dom";
 import LoadingSpin from "react-loading-spin";
-import axios from "axios";
 import { toast, Toaster } from "react-hot-toast";
+import REST_API from "../support/services/RESTApiService";
 function UpdatePassword() {
 	const [showPassword, setshowPassword] = useState(false);
 	const [showconfPass, setshowconfPass] = useState(false);
@@ -22,11 +22,14 @@ function UpdatePassword() {
 	let onSubmit = async () => {
 		try {
 			setdisable(true);
-
-			let { data } = await axios.patch("http://localhost:8000/user/reset-password/uid", {
-				uid: location.pathname.slice(16),
-				password: pass.current.value,
-				confPassword: confPass.current.value,
+			const { data } = await REST_API({
+				url: "user/reset-password/uid",
+				method: "POST",
+				data: {
+					uid: location.pathname.slice(16),
+					password: pass.current.value,
+					confPassword: confPass.current.value,
+				},
 			});
 
 			toast.success(data.message);

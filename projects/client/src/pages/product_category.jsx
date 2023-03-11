@@ -1,12 +1,11 @@
 import { Modal } from "flowbite-react";
 import { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import NavigationBar from "../components/navbar";
-// import { API } from "../support/services/restAPI";
 import { SlClose } from "react-icons/sl";
 import LoadingSpin from "react-loading-spin";
 import { toast, Toaster } from "react-hot-toast";
-import axios from "axios";
+import REST_API from "../support/services/RESTApiService";
 
 export default function ProductCategory() {
 	const params = useParams();
@@ -19,16 +18,71 @@ export default function ProductCategory() {
 	const [quantity, setquantity] = useState(1);
 	const [unit, setunit] = useState();
 	const [show, setshow] = useState(false);
+	const [order, setorder] = useState("");
+	const [profile, setprofile] = useState({
+		uid: "",
+		id: "",
+		name: "",
+		birthdate: "",
+		gender: "",
+		email: "",
+		phone_number: "",
+		profile_picture: "",
+		address: "",
+	});
 
-	let onGetData = async (page) => {
+	const Navigate = useNavigate();
+
+	const getProfile = async () => {
+		const { data } = await REST_API({
+			url: "user/profile",
+			method: "GET",
+		});
+		console.log(data);
+		setprofile({
+			...profile,
+			uid: data.data.uid,
+			id: data.data.id,
+			name: data.data.name,
+			birthdate: data.data.birthdate,
+			gender: data.data.gender,
+			email: data.data.email,
+			phone_number: data.data.phone_number,
+			profile_picture: data.data.img,
+			address: data.data.user_addresses,
+		});
+	};
+
+	let onGetData = async (page, sortby) => {
 		try {
-			const { data } = await axios.get(
-				`http://localhost:8000/product/branch_product?category=${params.product
+			const { data } = await REST_API({
+				url: `product/sortby?category=${params.product
 					.split("&")[0]
-					.slice(-1)}&branch=${params.product
-					.split("&")[1]
-					.slice(-1)}&page=${page}`
-			);
+					.slice(-1)}&branch=${params.product.split("&")[1].slice(-1)}&page=${page}&sortby=${
+					sortby ? sortby : ""
+				}`,
+				method: "GET",
+			});
+			console.log(data.data);
+			setproduct(data.data);
+			setselectedpage(page);
+		} catch (error) {
+			console.log(error);
+		}
+	};
+
+	let onSortby = async (page, sortby) => {
+		console.log(page, sortby);
+		try {
+			setorder(sortby);
+			const { data } = await REST_API({
+				url: `product/sortby?category=${params.product
+					.split("&")[0]
+					.slice(-1)}&branch=${params.product.split("&")[1].slice(-1)}&page=${page}&sortby=${
+					sortby ? sortby : ""
+				}`,
+				method: "GET",
+			});
 			console.log(data.data);
 			setproduct(data.data);
 			setselectedpage(page);
@@ -39,11 +93,12 @@ export default function ProductCategory() {
 
 	let onGetPage = async () => {
 		try {
-			const { data } = await axios.get(
-				`http://localhost:8000/product/pageCategory?branch=${params.product
+			const { data } = await REST_API({
+				url: `product/pageCategory?branch=${params.product
 					.split("&")[1]
-					.slice(-1)}&category=${params.product.split("&")[0].slice(-1)}`
-			);
+					.slice(-1)}&category=${params.product.split("&")[0].slice(-1)}`,
+				method: "GET",
+			});
 
 			const totalPage = [];
 			for (let i = 1; i <= data.data / 10; i++) {
@@ -57,9 +112,10 @@ export default function ProductCategory() {
 		console.log(branch);
 		console.log(products);
 		try {
-			const { data } = await axios.get(
-				`http://localhost:8000/product/detail?branch=${branch}&product=${products}`
-			);
+			const { data } = await REST_API({
+				url: `product/detail?branch=${branch}&product=${products}`,
+				method: "GET",
+			});
 			console.log(data.data[0].product);
 			console.log(data.data[0].branch);
 			console.log(data.data[0]);
@@ -73,11 +129,10 @@ export default function ProductCategory() {
 
 	let onGetUnit = async () => {
 		try {
-			const { data } = await axios.get(
-				`http://localhost:8000/product/getallproduct?category=${params.product
-					.split("&")[0]
-					.slice(-1)}`
-			);
+			const { data } = await REST_API({
+				url: `product/getallproduct?category=${params.product.split("&")[0].slice(-1)}`,
+				method: "GET",
+			});
 			console.log(data.data[0]);
 			setunit(data.data[0]);
 		} catch (error) {
@@ -87,14 +142,28 @@ export default function ProductCategory() {
 
 	let onSubmit = async () => {
 		try {
-			setdisable(true);
-			const { data } = await axios.post("http://localhost:8000/cart/add", {
-				qty: quantity,
-				branch_id: detail.branch_id,
-				user_id: 4,
-				product_id: detail.product_id,
-			});
-			toast.success(data.message);
+			let uid = profile.uid;
+
+			if (uid) {
+				setdisable(true);
+				const { data } = await REST_API({
+					url: "cart/add",
+					method: "POST",
+					data: {
+						qty: quantity,
+						user_id: profile.id,
+						branch_id: detail.branch_id,
+						product_id: detail.product_id,
+					},
+				});
+				toast.success(data.message);
+			} else {
+				toast("Redirecting to Login...");
+
+				setTimeout(() => {
+					Navigate("/login");
+				}, 3000);
+			}
 		} catch (error) {
 			toast.error(error.response.data.message);
 		} finally {
@@ -103,7 +172,10 @@ export default function ProductCategory() {
 	};
 
 	const getCategory = async () => {
-		const { data } = await axios.get("http://localhost:8000/product/category");
+		const { data } = await REST_API({
+			url: "product/category",
+			method: "GET",
+		});
 		setcategory(data.data);
 	};
 
@@ -112,12 +184,12 @@ export default function ProductCategory() {
 		getCategory();
 		onGetPage();
 		onGetUnit();
-		// eslint-disable-next-line react-hooks/exhaustive-deps
+		getProfile();
 	}, []);
 
 	return (
 		<div>
-			<NavigationBar />
+			<NavigationBar state={{ profile }} />
 			<div className=" bg-slate-200">
 				<div className="pt-[45px] max-w-screen-xl mx-auto ">
 					<div className="flex justify-evenly bg-white  rounded-lg shadow-2xl my-8 py-10">
@@ -126,7 +198,7 @@ export default function ProductCategory() {
 									return (
 										<a
 											href={`/category/category=${value.id}&branch=${
-												product ? product[0].branch_id : ""
+												product ? product[0].branch_products[0].branch_id : ""
 											}`}
 										>
 											<button key={index} className="space-y-2">
@@ -135,9 +207,7 @@ export default function ProductCategory() {
 													alt={value.name}
 													className="h-32 w-32 rounded-full overflow-visible shadow-lg"
 												/>
-												<p className="font-semibold font-mandalaFont text-xl">
-													{value.name}
-												</p>
+												<p className="font-semibold font-mandalaFont text-xl">{value.name}</p>
 											</button>
 										</a>
 									);
@@ -147,9 +217,14 @@ export default function ProductCategory() {
 					<div className=" flex justify-end my-5">
 						<div className=" flex justify-center items-center gap-1 w-[256px] h-10">
 							<p>Sort by</p>{" "}
-							<select className=" rounded-md w-[200px]">
-								<option>Price</option>
-								<option>Name</option>
+							<select
+								onChange={(e) => onSortby(1, e.target.value)}
+								className="rounded-md w-[200px]"
+							>
+								<option value="name-ASC">Name - Ascending</option>
+								<option value="name-DESC">Name - Descending</option>
+								<option value="price-ASC">Price - Ascending</option>
+								<option value="price-DESC">Price - Descending</option>
 							</select>
 						</div>
 					</div>
@@ -158,25 +233,19 @@ export default function ProductCategory() {
 							? product.map((value, index) => {
 									return (
 										<button
-											onClick={() =>
-												onGetDetail(value.branch_id, value.product_id)
-											}
+											onClick={() => onGetDetail(value.branch_products[0].branch_id, value.id)}
 											key={index}
 											className="flex flex-col shadow-xl h-full w-full bg-white border border-gray-200 rounded-lg dark:bg-gray-800 dark:border-gray-700"
 										>
-											<img
-												className="rounded-t-lg h-44 w-full"
-												src={value.product.img}
-												alt="product"
-											/>
+											<img className="rounded-t-lg h-44 w-full" src={value.img} alt="product" />
 											<div className="px-5 py-5 text-left">
 												<h5 className="text-lg font-semibold tracking-tight text-gray-900 dark:text-white">
-													{value.product.name}
+													{value.name}
 												</h5>
-												<h4>Toko {value.branch.location}</h4>
+												<h4>Toko {value.branch_products[0].branch.location}</h4>
 
 												<p className="text-lg font-bold text-gray-900 dark:text-white">
-													Rp. {value.product.price.toLocaleString()}
+													Rp. {value.price.toLocaleString()}
 												</p>
 											</div>
 										</button>
@@ -192,11 +261,9 @@ export default function ProductCategory() {
 											return (
 												<li key={index + 1}>
 													<button
-														onClick={() => onGetData(value)}
+														onClick={() => onSortby(value, order)}
 														className={`px-3 py-2 leading-tight text-gray-500 bg-white border border-gray-300 ${
-															selectedpage === value
-																? "!bg-red-700 text-white"
-																: null
+															selectedpage === value ? "!bg-red-700 text-white" : null
 														} hover:bg-slate-300  dark:bg-gray-800 dark:border-gray-700 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white`}
 													>
 														{value}
@@ -210,7 +277,7 @@ export default function ProductCategory() {
 					</div>
 				</div>
 			</div>
-			<Modal show={show} popup={true} size="md" onClose={() => setshow(false)}>
+			<Modal show={show} size="md" popup={true} onClose={() => setshow(false)}>
 				{/* <Modal.Header/> */}
 				<div>
 					<img
@@ -223,13 +290,8 @@ export default function ProductCategory() {
 					<h1 className=" text-[20px] font-bold  text-orange-700">
 						Rp. {detail ? detail.product.price.toLocaleString() : null}
 					</h1>
-					<h2 className=" mt-1 text-[16px] font-semibold">
-						{detail ? detail.product.name : null}
-					</h2>
-					<p className=" mt-1 text-[12px] text-slate-400 ">
-						{" "}
-						per {unit ? unit.unit.name : null}
-					</p>
+					<h2 className=" mt-1 text-[16px] font-semibold">{detail ? detail.product.name : null}</h2>
+					<p className=" mt-1 text-[12px] text-slate-400 "> per {unit ? unit.unit.name : null}</p>
 					<h2 className=" mt-1 text-[16px] font-semibold">Description</h2>
 					<p className=" text-[12px] mt-2 text-slate-400">
 						{detail ? detail.product.description : null}
@@ -299,9 +361,11 @@ export default function ProductCategory() {
 								className=" outline-none text-center max-w-[46px]"
 								defaultValue={1}
 								value={quantity}
+								onChange={(e) => setquantity(e.target.value)}
 							/>
 							<button
 								value={"+"}
+								disabled={quantity >= (detail ? detail.stock : null) ? true : false}
 								onClick={() => setquantity(quantity + 1)}
 								className=" text-green-500 font-bold"
 							>
@@ -310,8 +374,7 @@ export default function ProductCategory() {
 						</div>
 						{detail && detail.stock <= 5 ? (
 							<div className=" flex justify-center items-center ml-4 font-semibold">
-								Stock:{" "}
-								<p className="text-orange-700  px-2">{detail.stock} left</p>
+								Stock: <p className="text-orange-700  px-2">{detail.stock} left</p>
 							</div>
 						) : null}
 					</div>
@@ -324,11 +387,7 @@ export default function ProductCategory() {
 							className="font-medium w-full text-sm px-5 py-2.5 rounded-lg text-white bg-red-700 hover:bg-red-800 "
 						>
 							{disable ? (
-								<LoadingSpin
-									size={"30px"}
-									primaryColor={"red"}
-									secondaryColor={"gray"}
-								/>
+								<LoadingSpin size={"30px"} primaryColor={"red"} secondaryColor={"gray"} />
 							) : (
 								"Add to cart"
 							)}

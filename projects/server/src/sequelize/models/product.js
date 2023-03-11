@@ -52,6 +52,10 @@ module.exports = (sequelize, DataTypes) => {
 					notNull: { msg: "Product must have a price" },
 				},
 			},
+			description: {
+				type: DataTypes.TEXT,
+				allowNull: true,
+			},
 		},
 		{
 			sequelize,

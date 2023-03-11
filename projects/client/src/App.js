@@ -21,6 +21,8 @@ import LoginAdmin from "./pages/loginAdmin";
 import StockHistory from "./components/stockHistory";
 
 function App() {
+	const location = useLocation();
+	const [disable, setdisable] = useState();
 	const [profile, setprofile] = useState({
 		name: null,
 		birthdate: null,
@@ -48,6 +50,34 @@ function App() {
 			});
 		} catch (error) {
 			console.log(error);
+		}
+	};
+
+	let onLogin = async (email, password) => {
+		try {
+			setdisable(true);
+			const { data } = await REST_API({
+				url: "user/login",
+				method: "POST",
+				data: {
+					email: email,
+					password: password,
+				},
+			});
+			await localStorage.setItem("token", `${data.data.token}`);
+			toast.success(data.message);
+			email = "";
+			password = "";
+			getProfile();
+				setTimeout(() => {
+					window.location.href="http://localhost:3000/home"
+				}, 3000);
+				
+		} catch (error) {
+			toast.error(error.response.data.message);
+			console.log(error);
+		} finally {
+			setdisable(false);
 		}
 	};
 
@@ -81,11 +111,11 @@ function App() {
 							}
 						/>
 						<Route path="category/:product" element={<ProductCategory />} />
-						<Route path="checkout/:cart" element={<Checkout />} />
-						<Route path="cart/:id" element={<Cart />} />
+						<Route path="checkout" element={<Checkout />} />
+						<Route path="cart" element={<Cart />} />
 						<Route path="transaction" element={<Transaction />} />
 					</Route>
-					<Route path="/login" element={<Login />} />
+					<Route path="/login" element={<Login MyFunc={{ onLogin }} isDisable={{ disable }} />} />
 					<Route path="/updatePassword/:uid" element={<UpdatePassword />} />
 					<Route path="/register" element={<Register />} />
 					<Route path="/activation/:uid" element={<Activation />} />
