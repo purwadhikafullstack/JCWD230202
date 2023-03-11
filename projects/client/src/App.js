@@ -24,6 +24,8 @@ import { toast } from "react-hot-toast";
 function App() {
 	const [disable, setdisable] = useState();
 	const [profile, setprofile] = useState({
+		uid: null,
+		id: null,
 		name: null,
 		birthdate: null,
 		gender: null,
@@ -40,6 +42,8 @@ function App() {
 			});
 			setprofile({
 				...profile,
+				uid: data.data.uid,
+				id: data.data.id,
 				name: data.data.name,
 				birthdate: data.data.birthdate,
 				gender: data.data.gender,
