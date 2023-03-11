@@ -1,7 +1,6 @@
 import { Modal } from "flowbite-react";
 import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import NavigationBar from "../components/navbar";
 import { SlClose } from "react-icons/sl";
 import LoadingSpin from "react-loading-spin";
 import { toast, Toaster } from "react-hot-toast";
@@ -189,7 +188,6 @@ export default function ProductCategory() {
 
 	return (
 		<div>
-			<NavigationBar state={{ profile }} />
 			<div className=" bg-slate-200">
 				<div className="pt-[45px] max-w-screen-xl mx-auto ">
 					<div className="flex justify-evenly bg-white  rounded-lg shadow-2xl my-8 py-10">
