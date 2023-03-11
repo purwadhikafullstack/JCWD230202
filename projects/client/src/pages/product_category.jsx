@@ -34,7 +34,7 @@ export default function ProductCategory() {
 
 	const getProfile = async () => {
 		const { data } = await REST_API({
-			url: "user/profile",
+			url: "/user/profile",
 			method: "GET",
 		});
 		console.log(data);
@@ -146,7 +146,7 @@ export default function ProductCategory() {
 			if (uid) {
 				setdisable(true);
 				const { data } = await REST_API({
-					url: "cart/add",
+					url: "/cart/add",
 					method: "POST",
 					data: {
 						qty: quantity,

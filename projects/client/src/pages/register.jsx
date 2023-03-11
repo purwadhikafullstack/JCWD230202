@@ -25,7 +25,7 @@ function Register() {
 		try {
 			setdisable(true);
 			const { data } = await REST_API({
-				url: "user/register",
+				url: "/user/register",
 				method: "POST",
 				data: {
 					name: inputName.current.value,

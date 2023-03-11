@@ -15,7 +15,7 @@ export default function Cart() {
 	let onGetCart = async () => {
 		try {
 			let { data } = await REST_API({
-				url: "cart/get",
+				url: "/cart/get",
 				method: "GET",
 			});
 			let total = 0;
@@ -35,7 +35,7 @@ export default function Cart() {
 	let onDelCart = async (value) => {
 		try {
 			let { data } = await REST_API({
-				url: "cart/del",
+				url: "/cart/del",
 				method: "DELETE",
 				data: {
 					id: value,
@@ -53,7 +53,7 @@ export default function Cart() {
 		try {
 			if (operation === "+") {
 				const { data } = await REST_API({
-					url: "cart/inc",
+					url: "/cart/inc",
 					method: "POST",
 					data: {
 						id: value,
@@ -65,7 +65,7 @@ export default function Cart() {
 				onGetCart();
 			} else if (operation === "-") {
 				const { data } = await REST_API({
-					url: "cart/dec",
+					url: "/cart/dec",
 					method: "POST",
 					data: {
 						id: value,

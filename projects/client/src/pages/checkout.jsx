@@ -14,7 +14,7 @@ export default function Checkout() {
 	let onGetCart = async () => {
 		try {
 			let { data } = await REST_API({
-				url: "cart/get",
+				url: "/cart/get",
 				method: "GET",
 			});
 			let total = 0;

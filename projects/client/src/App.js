@@ -19,9 +19,9 @@ import BranchAdminRegister from "./components/branchAdminRegister";
 import Transaction from "./pages/transaction";
 import LoginAdmin from "./pages/loginAdmin";
 import StockHistory from "./components/stockHistory";
+import { toast } from "react-hot-toast";
 
 function App() {
-	const location = useLocation();
 	const [disable, setdisable] = useState();
 	const [profile, setprofile] = useState({
 		name: null,
@@ -57,7 +57,7 @@ function App() {
 		try {
 			setdisable(true);
 			const { data } = await REST_API({
-				url: "user/login",
+				url: "/user/login",
 				method: "POST",
 				data: {
 					email: email,
