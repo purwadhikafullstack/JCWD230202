@@ -24,7 +24,7 @@ function UpdatePassword() {
 			setdisable(true);
 			const { data } = await REST_API({
 				url: "/user/reset-password/uid",
-				method: "POST",
+				method: "PATCH",
 				data: {
 					uid: location.pathname.slice(16),
 					password: pass.current.value,
