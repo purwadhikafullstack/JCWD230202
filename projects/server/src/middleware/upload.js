@@ -15,11 +15,9 @@ const uploadImage = (req, res, next) => {
 			});
 			next();
 		} catch (error) {
-			console.log(error);
-
-			// if (error.fileToDelete) {
-			// 	deleteFiles(error.fileToDelete);
-			// }
+			if (error.fileToDelete) {
+				deleteFiles(error.fileToDelete);
+			}
 			return res.status(413).send({
 				isError: true,
 				message: error.message,

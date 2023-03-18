@@ -53,6 +53,66 @@ const category = async () => {
 			name: "Groceries",
 			img: "https://assets.segari.id/categories/v3/new/sembako_medium.png",
 		},
+		{
+			name: "Kitchenware",
+			img: "https://assets.segari.id/categories/v3/new/peralatan_dapur_medium.png",
+		},
+		{
+			name: "Self Care",
+			img: "https://assets.segari.id/categories/v3/new/perawatan_diri_medium.png",
+		},
+		{
+			name: "Instant Food",
+			img: "https://assets.segari.id/categories/v3/new/makanan_instan_medium.png",
+		},
+		{
+			name: "Healthcare",
+			img: "https://assets.segari.id/categories/v3/new/kesehatan_medium.png",
+		},
+		{
+			name: "Snacks",
+			img: "https://assets.segari.id/categories/v3/new/makanan_ringan_medium.png",
+		},
+		{
+			name: "Condiments",
+			img: "https://assets.segari.id/categories/v3/new/saus_dan_kondimen_medium.png",
+		},
+		{
+			name: "Dairy",
+			img: "https://assets.segari.id/categories/v3/new/susu_dan_olahan_susu_medium.png",
+		},
+		{
+			name: "Bakery",
+			img: "https://assets.segari.id/categories/v3/new/roti_medium.png",
+		},
+		{
+			name: "Frozen Goods",
+			img: "https://assets.segari.id/categories/v3/new/produk_beku_medium.png",
+		},
+		{
+			name: "Spices",
+			img: "https://assets.segari.id/categories/v3/new/bumbu_masak_medium.png",
+		},
+		{
+			name: "Breakfast",
+			img: "https://assets.segari.id/categories/v3/new/sarapan_medium.png",
+		},
+		{
+			name: "Home Cleaning",
+			img: "https://assets.segari.id/categories/v3/new/kebersihan_medium.png",
+		},
+		{
+			name: "Birds",
+			img: "https://assets.segari.id/categories/v3/new/unggas_medium.png",
+		},
+		{
+			name: "Meats",
+			img: "https://assets.segari.id/categories/v3/new/daging_medium.png",
+		},
+		{
+			name: "Seafoods",
+			img: "https://assets.segari.id/categories/v3/new/seafood_medium.png",
+		},
 	]);
 };
 

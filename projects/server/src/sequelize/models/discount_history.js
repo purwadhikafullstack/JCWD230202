@@ -36,7 +36,10 @@ module.exports = (sequelize, DataTypes) => {
 				},
 			},
 			expired: DataTypes.DATEONLY,
-			status: DataTypes.STRING,
+			status: {
+				type: DataTypes.STRING,
+				defaultValue: "Waiting Approval",
+			},
 		},
 		{
 			sequelize,

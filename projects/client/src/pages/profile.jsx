@@ -9,6 +9,7 @@ import {
 	Checkbox,
 } from "flowbite-react";
 import { useForm } from "react-hook-form";
+import FooterBar from "../components/footer";
 import { FaFemale, FaMale } from "react-icons/fa";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
@@ -716,6 +717,7 @@ export default function Profile(props) {
 				</Modal.Body>
 			</Modal>
 			<Toaster />
+			<FooterBar />
 		</div>
 	);
 }

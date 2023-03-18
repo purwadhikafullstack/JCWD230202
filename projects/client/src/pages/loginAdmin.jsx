@@ -11,7 +11,6 @@ function LoginAdmin() {
 	const [errEmail, seterrEmail] = useState();
 	const [errPass, seterrPass] = useState();
 	const [disable, setdisable] = useState();
-	const [name, setname] = useState();
 
 	const email = useRef();
 	const password = useRef();
@@ -28,7 +27,6 @@ function LoginAdmin() {
 			});
 
 			localStorage.setItem("token", `${data.data.token}`);
-			setname(data.data.name);
 			toast.success(data.message);
 			email.current.value = "";
 			password.current.value = "";
