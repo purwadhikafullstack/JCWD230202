@@ -1,38 +1,84 @@
 const db = require("../sequelize/models");
 const { Op } = require("sequelize");
+const HTTPStatus = require("../helper/HTTPStatus");
+const { sequelize } = require("../sequelize/models");
+const deleteFiles = require("../helper/deleteFiles");
 
 module.exports = {
-	getSuggested: async (req, res) => {
-		const {} = req.query;
+	deleteProduct: async (req, res) => {},
+	createProduct: async (req, res) => {
+		const { uid } = req.uid;
+		const { name, price, category_id, stock, unit_id, description } =
+			JSON.parse(req.body.data);
+		const t = await sequelize.transaction();
 		try {
-			const data = await db.discount_history.findAll({
-				where: { branch_id: 1 },
+			const admin = await db.user.findOne({
+				where: { uid },
+				include: { model: db.branch },
+			});
+			const product = await db.product.create(
+				{
+					name,
+					price,
+					category_id,
+					unit_id,
+					description,
+					img: req.files.images[0].path,
+				},
+				{ transaction: t }
+			);
+
+			await db.branch_product.create(
+				{
+					stock,
+					branch_id: admin.branch.id,
+					product_id: product.id,
+				},
+				{ transaction: t }
+			);
+			await db.stock_history.create(
+				{
+					stock,
+					branch_id: admin.branch.id,
+					product_id: product.id,
+				},
+				{ transaction: t }
+			);
+			await t.commit();
+			new HTTPStatus(res).success("Product created").send();
+		} catch (error) {
+			await t.rollback();
+			deleteFiles(req.files.images[0].path);
+			new HTTPStatus(res, error).error(error.message, 400).send();
+		}
+	},
+	getSuggested: async (req, res) => {
+		try {
+			const data = await db.transaction.findAll({
+				attributes: [
+					[
+						sequelize.fn("COUNT", sequelize.col("product_name")),
+						"total_transaction",
+					],
+				],
+				limit: 10,
 				include: [
 					{
 						model: db.product,
+						attributes: ["id", "name", "img", "price", "description"],
+						include: [{ model: db.unit }],
 					},
-					{
-						model: db.branch,
-					},
+					{ model: db.branch, attributes: ["id", "location"] },
 				],
-				offset: 0,
-				limit: 10,
+				group: ["product_name"],
+				order: [["total_transaction", "DESC"]],
 			});
-			res.status(200).send({
-				isError: false,
-				message: "Get All Product",
-				data,
-			});
+			new HTTPStatus(res, data).success("Get best seller product").send();
 		} catch (error) {
-			res.status(400).send({
-				isError: true,
-				message: error.message,
-				data: error,
-			});
+			new HTTPStatus(res, error).error(error.message, 400).send();
 		}
 	},
-	getAllProduct: async (req, res) => {
-		const { page } = req.query;
+	getRandom: async (req, res) => {
 		try {
 			const data = await db.branch_product.findAll({
 				where: { branch_id: 1 },
@@ -42,7 +88,7 @@ module.exports = {
 					},
 					{ model: db.branch },
 				],
-				offset: page == 1 ? 0 : page * 10 - 10,
+				offset: Math.floor(Math.random() * 155),
 				limit: 10,
 			});
 			res.status(200).send({

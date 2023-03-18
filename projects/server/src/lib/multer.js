@@ -5,8 +5,6 @@ const defaultPath = "Public";
 
 const storage = multer.diskStorage({
 	destination: async (req, file, cb) => {
-		console.log(file);
-
 		let isDirectoryExist = fs.existsSync(`${defaultPath}/${file.fieldname}`);
 		if (!isDirectoryExist) {
 			await fs.promises.mkdir(`${defaultPath}/${file.fieldname}`, {

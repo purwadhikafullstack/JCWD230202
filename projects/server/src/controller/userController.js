@@ -14,28 +14,19 @@ module.exports = {
 	getUser: async (req, res) => {
 		const { uid } = req.uid;
 		try {
-			const {
-				id,
-				name,
-				email,
-				gender,
-				birthdate,
-				phone_number,
-				img,
-				user_addresses,
-			} = await db.user.findOne({
+			const { id, name, email, gender, birthdate, phone_number, img, user_addresses, role } = await db.user.findOne({
 				where: { uid },
 				include: { model: db.user_address },
 			});
 			const httpStatus = new HTTPStatus(res, {
 				id,
-				uid,
 				name,
 				email,
 				gender,
 				birthdate,
 				phone_number,
 				img,
+				role,
 				user_addresses: {
 					main_address: user_addresses.filter((value) => {
 						return value.main_address === true;
@@ -100,8 +91,7 @@ module.exports = {
 					data: null,
 				});
 
-			let char =
-				/^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*[a-zA-Z])([a-zA-Z0-9]+)$/;
+			let char = /^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*[a-zA-Z])([a-zA-Z0-9]+)$/;
 			if (!char.test(password))
 				return res.status(404).send({
 					isError: true,
@@ -122,10 +112,7 @@ module.exports = {
 				phone_number,
 			});
 
-			const template = await fs.readFile(
-				"./template/confirmation.html",
-				"utf-8"
-			);
+			const template = await fs.readFile("./template/confirmation.html", "utf-8");
 			const templateToCompile = await handlebars.compile(template);
 			const newTemplate = templateToCompile({
 				name,
@@ -177,10 +164,7 @@ module.exports = {
 					data: null,
 				});
 
-			let hashMatchResult = await matchPassword(
-				password,
-				findEmail.dataValues.password
-			);
+			let hashMatchResult = await matchPassword(password, findEmail.dataValues.password);
 
 			if (hashMatchResult === false)
 				return res.status(404).send({
@@ -196,7 +180,13 @@ module.exports = {
 			res.status(201).send({
 				isError: false,
 				message: "Login Success",
-				data: { token, uid: findEmail.dataValues.uid, name: findEmail.dataValues.name,email: findEmail.dataValues.email, phone_number: findEmail.dataValues.phone_number },
+				data: {
+					token,
+					uid: findEmail.dataValues.uid,
+					name: findEmail.dataValues.name,
+					email: findEmail.dataValues.email,
+					phone_number: findEmail.dataValues.phone_number,
+				},
 			});
 		} catch (error) {
 			res.status(404).send({
@@ -311,10 +301,7 @@ module.exports = {
 
 			const name = findEmail.dataValues.name;
 
-			const template = await fs.readFile(
-				"./template/resetPassword.html",
-				"utf-8"
-			);
+			const template = await fs.readFile("./template/resetPassword.html", "utf-8");
 			const templateToCompile = await handlebars.compile(template);
 			const newTemplate = templateToCompile({
 				name,
@@ -389,10 +376,7 @@ module.exports = {
 					data: null,
 				});
 			}
-			await db.user.update(
-				{ password: newPassword },
-				{ where: { uid: token } }
-			);
+			await db.user.update({ password: newPassword }, { where: { uid: token } });
 			res.status(201).send({
 				isError: false,
 				message: "Password updated",
@@ -427,16 +411,8 @@ module.exports = {
 		const { id } = req.params;
 		const t = await sequelize.transaction();
 		try {
-			await db.user_address.update(
-				{ main_address: false },
-				{ where: { main_address: true } },
-				{ transaction: t }
-			);
-			await db.user_address.update(
-				{ main_address: true },
-				{ where: { id } },
-				{ transaction: t }
-			);
+			await db.user_address.update({ main_address: false }, { where: { main_address: true } }, { transaction: t });
+			await db.user_address.update({ main_address: true }, { where: { id } }, { transaction: t });
 			t.commit();
 			res.status(201).send({
 				isError: false,
@@ -454,10 +430,9 @@ module.exports = {
 	},
 	rakirProvince: async (req, res) => {
 		try {
-			const { data } = await axios.get(
-				"https://api.rajaongkir.com/starter/province",
-				{ headers: { key: "1625ecd94b7c4d9ecc661a5e0500bf2f" } }
-			);
+			const { data } = await axios.get("https://api.rajaongkir.com/starter/province", {
+				headers: { key: "1625ecd94b7c4d9ecc661a5e0500bf2f" },
+			});
 			res.status(200).send({
 				isError: false,
 				message: "Rajaongkir Province",
@@ -480,12 +455,9 @@ module.exports = {
 					message: "Province_Id Not Found!",
 					data: null,
 				});
-			const { data } = await axios.get(
-				`https://api.rajaongkir.com/starter/city?province=${province}`,
-				{
-					headers: { key: "1625ecd94b7c4d9ecc661a5e0500bf2f" },
-				}
-			);
+			const { data } = await axios.get(`https://api.rajaongkir.com/starter/city?province=${province}`, {
+				headers: { key: "1625ecd94b7c4d9ecc661a5e0500bf2f" },
+			});
 			res.status(201).send({
 				isError: false,
 				message: "Rajaongkir City by province",
@@ -502,14 +474,7 @@ module.exports = {
 	addAddress: async (req, res) => {
 		const t = await sequelize.transaction();
 		const { uid } = req.uid;
-		const {
-			province,
-			city,
-			address,
-			receiver_name,
-			receiver_phone,
-			main_address,
-		} = req.body;
+		const { province, city, address, receiver_name, receiver_phone, main_address } = req.body;
 		try {
 			const { id } = await db.user.findOne({ where: { uid } });
 			if (main_address) {
