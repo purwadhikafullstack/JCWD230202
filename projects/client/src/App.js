@@ -22,6 +22,7 @@ import StockHistory from "./components/stockHistory";
 import { toast } from "react-hot-toast";
 import ProductManagement from "./pages/productManagement";
 import DiscountManagement from "./pages/discountManagement";
+import BranchAdminProductList from "./components/branchAdminProductlist";
 
 function App() {
 	const [disable, setdisable] = useState();
@@ -132,6 +133,7 @@ function App() {
 						element={<BranchAdminRegister />}
 					/>
 					<Route path="stock-history" element={<StockHistory />} />
+					<Route path="admin-product" element={<BranchAdminProductList />} />
 					<Route path="product-management" element={<ProductManagement />} />
 					<Route path="discount-management" element={<DiscountManagement />} />
 				</Route>
