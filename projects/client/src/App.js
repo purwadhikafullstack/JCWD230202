@@ -20,6 +20,8 @@ import Transaction from "./pages/transaction";
 import LoginAdmin from "./pages/loginAdmin";
 import StockHistory from "./components/stockHistory";
 import { toast } from "react-hot-toast";
+import BranchAdminProductList from "./components/branchAdminProductlist";
+
 
 function App() {
 	const [disable, setdisable] = useState();
@@ -73,10 +75,9 @@ function App() {
 			email = "";
 			password = "";
 			getProfile();
-				setTimeout(() => {
-					window.location.href="http://localhost:3000/home"
-				}, 3000);
-				
+			setTimeout(() => {
+				window.location.href = "http://localhost:3000/home";
+			}, 3000);
 		} catch (error) {
 			toast.error(error.response.data.message);
 			console.log(error);
@@ -119,7 +120,10 @@ function App() {
 						<Route path="cart" element={<Cart />} />
 						<Route path="transaction" element={<Transaction />} />
 					</Route>
-					<Route path="/login" element={<Login MyFunc={{ onLogin }} isDisable={{ disable }} />} />
+					<Route
+						path="/login"
+						element={<Login MyFunc={{ onLogin }} isDisable={{ disable }} />}
+					/>
 					<Route path="/updatePassword/:uid" element={<UpdatePassword />} />
 					<Route path="/register" element={<Register />} />
 					<Route path="/activation/:uid" element={<Activation />} />
@@ -133,6 +137,7 @@ function App() {
 							element={<BranchAdminRegister />}
 						/>
 						<Route path="stock-history" element={<StockHistory />} />
+						<Route path="admin-product" element={<BranchAdminProductList />} />
 					</Route>
 					<Route path="/loginAdmin" element={<LoginAdmin />} />
 				</Routes>
