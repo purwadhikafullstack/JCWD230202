@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { toast, Toaster } from "react-hot-toast";
 import REST_API from "../support/services/RESTApiService";
+import FooterBar from "../components/footer";
 
 export default function Transaction() {
 	const [transaction, settransaction] = useState();
@@ -55,7 +56,6 @@ export default function Transaction() {
 				<h1 className="text-2xl font-semibold text-gray-500">
 					Transaction List
 				</h1>
-				{console.log(transaction)}
 				{transaction?.map((value, index) => {
 					return (
 						<div
@@ -93,7 +93,7 @@ export default function Transaction() {
 										</p>
 									</div>
 									<div className="col-span-1 flex justify-end border-l-[1px]">
-										<p>Rp. {value.total_price}</p>
+										<p>Rp. {parseInt(value.total_price).toLocaleString()}</p>
 									</div>
 								</div>
 								<div className="flex justify-end">
@@ -124,6 +124,7 @@ export default function Transaction() {
 				})}
 			</div>
 			<Toaster />
+			<FooterBar />
 		</div>
 	);
 }

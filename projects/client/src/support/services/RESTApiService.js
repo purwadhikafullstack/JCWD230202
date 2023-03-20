@@ -4,6 +4,7 @@ const REST_API = axios.create({
 	baseURL: "http://localhost:8000",
 	headers: { token: localStorage.getItem("token") },
 });
+export default REST_API;
 
 // const REST_API = {
 // 	get: async (url, headers = {}) => {
@@ -58,5 +59,3 @@ const REST_API = axios.create({
 // 		}
 // 	},
 // };
-
-export default REST_API;

@@ -493,7 +493,7 @@ export default function Dashboard(params) {
 				</aside>
 			)}
 
-			<div className="p-4 h-screen max-[640px]:mt-20 sm:ml-64">
+			<div className="h-screen max-[640px]:mt-20 sm:ml-64">
 				<Outlet />
 			</div>
 		</div>
