@@ -1071,4 +1071,217 @@ module.exports = {
 			console.log(error);
 		}
 	},
+	branchAdminProductList: async (req, res) => {
+		const { page, sort } = req.query;
+		const token = req.uid;
+		console.log(sort);
+
+		try {
+			let admin_branch_id;
+			let data;
+			let totalPage;
+
+			let admin = await db.user.findOne({
+				where: {
+					uid: token.uid,
+				},
+				include: { model: db.branch, attributes: [["id", "branch_id"]] },
+			});
+
+			let role = admin.role;
+			if (role === "branch admin") {
+				admin_branch_id = admin.dataValues.branches[0].dataValues.branch_id;
+			}
+
+			if (sort !== "") {
+				data = await db.branch_product.findAll({
+					where: { branch_id: admin_branch_id },
+					include: [
+						{
+							model: db.product,
+							order: ["name", "ASC"],
+						},
+						{ model: db.branch },
+					],
+					offset: page == 1 ? 0 : (page - 1) * 16,
+					limit: 16,
+					order: [
+						[{ model: db.product }, sort.split("-")[0], sort.split("-")[1]],
+					],
+				});
+
+				totalPage = await db.branch_product.count({
+					where: { branch_id: admin_branch_id },
+				});
+			} else {
+				data = await db.branch_product.findAll({
+					where: { branch_id: admin_branch_id },
+					include: [
+						{
+							model: db.product,
+						},
+						{ model: db.branch },
+					],
+					offset: page == 1 ? 0 : (page - 1) * 16,
+					limit: 16,
+				});
+
+				totalPage = await db.branch_product.count({
+					where: { branch_id: admin_branch_id },
+				});
+			}
+
+			res.status(200).send({
+				isError: false,
+				message: "Get Data Product Success",
+				data: { data, page },
+			});
+		} catch (error) {
+			res.status(400).send({
+				isError: false,
+				message: error.message,
+				data: error,
+			});
+		}
+	},
+
+	totalPageAdminProduct: async (req, res) => {
+		const token = req.uid;
+		let admin_branch_id;
+
+		let admin = await db.user.findOne({
+			where: {
+				uid: token.uid,
+			},
+			include: { model: db.branch, attributes: [["id", "branch_id"]] },
+		});
+
+		let role = admin.role;
+		if (role === "branch admin") {
+			admin_branch_id = admin.dataValues.branches[0].dataValues.branch_id;
+		}
+
+		try {
+			const data = await db.branch_product.count({
+				where: { branch_id: admin_branch_id },
+			});
+
+			res.status(200).send({
+				isError: false,
+				message: "Get Total Page Admin",
+				data,
+			});
+		} catch (error) {
+			res.status(400).send({
+				isError: false,
+				message: error.message,
+				data: error,
+			});
+		}
+	},
+	getCategory: async (req, res) => {
+		try {
+			let data = await db.category.findAll({});
+			res.status(200).send({
+				isError: false,
+				message: "get category success",
+				data,
+			});
+		} catch (error) {
+			res.status(400).send({
+				isError: false,
+				message: "get category success",
+				data,
+			});
+		}
+	},
+	getProductByCategory: async (req, res) => {
+		try {
+			const { uid } = req.uid;
+			const { page, category, sort } = req.query;
+			let data;
+
+			let admin = await db.user.findOne({
+				where: {
+					uid,
+				},
+				include: { model: db.branch },
+			});
+			if (sort !== "") {
+				data = await db.branch_product.findAll({
+					where: {
+						branch_id: admin.branches[0].id,
+					},
+					include: [
+						{
+							model: db.product,
+							where: {
+								category_id: category,
+							},
+						},
+						{ model: db.branch },
+					],
+					offset: page == 1 ? 0 : (page - 1) * 16,
+					limit: 16,
+					order: [
+						[{ model: db.product }, sort.split("-")[0], sort.split("-")[1]],
+					],
+				});
+			} else {
+				data = await db.branch_product.findAll({
+					where: {
+						branch_id: admin.branches[0].id,
+					},
+					include: [
+						{
+							model: db.product,
+							where: {
+								category_id: category,
+							},
+						},
+						{ model: db.branch },
+					],
+					offset: page == 1 ? 0 : (page - 1) * 16,
+					limit: 16,
+				});
+			}
+
+			res.status(200).send({
+				isError: false,
+				message: "Get Data Product Success",
+				data,
+			});
+		} catch (error) {
+			res.status(200).send({
+				isError: true,
+				message: error.message,
+				data: error,
+			});
+		}
+	},
+	checkRole: async (req, res) => {
+		try {
+			const token = req.uid;
+			let admin_branch_id;
+
+			let admin = await db.user.findOne({
+				where: {
+					uid: token.uid,
+				},
+				include: { model: db.branch, attributes: [["id", "branch_id"]] },
+			});
+
+			res.status(200).send({
+				isError: false,
+				message: "Get Data Product Success",
+				data: { admin },
+			});
+		} catch (error) {
+			res.status(400).send({
+				isError: true,
+				message: error.message,
+				data: data.error,
+			});
+		}
+	},
 };
