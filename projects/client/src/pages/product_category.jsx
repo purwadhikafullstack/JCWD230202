@@ -55,11 +55,11 @@ export default function ProductCategory() {
 	let onGetData = async (page, sortby) => {
 		try {
 			const { data } = await REST_API({
-				url: `product/sortby?category=${
-					params.product.split("&")[0].split("=")[1]
-				}&branch=${
-					params.product.split("&")[1].split("=")[1]
-				}&page=${page}&sortby=${sortby ? sortby : ""}`,
+				url: `product/sortby?category=${params.product
+					.split("&")[0]
+					.slice(-1)}&branch=${params.product.split("&")[1].slice(-1)}&page=${page}&sortby=${
+					sortby ? sortby : ""
+				}`,
 				method: "GET",
 			});
 			console.log(data.data);
@@ -75,11 +75,11 @@ export default function ProductCategory() {
 		try {
 			setorder(sortby);
 			const { data } = await REST_API({
-				url: `product/sortby?category=${
-					params.product.split("&")[0].split("=")[1]
-				}&branch=${
-					params.product.split("&")[1].split("=")[1]
-				}&page=${page}&sortby=${sortby ? sortby : ""}`,
+				url: `product/sortby?category=${params.product
+					.split("&")[0]
+					.slice(-1)}&branch=${params.product.split("&")[1].slice(-1)}&page=${page}&sortby=${
+					sortby ? sortby : ""
+				}`,
 				method: "GET",
 			});
 			console.log(data.data);
@@ -129,9 +129,7 @@ export default function ProductCategory() {
 	let onGetUnit = async () => {
 		try {
 			const { data } = await REST_API({
-				url: `product/getallproduct?category=${params.product
-					.split("&")[0]
-					.slice(-1)}`,
+				url: `product/getallproduct?category=${params.product.split("&")[0].slice(-1)}`,
 				method: "GET",
 			});
 			console.log(data.data[0]);
@@ -184,7 +182,6 @@ export default function ProductCategory() {
 		onGetPage();
 		onGetUnit();
 		getProfile();
-		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, []);
 
 	return (
@@ -206,9 +203,7 @@ export default function ProductCategory() {
 													alt={value.name}
 													className="w-11/12 rounded-full overflow-visible shadow-lg"
 												/>
-												<p className="font-semibold font-mandalaFont text-xl">
-													{value.name}
-												</p>
+												<p className="font-semibold font-mandalaFont text-xl">{value.name}</p>
 											</button>
 										</a>
 									);
@@ -220,12 +215,12 @@ export default function ProductCategory() {
 							<p>Sort by</p>{" "}
 							<select
 								onChange={(e) => onSortby(1, e.target.value)}
-								className="rounded-md w-[200px]"
+								className="rounded-md w-[200px] focus:ring-0 focus:ring-transparent focus:border-red-700 pl-2"
 							>
-								<option value="name-ASC">Name - Ascending</option>
-								<option value="name-DESC">Name - Descending</option>
-								<option value="price-ASC">Price - Ascending</option>
-								<option value="price-DESC">Price - Descending</option>
+								<option  value="name-ASC">Name - Ascending</option>
+								<option  value="name-DESC">Name - Descending</option>
+								<option  value="price-ASC">Price - Ascending</option>
+								<option  value="price-DESC">Price - Descending</option>
 							</select>
 						</div>
 					</div>
@@ -234,21 +229,11 @@ export default function ProductCategory() {
 							? product.map((value, index) => {
 									return (
 										<button
-											onClick={(e) => {
-												onGetDetail(
-													value.branch_products[0].branch_id,
-													value.id
-												);
-												console.log(e.target);
-											}}
+											onClick={() => onGetDetail(value.branch_products[0].branch_id, value.id)}
 											key={index}
 											className="flex flex-col shadow-xl h-full w-full bg-white border border-gray-200 rounded-lg dark:bg-gray-800 dark:border-gray-700"
 										>
-											<img
-												className="rounded-t-lg h-44 w-full"
-												src={value.img}
-												alt="product"
-											/>
+											<img className="rounded-t-lg h-44 w-full" src={value.img} alt="product" />
 											<div className="px-5 py-5 text-left">
 												<h5 className="text-lg font-semibold tracking-tight text-gray-900 dark:text-white">
 													{value.name}
@@ -274,9 +259,7 @@ export default function ProductCategory() {
 													<button
 														onClick={() => onSortby(value, order)}
 														className={`px-3 py-2 leading-tight text-gray-500 bg-white border border-gray-300 ${
-															selectedpage === value
-																? "!bg-red-700 text-white"
-																: null
+															selectedpage === value ? "!bg-red-700 text-white" : null
 														} hover:bg-slate-300  dark:bg-gray-800 dark:border-gray-700 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white`}
 													>
 														{value}
@@ -303,13 +286,8 @@ export default function ProductCategory() {
 					<h1 className=" text-[20px] font-bold  text-orange-700">
 						Rp. {detail ? detail.product.price.toLocaleString() : null}
 					</h1>
-					<h2 className=" mt-1 text-[16px] font-semibold">
-						{detail ? detail.product.name : null}
-					</h2>
-					<p className=" mt-1 text-[12px] text-slate-400 ">
-						{" "}
-						per {unit ? unit.unit.name : null}
-					</p>
+					<h2 className=" mt-1 text-[16px] font-semibold">{detail ? detail.product.name : null}</h2>
+					<p className=" mt-1 text-[12px] text-slate-400 "> per {unit ? unit.unit.name : null}</p>
 					<h2 className=" mt-1 text-[16px] font-semibold">Description</h2>
 					<p className=" text-[12px] mt-2 text-slate-400">
 						{detail ? detail.product.description : null}
@@ -383,9 +361,7 @@ export default function ProductCategory() {
 							/>
 							<button
 								value={"+"}
-								disabled={
-									quantity >= (detail ? detail.stock : null) ? true : false
-								}
+								disabled={quantity >= (detail ? detail.stock : null) ? true : false}
 								onClick={() => setquantity(quantity + 1)}
 								className=" text-green-500 font-bold"
 							>
@@ -394,8 +370,7 @@ export default function ProductCategory() {
 						</div>
 						{detail && detail.stock <= 5 ? (
 							<div className=" flex justify-center items-center ml-4 font-semibold">
-								Stock:{" "}
-								<p className="text-orange-700  px-2">{detail.stock} left</p>
+								Stock: <p className="text-orange-700  px-2">{detail.stock} left</p>
 							</div>
 						) : null}
 					</div>
@@ -405,14 +380,10 @@ export default function ProductCategory() {
 							type="submit"
 							disabled={disable}
 							onClick={() => onSubmit()}
-							className="font-medium w-full text-sm px-5 py-2.5 rounded-lg text-white bg-red-700 hover:bg-red-800 "
+							className="font-medium w-full text-sm px-5 py-2.5 rounded-lg text-white bg-[#0095DA] hover:bg-gray-300 "
 						>
 							{disable ? (
-								<LoadingSpin
-									size={"30px"}
-									primaryColor={"red"}
-									secondaryColor={"gray"}
-								/>
+								<LoadingSpin size={"30px"} primaryColor={"#38ADE3"} secondaryColor={"gray"} />
 							) : (
 								"Add to cart"
 							)}

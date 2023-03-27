@@ -22,6 +22,8 @@ import StockHistory from "./components/stockHistory";
 import { toast } from "react-hot-toast";
 import DiscountManagement from "./pages/discountManagement";
 import BranchAdminProductList from "./components/branchAdminProductlist";
+import PaymentProof from "./pages/paymentProof";
+import TransactionAdmin from "./components/transaction";
 
 function App() {
 	const navigate = useNavigate();
@@ -109,38 +111,28 @@ function App() {
 		<div className="relative">
 			<Routes>
 				{/* User */}
-				<Route
-					path="/"
-					element={<NavigationBar state={{ profile }} Func={{ onLogout }} />}
-				>
+				<Route path="/" element={<NavigationBar state={{ profile }} Func={{ onLogout }} />}>
 					<Route path="home" element={<LandingPage />} />
 					<Route
 						path="profile"
-						element={
-							<Profile func={{ getProfile }} state={{ profile, setprofile }} />
-						}
+						element={<Profile func={{ getProfile }} state={{ profile, setprofile }} />}
 					/>
 					<Route path="category/:product" element={<ProductCategory />} />
-					<Route path="checkout" element={<Checkout />} />
 					<Route path="cart" element={<Cart />} />
 					<Route path="transaction" element={<Transaction />} />
 				</Route>
-				<Route
-					path="/login"
-					element={<Login MyFunc={{ onLogin }} isDisable={{ disable }} />}
-				/>
+				<Route path="checkout" element={<Checkout />} />
+				<Route path="/login" element={<Login MyFunc={{ onLogin }} isDisable={{ disable }} />} />
 				<Route path="/updatePassword/:uid" element={<UpdatePassword />} />
 				<Route path="/register" element={<Register />} />
 				<Route path="/activation/:uid" element={<Activation />} />
 				<Route path="/forgotpassword" element={<ForgotPass />} />
+				<Route path="/uploadpayment" element={<PaymentProof />} />
 				{/* Admin */}
 				<Route path="/admin" element={<Dashboard />}>
 					{/* <Route path="/admin" element={<Overview />} /> */}
 					<Route path="sales-report" element={<SalesReport />} />
-					<Route
-						path="branch-admin-register"
-						element={<BranchAdminRegister />}
-					/>
+					<Route path="branch-admin-register" element={<BranchAdminRegister />} />
 					<Route path="stock-history" element={<StockHistory />} />
 					<Route path="admin-product" element={<BranchAdminProductList />} />
 					<Route
@@ -148,6 +140,7 @@ function App() {
 						element={<BranchAdminProductList />}
 					/>
 					<Route path="discount-management" element={<DiscountManagement />} />
+					<Route path="transaction" element={<TransactionAdmin />} />
 				</Route>
 				<Route path="/loginAdmin" element={<LoginAdmin />} />
 			</Routes>

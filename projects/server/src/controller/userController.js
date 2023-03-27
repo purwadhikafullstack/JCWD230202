@@ -15,7 +15,6 @@ module.exports = {
 		const { uid } = req.uid;
 		try {
 			const {
-				id,
 				name,
 				email,
 				gender,
@@ -29,7 +28,6 @@ module.exports = {
 				include: { model: db.user_address },
 			});
 			const httpStatus = new HTTPStatus(res, {
-				id,
 				name,
 				email,
 				gender,
@@ -445,6 +443,7 @@ module.exports = {
 				{ where: { id } },
 				{ transaction: t }
 			);
+
 			t.commit();
 			res.status(201).send({
 				isError: false,

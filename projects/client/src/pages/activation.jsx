@@ -35,7 +35,7 @@ function Activation() {
 	return (
 		<div className=" max-h-screen overflow-hidden ">
 			<div className=" mt-[20px] flex content-center justify-center">
-				<h1 className=" font-bold text-4xl font-mandalaFont text-red-700 ">tokonglomerat</h1>
+				<h1 className=" font-bold text-4xl font-mandalaFont text-[#0095DA] ">tokonglomerat</h1>
 			</div>
 			<div className=" flex content-center justify-center max-w-sm h-screen xl:max-w-screen-2xl mx-auto">
 				<div className=" xl:flex-row xl:block">
