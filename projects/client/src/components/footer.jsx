@@ -1,59 +1,92 @@
 import React from "react";
-import { Footer } from "flowbite-react";
-import { BsFacebook, BsInstagram, BsTwitter, BsGithub, BsDribbble } from "react-icons/bs";
+import { BiPhoneCall, BiMailSend } from "react-icons/bi";
+import { Button } from "flowbite-react";
 
 export default function FooterBar() {
 	return (
-		<Footer className="mt-32 border-t-[2px]" bgDark={true}>
-			<div className="w-full">
-				<div className="grid w-full grid-cols-2 gap-8 py-8 px-6 md:grid-cols-4">
-					<div>
-						<Footer.Title title="Company" />
-						<Footer.LinkGroup col={true}>
-							<Footer.Link>About</Footer.Link>
-							<Footer.Link>Careers</Footer.Link>
-							<Footer.Link>Brand Center</Footer.Link>
-							<Footer.Link>Blog</Footer.Link>
-						</Footer.LinkGroup>
+		<footer className="border-t-8 border-[#0095da] mt-36 mb-5">
+			<div className="pt-3 px-72 text-sm grid grid-cols-5">
+				<div className="space-y-1">
+					<h2 className="font-semibold pb-1">BANTUAN</h2>
+					<p>Pembayaran</p>
+					<p>Pengiriman</p>
+					<p>Status pengiriman</p>
+					<p>Pengembalian product</p>
+					<p>tokonglomerat ticket rewards</p>
+					<p>Cara berbelanja</p>
+					<p>Hubungi kami</p>
+				</div>
+				<div className="space-y-1">
+					<h2 className="font-semibold pb-1">CUSTOMER CARE</h2>
+					<p>Buka 24 jam setiap hari</p>
+					<div className="flex items-center space-x-1">
+						<BiPhoneCall />
+						<p>0888-888-8888</p>
 					</div>
-					<div>
-						<Footer.Title title="help center" />
-						<Footer.LinkGroup col={true}>
-							<Footer.Link>Discord Server</Footer.Link>
-							<Footer.Link>Twitter</Footer.Link>
-							<Footer.Link>Facebook</Footer.Link>
-							<Footer.Link>Contact Us</Footer.Link>
-						</Footer.LinkGroup>
+					<div className="flex items-center space-x-1">
+						<BiMailSend />
+						<p>customer-care@tokonglomerat.com</p>
 					</div>
-					<div>
-						<Footer.Title title="legal" />
-						<Footer.LinkGroup col={true}>
-							<Footer.Link>Privacy Policy</Footer.Link>
-							<Footer.Link>Licensing</Footer.Link>
-							<Footer.Link>Terms & Conditions</Footer.Link>
-						</Footer.LinkGroup>
-					</div>
-					<div>
-						<Footer.Title title="download" />
-						<Footer.LinkGroup col={true}>
-							<Footer.Link>iOS</Footer.Link>
-							<Footer.Link>Android</Footer.Link>
-							<Footer.Link>Windows</Footer.Link>
-							<Footer.Link>MacOS</Footer.Link>
-						</Footer.LinkGroup>
+					<Button className="bg-[#0095da]">Pusat Bantuan</Button>
+					<h2 className="font-semibold pb-1 pt-2">
+						LAYANAN PENGADUAN KONSUMEN
+					</h2>
+					<p>Direktorat Jenderal Perlindungan</p>
+					<p>Konsumen dan Tertib Niaga</p>
+					<p>Kementerian Perdagangan RI</p>
+					<div className="flex items-center">
+						<BiPhoneCall />
+						<p>085311111010</p>
 					</div>
 				</div>
-				<div className="w-full bg-gray-700 py-6 px-4 sm:flex sm:items-center sm:justify-between">
-					<Footer.Copyright by="tokonglomerat™" year={2023} />
-					<div className="mt-4 flex space-x-6 sm:mt-0 sm:justify-center">
-						<Footer.Icon href="#" icon={BsFacebook} />
-						<Footer.Icon href="#" icon={BsInstagram} />
-						<Footer.Icon href="#" icon={BsTwitter} />
-						<Footer.Icon href="#" icon={BsGithub} />
-						<Footer.Icon href="#" icon={BsDribbble} />
+				<div className="space-y-1">
+					<h2 className="font-semibold pb-1">INFO TOKONGLOMERAT</h2>
+					<p>Blog tokonglomerat Friends</p>
+					<p>Siaran Pers</p>
+					<p>Kabar Terbaru</p>
+					<p>Karir</p>
+					<p>Ketentuan dan kebijakan privasi</p>
+					<p>Hak kekayaan intelektual</p>
+					<p>Sahabat ibu pintar</p>
+					<p>Sahabat perjalananmu</p>
+					<p>Sahabat main</p>
+					<p>tokonglomerat cinta bumi</p>
+				</div>
+				<div className="space-y-1">
+					<h2 className="font-semibold pb-1">KERJASAMA</h2>
+					<p>Affiliate program</p>
+					<p>Jual di tokonglomerat</p>
+					<p>B2B Program</p>
+					<p>Travel for business</p>
+					<h2 className="font-semibold pb-1 pt-2">TOKONGLOMERAT FAMILY</h2>
+					<img src={require("../support/assets/logo/download.png")} alt="" />
+					<img
+						src={require("../support/assets/logo/download (1).png")}
+						alt=""
+					/>
+				</div>
+				<div className="space-y-1">
+					<h2 className="font-semibold pb-1">IKUTI KAMI</h2>
+					<div className="flex space-x-1">
+						<img
+							src={require("../support/assets/logo/download (2).png")}
+							alt=""
+						/>
+						<img
+							src={require("../support/assets/logo/download (3).png")}
+							alt=""
+						/>
+						<img
+							src={require("../support/assets/logo/download (4).png")}
+							alt=""
+						/>
+						<img
+							src={require("../support/assets/logo/download (5).png")}
+							alt=""
+						/>
 					</div>
 				</div>
 			</div>
-		</Footer>
+		</footer>
 	);
 }

@@ -16,6 +16,7 @@ module.exports = (sequelize, DataTypes) => {
 	branch_product.init(
 		{
 			stock: DataTypes.INTEGER,
+			status: DataTypes.STRING,
 		},
 		{
 			sequelize,

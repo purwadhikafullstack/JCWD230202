@@ -44,13 +44,17 @@ export default function Checkout() {
 			</div>
 			<div className=" mx-auto flex px-5 w-[1120px]">
 				<div className=" w-[685px]">
-					<div className="mt-10 font-tokpedFont text-[20px] font-bold">Checkout</div>
+					<div className="mt-10 font-tokpedFont text-[20px] font-bold">
+						Checkout
+					</div>
 					<div className="flex justify-start h-[31px] items-start border-b mt-[29px] font-tokpedFont font-semibold text-[14px] w-[685px] ">
 						Shipping Address
 					</div>
 					<div className=" h-[109px] border-b">
 						<div className=" pt-3 flex gap-1">
-							<p className=" font-semibold font-tokpedFont text-[13px]">Aswin Wibowo</p>
+							<p className=" font-semibold font-tokpedFont text-[13px]">
+								Aswin Wibowo
+							</p>
 							<p className=" font-tokpedFont text-[13px] ">
 								(jl. layar 1 no. 29, Kelapa Dua, Tangerang)
 							</p>
@@ -58,7 +62,9 @@ export default function Checkout() {
 								Utama
 							</p>
 						</div>
-						<div className=" mt-1 font-tokpedFont font-normal text-[13px]">087805667895</div>
+						<div className=" mt-1 font-tokpedFont font-normal text-[13px]">
+							087805667895
+						</div>
 						<div className=" mt-1 font-tokpedFont text-slate-500 font-normal text-[13px]">
 							jl. layar 1 no.29, kelapa dua, Tangerang
 						</div>
@@ -76,7 +82,9 @@ export default function Checkout() {
 								<Dropdown inline={true} label="Shipping Methode">
 									<DropdownItem className=" flex justify-between w-[270px] h-[60px] mx-[15px] pt-3 border-b ">
 										<div className=" text-left ">
-											<p className=" font-bold font-tokpedFont text-[12px]">POS</p>
+											<p className=" font-bold font-tokpedFont text-[12px]">
+												POS
+											</p>
 											<p className=" font-tokpedFont text-slate-500 text text-[12px]">
 												Estimasi Hari 4-5
 											</p>
@@ -85,7 +93,9 @@ export default function Checkout() {
 									</DropdownItem>
 									<DropdownItem className=" flex justify-between h-[60px] mx-[15px] pt-3 border-b ">
 										<div className=" text-left ">
-											<p className=" font-bold font-tokpedFont text-[12px]">JNE</p>
+											<p className=" font-bold font-tokpedFont text-[12px]">
+												JNE
+											</p>
 											<p className=" font-tokpedFont text-slate-500 text text-[12px]">
 												Estimasi Hari 4-5
 											</p>
@@ -94,7 +104,9 @@ export default function Checkout() {
 									</DropdownItem>
 									<DropdownItem className=" flex justify-between h-[60px] mx-[15px] pt-3 border-b ">
 										<div className=" text-left ">
-											<p className=" font-bold font-tokpedFont text-[12px]">TIKI</p>
+											<p className=" font-bold font-tokpedFont text-[12px]">
+												TIKI
+											</p>
 											<p className=" font-tokpedFont text-slate-500 text text-[12px]">
 												Estimasi Hari 4-5
 											</p>
@@ -129,7 +141,10 @@ export default function Checkout() {
 															{value.product.name}
 														</p>
 														<p className=" pl-[15px] flex gap-1 font-tokpedFont text-[12px]">
-															per <p className=" font-semibold">{value.product.unit.name}</p>
+															per{" "}
+															<p className=" font-semibold">
+																{value.product.unit.name}
+															</p>
 														</p>
 														<p className=" pl-[15px] font-semibold font-tokpedFont text-[14px]">
 															Rp. {value.product.price.toLocaleString()}
@@ -146,7 +161,8 @@ export default function Checkout() {
 											<div className=" h-14 my-[6px] flex justify-between items-center">
 												<p className=" font-semibold text-[14px]">Subtotal</p>
 												<p className=" font-semibold text-[14px]">
-													Rp. {(value.product.price * value.qty).toLocaleString()}{" "}
+													Rp.{" "}
+													{(value.product.price * value.qty).toLocaleString()}{" "}
 												</p>
 											</div>
 										</div>
@@ -160,23 +176,33 @@ export default function Checkout() {
 					<p className=" font-semibold text-[14px]">Shopping Summary</p>
 					<div className=" h-fit my-4 flex justify-between">
 						<div>
-							<p className=" text-[14px] ">Total price ({data ? data.length : null} Products)</p>
+							<p className=" text-[14px] ">
+								Total price ({data ? data.length : null} Products)
+							</p>
 							<p className=" mt-2 text-[14px] ">Courier Cost </p>
 						</div>
 						<div>
-							<p className=" flex gap-1 text-[14px]">Rp. {sum.toLocaleString()} </p>
-							<p className=" mt-2 text-[14px]">Rp. {courier.toLocaleString()}</p>
+							<p className=" flex gap-1 text-[14px]">
+								Rp. {sum.toLocaleString()}{" "}
+							</p>
+							<p className=" mt-2 text-[14px]">
+								Rp. {courier.toLocaleString()}
+							</p>
 						</div>
 					</div>
 					<div className=" border-t flex justify-between h-[37px] items-end ">
 						<p className=" font-semibold text-[16px] ">Total Bill</p>
-						<p className=" font-semibold text-[16px] ">Rp. {(sum + courier).toLocaleString()}</p>
+						<p className=" font-semibold text-[16px] ">
+							Rp. {(sum + courier).toLocaleString()}
+						</p>
 					</div>
 					<p className=" mt-4 text-slate-500 text-[11px]">
 						Dengan mengaktifkan asuransi, Saya menyetujui{" "}
 						<p className=" text-red-700">syarat dan ketentuan yang berlaku.</p>
 					</p>
-					<button className=" mt-6 h-12 w-full text-white bg-red-700 rounded-lg ">Payment</button>
+					<button className=" mt-6 h-12 w-full text-white bg-red-700 rounded-lg ">
+						Payment
+					</button>
 				</div>
 			</div>
 		</div>
