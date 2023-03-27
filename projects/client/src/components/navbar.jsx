@@ -38,7 +38,7 @@ export default function NavigationBar(props) {
 					</button>
 				</div>
 				{localStorage.getItem("token") ? (
-					<div className="col-span-2 flex text-white items-center justify-end space-x-4">
+					<div className="col-span-2 pr-20 flex text-white items-center justify-end space-x-4">
 						<Dropdown
 							inline={true}
 							label={props.state.profile.name}
@@ -68,7 +68,7 @@ export default function NavigationBar(props) {
 						</Dropdown>
 					</div>
 				) : (
-					<div className="col-span-2 grid grid-cols-2 gap-4">
+					<div className="col-span-3 grid grid-cols-2 gap-4">
 						<button
 							onClick={() => navigate("/login")}
 							className="font-semibold border-[2px] text-white rounded-lg px-2 py-1"
