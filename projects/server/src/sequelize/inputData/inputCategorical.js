@@ -142,8 +142,8 @@ const branch = async () => {
 		location: "Jakarta",
 		address:
 			"Jl. Puri Indah Raya, RT.3/RW.2, Kembangan Sel., Kec. Kembangan, Kota Jakarta Barat, Daerah Khusus Ibukota Jakarta",
-		lat: branch1.data.results[0].annotations.DMS.lat,
-		lng: branch1.data.results[0].annotations.DMS.lng,
+		lat: branch1.data.results[0].annotations.Mercator.x,
+		lng: branch1.data.results[0].annotations.Mercator.y,
 	});
 
 	const branch2 = await axios.get(
@@ -151,10 +151,9 @@ const branch = async () => {
 	);
 	await db.branch.create({
 		location: "Bandung",
-		address:
-			"Jl. Braga No.99-101, Braga, Kec. Sumur Bandung, Kota Bandung, Jawa Barat",
-		lat: branch2.data.results[0].annotations.DMS.lat,
-		lng: branch2.data.results[0].annotations.DMS.lng,
+		address: "Jl. Braga No.99-101, Braga, Kec. Sumur Bandung, Kota Bandung, Jawa Barat",
+		lat: branch2.data.results[0].annotations.Mercator.x,
+		lng: branch2.data.results[0].annotations.Mercator.y,
 	});
 
 	const branch3 = await axios.get(
@@ -164,8 +163,8 @@ const branch = async () => {
 		location: "Yogyakarta",
 		address:
 			"Jl. Mataram No.31, Suryatmajan, Kec. Danurejan, Kota Yogyakarta, Daerah Istimewa Yogyakarta",
-		lat: branch3.data.results[0].annotations.DMS.lat,
-		lng: branch3.data.results[0].annotations.DMS.lng,
+		lat: branch3.data.results[0].annotations.Mercator.x,
+		lng: branch3.data.results[0].annotations.Mercator.y,
 	});
 
 	const branch4 = await axios.get(
@@ -173,10 +172,9 @@ const branch = async () => {
 	);
 	await db.branch.create({
 		location: "Semarang",
-		address:
-			"Jl. Pemuda No.118, Sekayu, Kec. Semarang Tengah, Kota Semarang, Jawa Tengah",
-		lat: branch4.data.results[0].annotations.DMS.lat,
-		lng: branch4.data.results[0].annotations.DMS.lng,
+		address: "Jl. Pemuda No.118, Sekayu, Kec. Semarang Tengah, Kota Semarang, Jawa Tengah",
+		lat: branch4.data.results[0].annotations.Mercator.x,
+		lng: branch4.data.results[0].annotations.Mercator.y,
 	});
 
 	const branch5 = await axios.get(
@@ -186,8 +184,8 @@ const branch = async () => {
 		location: "Kalimantan",
 		address:
 			"Jl. Untung Suropati No.08, Karang Asam Ulu, Kec. Sungai Kunjang, Kota Samarinda, Kalimantan Timur",
-		lat: branch5.data.results[0].annotations.DMS.lat,
-		lng: branch5.data.results[0].annotations.DMS.lng,
+		lat: branch5.data.results[0].annotations.Mercator.x,
+		lng: branch5.data.results[0].annotations.Mercator.y,
 	});
 
 	const branch6 = await axios.get(
@@ -195,10 +193,9 @@ const branch = async () => {
 	);
 	await db.branch.create({
 		location: "Sulawesi",
-		address:
-			"Jl. Metro Tj. Bunga No.2, Panambungan, Kec. Mariso, Kota Makassar, Sulawesi Selatan",
-		lat: branch6.data.results[0].annotations.DMS.lat,
-		lng: branch6.data.results[0].annotations.DMS.lng,
+		address: "Jl. Metro Tj. Bunga No.2, Panambungan, Kec. Mariso, Kota Makassar, Sulawesi Selatan",
+		lat: branch6.data.results[0].annotations.Mercator.x,
+		lng: branch6.data.results[0].annotations.Mercator.y,
 	});
 };
 

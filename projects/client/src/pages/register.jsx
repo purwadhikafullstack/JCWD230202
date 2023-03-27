@@ -97,7 +97,7 @@ function Register() {
 	return (
 		<div className=" max-h-screen overflow-hidden ">
 			<div className=" mt-[20px] mb-[25px] flex content-center justify-center">
-				<h1 className=" font-bold text-4xl font-mandalaFont text-red-700 ">tokonglomerat</h1>
+				<h1 className=" font-bold text-4xl font-mandalaFont text-[#0095DA] "><button onClick={() => Navigate("/home")}>tokonglomerat</button></h1>
 			</div>
 			<div className="  flex content-center justify-center max-w-sm h-screen xl:max-w-screen-2xl mx-auto">
 				<div className=" hidden xl:flex-row xl:block">
@@ -200,18 +200,18 @@ function Register() {
 					</div>
 					<div className=" mb-5 flex items-center justify-center text-slate-400 text-[14px] ">
 						<p>Already have an account Tokonglomerat?</p>
-						<a href="/login" className=" text-red-700 underline">
+						<a href="/login" className=" text-[#0095DA] underline">
 							Login
 						</a>
 					</div>
 					<button
 						type="submit"
-						className="inline-flex w-full items-center justify-center px-8 py-4 font-sans font-semibold tracking-wide hover:bg-gray-300 text-white bg-red-700 rounded-lg h-[60px]"
+						className="inline-flex w-full items-center justify-center px-8 py-4 font-sans font-semibold tracking-wide hover:bg-gray-300 text-white bg-[#0095DA] rounded-lg h-[60px]"
 						disabled={disable}
 						onClick={() => onSubmit()}
 					>
 						{disable ? (
-							<LoadingSpin size={"30px"} primaryColor={"red"} secondaryColor={"gray"} />
+							<LoadingSpin size={"30px"} primaryColor={"#38ADE3"} secondaryColor={"gray"} />
 						) : (
 							"Create an account"
 						)}

@@ -22,7 +22,7 @@ app.use(express.json());
 //#region API ROUTES
 app.use("/Public", express.static("Public"));
 
-const { productRouter, cartRouter } = require("./router");
+const { productRouter, cartRouter, courierRouter } = require("./router");
 const { userRouter } = require("./router");
 const { adminRouter } = require("./router");
 const { transactionRouter } = require("./router");
@@ -32,6 +32,7 @@ app.use("/user", userRouter);
 app.use("/transaction", transactionRouter);
 app.use("/admin", adminRouter);
 app.use("/cart", cartRouter)
+app.use("/courier", courierRouter)
 
 // cron.schedule("* * * * *", () => console.log("hello"), {
 // 	timezone: "Asia/Jakarta",

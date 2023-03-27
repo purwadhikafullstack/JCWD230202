@@ -14,10 +14,11 @@ module.exports = {
 	getUser: async (req, res) => {
 		const { uid } = req.uid;
 		try {
-			const { id, name, email, gender, birthdate, phone_number, img, user_addresses, role } = await db.user.findOne({
-				where: { uid },
-				include: { model: db.user_address },
-			});
+			const { id, name, email, gender, birthdate, phone_number, img, user_addresses, role } =
+				await db.user.findOne({
+					where: { uid },
+					include: { model: db.user_address },
+				});
 			const httpStatus = new HTTPStatus(res, {
 				id,
 				name,
@@ -411,7 +412,11 @@ module.exports = {
 		const { id } = req.params;
 		const t = await sequelize.transaction();
 		try {
-			await db.user_address.update({ main_address: false }, { where: { main_address: true } }, { transaction: t });
+			await db.user_address.update(
+				{ main_address: false },
+				{ where: { main_address: true } },
+				{ transaction: t }
+			);
 			await db.user_address.update({ main_address: true }, { where: { id } }, { transaction: t });
 			t.commit();
 			res.status(201).send({
@@ -429,9 +434,10 @@ module.exports = {
 		}
 	},
 	rakirProvince: async (req, res) => {
+		let key = "4b6e60a265f072c392f96596c655cc4e";
 		try {
 			const { data } = await axios.get("https://api.rajaongkir.com/starter/province", {
-				headers: { key: "1625ecd94b7c4d9ecc661a5e0500bf2f" },
+				headers: { key: key },
 			});
 			res.status(200).send({
 				isError: false,
@@ -448,6 +454,7 @@ module.exports = {
 	},
 	rakirCity: async (req, res) => {
 		const { province } = req.query;
+		let key = "4b6e60a265f072c392f96596c655cc4e";
 		try {
 			if (!province)
 				return res.status(404).send({
@@ -455,9 +462,12 @@ module.exports = {
 					message: "Province_Id Not Found!",
 					data: null,
 				});
-			const { data } = await axios.get(`https://api.rajaongkir.com/starter/city?province=${province}`, {
-				headers: { key: "1625ecd94b7c4d9ecc661a5e0500bf2f" },
-			});
+			const { data } = await axios.get(
+				`https://api.rajaongkir.com/starter/city?province=${province}`,
+				{
+					headers: { key: key },
+				}
+			);
 			res.status(201).send({
 				isError: false,
 				message: "Rajaongkir City by province",
