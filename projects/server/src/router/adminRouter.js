@@ -28,6 +28,21 @@ Router.get(
 );
 
 // Nathan
+Router.patch(
+	"/edit-category-image/:id",
+	tokenVerify,
+	adminController.updateCategoryImage
+);
+Router.patch(
+	"/edit-category-data/:id",
+	tokenVerify,
+	adminController.updateCategoryData
+);
+Router.get(
+	"/get-edited-category",
+	tokenVerify,
+	productController.getCategoryEdit
+);
 Router.post("/create-discount", tokenVerify, discountController.createDiscount);
 Router.get("/discount-list", tokenVerify, discountController.discountList);
 Router.get(
@@ -43,5 +58,17 @@ Router.post(
 	upload,
 	productController.createProduct
 );
+Router.delete(
+	"/delete-product/:id",
+	tokenVerify,
+	productController.deleteProduct
+);
+Router.delete(
+	"/delete-category/:id",
+	tokenVerify,
+	productController.deleteCategory
+);
+Router.get("/get-product-edit", tokenVerify, adminController.getProductEdit);
+Router.patch("/edit-product", tokenVerify, productController.editProduct);
 
 module.exports = Router;

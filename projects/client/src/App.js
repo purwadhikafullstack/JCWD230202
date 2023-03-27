@@ -1,6 +1,6 @@
 import "./App.css";
 import REST_API from "./support/services/RESTApiService";
-import { Routes, Route } from "react-router-dom";
+import { Routes, Route, useNavigate } from "react-router-dom";
 import LandingPage from "./pages/landingPage";
 import NavigationBar from "./components/navbar";
 import Profile from "./pages/profile";
@@ -20,13 +20,13 @@ import Transaction from "./pages/transaction";
 import LoginAdmin from "./pages/loginAdmin";
 import StockHistory from "./components/stockHistory";
 import { toast } from "react-hot-toast";
-import ProductManagement from "./pages/productManagement";
 import DiscountManagement from "./pages/discountManagement";
 import BranchAdminProductList from "./components/branchAdminProductlist";
 import PaymentProof from "./pages/paymentProof";
 import TransactionAdmin from "./components/transaction";
 
 function App() {
+	const navigate = useNavigate();
 	const [disable, setdisable] = useState();
 	const [profile, setprofile] = useState({
 		id: null,
@@ -88,15 +88,24 @@ function App() {
 		}
 	};
 
+	let onLogout = () => {
+		localStorage.removeItem("token");
+		setprofile({
+			id: null,
+			name: null,
+			birthdate: null,
+			gender: null,
+			email: null,
+			phone_number: null,
+			profile_picture: null,
+			address: null,
+		});
+		navigate("/home");
+	};
 	useEffect(() => {
 		getProfile();
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, []);
-
-	let onLogout = () => {
-		localStorage.removeItem("token");
-		setprofile({ ...profile, name: "" });
-	};
 
 	return (
 		<div className="relative">
@@ -126,7 +135,10 @@ function App() {
 					<Route path="branch-admin-register" element={<BranchAdminRegister />} />
 					<Route path="stock-history" element={<StockHistory />} />
 					<Route path="admin-product" element={<BranchAdminProductList />} />
-					<Route path="product-management" element={<ProductManagement />} />
+					<Route
+						path="product-management"
+						element={<BranchAdminProductList />}
+					/>
 					<Route path="discount-management" element={<DiscountManagement />} />
 					<Route path="transaction" element={<TransactionAdmin />} />
 				</Route>

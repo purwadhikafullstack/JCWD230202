@@ -14,13 +14,20 @@ module.exports = {
 	getUser: async (req, res) => {
 		const { uid } = req.uid;
 		try {
-			const { id, name, email, gender, birthdate, phone_number, img, user_addresses, role } =
-				await db.user.findOne({
-					where: { uid },
-					include: { model: db.user_address },
-				});
+			const {
+				name,
+				email,
+				gender,
+				birthdate,
+				phone_number,
+				img,
+				user_addresses,
+				role,
+			} = await db.user.findOne({
+				where: { uid },
+				include: { model: db.user_address },
+			});
 			const httpStatus = new HTTPStatus(res, {
-				id,
 				name,
 				email,
 				gender,
@@ -92,7 +99,8 @@ module.exports = {
 					data: null,
 				});
 
-			let char = /^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*[a-zA-Z])([a-zA-Z0-9]+)$/;
+			let char =
+				/^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*[a-zA-Z])([a-zA-Z0-9]+)$/;
 			if (!char.test(password))
 				return res.status(404).send({
 					isError: true,
@@ -113,7 +121,10 @@ module.exports = {
 				phone_number,
 			});
 
-			const template = await fs.readFile("./template/confirmation.html", "utf-8");
+			const template = await fs.readFile(
+				"./template/confirmation.html",
+				"utf-8"
+			);
 			const templateToCompile = await handlebars.compile(template);
 			const newTemplate = templateToCompile({
 				name,
@@ -165,7 +176,10 @@ module.exports = {
 					data: null,
 				});
 
-			let hashMatchResult = await matchPassword(password, findEmail.dataValues.password);
+			let hashMatchResult = await matchPassword(
+				password,
+				findEmail.dataValues.password
+			);
 
 			if (hashMatchResult === false)
 				return res.status(404).send({
@@ -302,7 +316,10 @@ module.exports = {
 
 			const name = findEmail.dataValues.name;
 
-			const template = await fs.readFile("./template/resetPassword.html", "utf-8");
+			const template = await fs.readFile(
+				"./template/resetPassword.html",
+				"utf-8"
+			);
 			const templateToCompile = await handlebars.compile(template);
 			const newTemplate = templateToCompile({
 				name,
@@ -357,7 +374,7 @@ module.exports = {
 				data: null,
 			});
 		} catch (error) {
-			deleteFiles(req.files);
+			deleteFiles(req.files.images[0].path);
 			res.status(400).send({
 				isError: true,
 				message: error.message,
@@ -370,14 +387,18 @@ module.exports = {
 		const { oldPassword, newPassword } = req.body;
 		try {
 			const data = await db.user.findOne({ where: { uid } });
-			if (oldPassword !== data.password) {
+
+			if (!(await matchPassword(oldPassword, data.password))) {
 				return res.status(400).send({
 					isError: true,
 					message: "Invalid password",
 					data: null,
 				});
 			}
-			await db.user.update({ password: newPassword }, { where: { uid: token } });
+			await db.user.update(
+				{ password: await hashPassword(newPassword) },
+				{ where: { uid } }
+			);
 			res.status(201).send({
 				isError: false,
 				message: "Password updated",
@@ -417,7 +438,12 @@ module.exports = {
 				{ where: { main_address: true } },
 				{ transaction: t }
 			);
-			await db.user_address.update({ main_address: true }, { where: { id } }, { transaction: t });
+			await db.user_address.update(
+				{ main_address: true },
+				{ where: { id } },
+				{ transaction: t }
+			);
+
 			t.commit();
 			res.status(201).send({
 				isError: false,
@@ -434,11 +460,13 @@ module.exports = {
 		}
 	},
 	rakirProvince: async (req, res) => {
-		let key = "4b6e60a265f072c392f96596c655cc4e";
 		try {
-			const { data } = await axios.get("https://api.rajaongkir.com/starter/province", {
-				headers: { key: key },
-			});
+			const { data } = await axios.get(
+				"https://api.rajaongkir.com/starter/province",
+				{
+					headers: { key: "1625ecd94b7c4d9ecc661a5e0500bf2f" },
+				}
+			);
 			res.status(200).send({
 				isError: false,
 				message: "Rajaongkir Province",
@@ -454,7 +482,6 @@ module.exports = {
 	},
 	rakirCity: async (req, res) => {
 		const { province } = req.query;
-		let key = "4b6e60a265f072c392f96596c655cc4e";
 		try {
 			if (!province)
 				return res.status(404).send({
@@ -465,7 +492,7 @@ module.exports = {
 			const { data } = await axios.get(
 				`https://api.rajaongkir.com/starter/city?province=${province}`,
 				{
-					headers: { key: key },
+					headers: { key: "1625ecd94b7c4d9ecc661a5e0500bf2f" },
 				}
 			);
 			res.status(201).send({
@@ -484,7 +511,14 @@ module.exports = {
 	addAddress: async (req, res) => {
 		const t = await sequelize.transaction();
 		const { uid } = req.uid;
-		const { province, city, address, receiver_name, receiver_phone, main_address } = req.body;
+		const {
+			province,
+			city,
+			address,
+			receiver_name,
+			receiver_phone,
+			main_address,
+		} = req.body;
 		try {
 			const { id } = await db.user.findOne({ where: { uid } });
 			if (main_address) {

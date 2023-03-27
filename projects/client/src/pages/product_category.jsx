@@ -141,9 +141,7 @@ export default function ProductCategory() {
 
 	let onSubmit = async () => {
 		try {
-			let uid = profile.uid;
-
-			if (uid) {
+			if (localStorage.getItem("token")) {
 				setdisable(true);
 				const { data } = await REST_API({
 					url: "/cart/add",
@@ -190,7 +188,7 @@ export default function ProductCategory() {
 		<div>
 			<div className=" bg-slate-200">
 				<div className="pt-[45px] max-w-screen-xl mx-auto ">
-					<div className="flex justify-evenly bg-white  rounded-lg shadow-2xl my-8 py-10">
+					<div className="grid grid-cols-10 gap-4 bg-white  rounded-lg shadow-2xl my-8 py-10">
 						{category
 							? category.map((value, index) => {
 									return (
@@ -203,7 +201,7 @@ export default function ProductCategory() {
 												<img
 													src={value.img}
 													alt={value.name}
-													className="h-32 w-32 rounded-full overflow-visible shadow-lg"
+													className="w-11/12 rounded-full overflow-visible shadow-lg"
 												/>
 												<p className="font-semibold font-mandalaFont text-xl">{value.name}</p>
 											</button>

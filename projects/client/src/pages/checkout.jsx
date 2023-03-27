@@ -204,7 +204,9 @@ export default function Checkout(props) {
 			</div>
 			<div className=" mx-auto flex px-5 w-[1120px]">
 				<div className=" w-[685px]">
-					<div className="mt-10 font-tokpedFont text-[20px] font-bold">Checkout</div>
+					<div className="mt-10 font-tokpedFont text-[20px] font-bold">
+						Checkout
+					</div>
 					<div className="flex justify-start h-[31px] items-start border-b mt-[29px] font-tokpedFont font-semibold text-[14px] w-[685px] ">
 						Shipping Address
 					</div>
@@ -375,7 +377,10 @@ export default function Checkout(props) {
 															{value.product.name}
 														</p>
 														<p className=" pl-[15px] flex gap-1 font-tokpedFont text-[12px]">
-															per <p className=" font-semibold">{value.product.unit.name}</p>
+															per{" "}
+															<p className=" font-semibold">
+																{value.product.unit.name}
+															</p>
 														</p>
 														<p className=" pl-[15px] font-semibold font-tokpedFont text-[14px]">
 															Rp. {value.product.price.toLocaleString()}
@@ -392,7 +397,8 @@ export default function Checkout(props) {
 											<div className=" h-14 my-[6px] flex justify-between items-center">
 												<p className=" font-semibold text-[14px]">Subtotal</p>
 												<p className=" font-semibold text-[14px]">
-													Rp. {(value.product.price * value.qty).toLocaleString()}{" "}
+													Rp.{" "}
+													{(value.product.price * value.qty).toLocaleString()}{" "}
 												</p>
 											</div>
 										</div>

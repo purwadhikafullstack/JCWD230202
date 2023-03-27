@@ -2,6 +2,7 @@ const db = require("../sequelize/models");
 // const sequelize = require("sequelize");
 const { Op } = require("sequelize");
 const { sequelize } = require("../sequelize/models");
+const HTTPStatus = require("../helper/HTTPStatus");
 
 module.exports = {
 	salesReport: async (req, res) => {
@@ -9,8 +10,6 @@ module.exports = {
 		const { filter, report, sort } = req.query;
 		const filterBy = filter ? filter.split("/") : "";
 		const sortBy = sort ? sort.split("-") : "";
-		console.log(filterBy);
-		console.log(token.token);
 		let admin_branch_id;
 		let data;
 
@@ -21,14 +20,10 @@ module.exports = {
 				},
 				include: { model: db.branch, attributes: [["id", "branch_id"]] },
 			});
-
-			// console.log(admin.dataValues.role,'masuk')
 			let role = admin.dataValues.role;
 			if (role === "branch admin") {
 				admin_branch_id = admin.dataValues.branches[0].dataValues.branch_id;
 			}
-
-			console.log(admin_branch_id, "dari sini");
 			if (role === "super admin") {
 				// 1. Report by User
 				if (report === "user") {
@@ -707,7 +702,6 @@ module.exports = {
 			);
 
 			let role = admin.dataValues.role;
-			console.log(role, "role");
 
 			if (role === "super admin") {
 				if (!email.length || !password.length) {
@@ -741,7 +735,6 @@ module.exports = {
 				);
 
 				let userIdUpdate = resCreateAdmin.id;
-				console.log(userIdUpdate, "tess id");
 
 				await db.branch.update(
 					{
@@ -848,14 +841,11 @@ module.exports = {
 	stockHistory: async (req, res) => {
 		try {
 			let { search, filter, sort } = req.query;
-			console.log(search, filter, sort, "test");
 			const sortBy = sort ? sort.split("-") : "";
 			const filterBy = filter ? filter.split("/") : "";
-			console.log(sortBy);
 			let response;
 			const token = req.uid;
 			let admin_branch_id;
-			console.log(token);
 
 			let admin = await db.user.findOne({
 				where: {
@@ -863,7 +853,6 @@ module.exports = {
 				},
 				include: { model: db.branch, attributes: [["id", "branch_id"]] },
 			});
-			console.log(admin);
 			let role = admin.dataValues.role;
 
 			if (role === "branch admin") {
@@ -1068,13 +1057,16 @@ module.exports = {
 				data: response,
 			});
 		} catch (error) {
-			console.log(error);
+			res.status(400).send({
+				isError: true,
+				message: error.message,
+				data: error,
+			});
 		}
 	},
 	branchAdminProductList: async (req, res) => {
 		const { page, sort } = req.query;
 		const token = req.uid;
-		console.log(sort);
 
 		try {
 			let admin_branch_id;
@@ -1085,12 +1077,12 @@ module.exports = {
 				where: {
 					uid: token.uid,
 				},
-				include: { model: db.branch, attributes: [["id", "branch_id"]] },
+				include: { model: db.branch },
 			});
 
 			let role = admin.role;
-			if (role === "branch admin") {
-				admin_branch_id = admin.dataValues.branches[0].dataValues.branch_id;
+			if (role === "Branch Admin") {
+				admin_branch_id = admin.branch.id;
 			}
 
 			if (sort !== "") {
@@ -1134,7 +1126,7 @@ module.exports = {
 			res.status(200).send({
 				isError: false,
 				message: "Get Data Product Success",
-				data: { data, page },
+				data: { data, totalPage },
 			});
 		} catch (error) {
 			res.status(400).send({
@@ -1210,7 +1202,7 @@ module.exports = {
 			if (sort !== "") {
 				data = await db.branch_product.findAll({
 					where: {
-						branch_id: admin.branches[0].id,
+						branch_id: admin.branch.id,
 					},
 					include: [
 						{
@@ -1230,7 +1222,7 @@ module.exports = {
 			} else {
 				data = await db.branch_product.findAll({
 					where: {
-						branch_id: admin.branches[0].id,
+						branch_id: admin.branch.id,
 					},
 					include: [
 						{
@@ -1282,6 +1274,61 @@ module.exports = {
 				message: error.message,
 				data: data.error,
 			});
+		}
+	},
+	updateCategoryImage: async (req, res) => {
+		const { id } = req.params;
+
+		try {
+			let { img } = await db.category.findOne({
+				where: {
+					id,
+				},
+			});
+			await db.category.update(
+				{
+					img: req.files.images[0].path,
+				},
+				{
+					where: {
+						uid,
+					},
+				}
+			);
+
+			deleteFiles(img);
+			new HTTPStatus(res).success("Update Products Success!").send();
+		} catch (error) {
+			deleteFiles(req.files.images[0].path);
+			new HTTPStatus(res, error).error(error.message).send();
+		}
+	},
+	updateCategoryData: async (req, res) => {
+		const { id, name } = req.body;
+		try {
+			await db.category.update({ name }, { where: { id } });
+			new HTTPStatus(res).success("Category detail updated");
+		} catch (error) {
+			new HTTPStatus(res, error).error(error.message).send();
+		}
+	},
+	getProductEdit: async (req, res) => {
+		const { id } = req.query;
+		const { uid } = req.uid;
+		try {
+			const admin = await db.user.findOne({
+				where: { uid },
+				include: { model: db.branch },
+			});
+			const data = await db.branch_product.findOne({
+				where: {
+					[Op.and]: [{ branch_id: admin.branch.id }, { product_id: id }],
+				},
+				include: { model: db.product },
+			});
+			new HTTPStatus(res, data).success("Get product details for edit").send();
+		} catch (error) {
+			new HTTPStatus(res, error).error(error.message).send();
 		}
 	},
 };
