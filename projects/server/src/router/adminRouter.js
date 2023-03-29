@@ -8,11 +8,16 @@ const {
 	discountController,
 } = require("../controller");
 
-Router.get("/sales-report", adminController.salesReport);
-Router.post("/register", adminController.adminRegister);
-Router.get("/branch-admin-available", adminController.getBranchAdmin);
+Router.get("/sales-report", tokenVerify, adminController.salesReport);
+Router.get("/sales-report-detail", adminController.salesReportDetail);
+Router.post("/register", tokenVerify, adminController.adminRegister);
+Router.get(
+	"/branch-admin-available",
+	tokenVerify,
+	adminController.getBranchAdmin
+);
 Router.post("/login", adminController.adminLogin);
-Router.get("/stock-history", tokenVerify, adminController.stockHistory);
+// Router.get("/stock-history", tokenVerify, adminController.stockHistory);
 Router.get(
 	"/branch-admin-product-list",
 	tokenVerify,
@@ -58,6 +63,14 @@ Router.post(
 	upload,
 	productController.createProduct
 );
+
+Router.get("/history-stock", tokenVerify, adminController.stockHistory2);
+Router.get(
+	"/product-history-detail",
+	tokenVerify,
+	adminController.stockHistoryDetail
+);
+
 Router.delete(
 	"/delete-product/:id",
 	tokenVerify,
