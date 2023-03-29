@@ -3,29 +3,36 @@ const db = require("../sequelize/models");
 const { Op } = require("sequelize");
 const { sequelize } = require("../sequelize/models");
 
+const { hashPassword, matchPassword } = require("../lib/hash");
+// Import JWT
+const { createToken } = require("../lib/jwt");
+
 module.exports = {
 	salesReport: async (req, res) => {
-		const token = req.headers;
+		const token = req.uid;
+
 		const { filter, report, sort } = req.query;
 		const filterBy = filter ? filter.split("/") : "";
 		const sortBy = sort ? sort.split("-") : "";
 		console.log(filterBy);
-		console.log(token.token);
+		console.log(token.uid);
 		let admin_branch_id;
 		let data;
 
 		try {
 			let admin = await db.user.findOne({
 				where: {
-					uid: token.token,
+					uid: token.uid,
 				},
-				include: { model: db.branch, attributes: [["id", "branch_id"]] },
+				include: { model: db.branch },
 			});
 
-			// console.log(admin.dataValues.role,'masuk')
-			let role = admin.dataValues.role;
+			console.log(admin.role, "masuk");
+			// console.log(admin.branch.id), "ini apaa";
+
+			let role = admin.role;
 			if (role === "branch admin") {
-				admin_branch_id = admin.dataValues.branches[0].dataValues.branch_id;
+				admin_branch_id = admin.branch.id;
 			}
 
 			console.log(admin_branch_id, "dari sini");
@@ -40,8 +47,11 @@ module.exports = {
 								attributes: [
 									"user_id",
 									"createdAt",
-									"invoice_no",
-									[sequelize.fn("sum", sequelize.col("price")), "total_price"],
+									"invoice",
+									[
+										sequelize.fn("sum", sequelize.col("total_price")),
+										"total_price",
+									],
 									[sequelize.fn("sum", sequelize.col("qty")), "total_qty"],
 								],
 								where: {
@@ -52,7 +62,7 @@ module.exports = {
 										],
 									},
 								},
-								group: ["invoice_no", "user_id"],
+								group: ["user_id"],
 								include: { model: db.user, attributes: ["name"] },
 								order: [["createdAt", sortBy[1]]], //sort nya masuk kesini
 							});
@@ -62,8 +72,11 @@ module.exports = {
 								attributes: [
 									"user_id",
 									"createdAt",
-									"invoice_no",
-									[sequelize.fn("sum", sequelize.col("price")), "total_price"],
+									"invoice",
+									[
+										sequelize.fn("sum", sequelize.col("total_price")),
+										"total_price",
+									],
 									[sequelize.fn("sum", sequelize.col("qty")), "total_qty"],
 								],
 								where: {
@@ -74,7 +87,7 @@ module.exports = {
 										],
 									},
 								},
-								group: ["invoice_no", "user_id"],
+								group: ["user_id"],
 								include: { model: db.user, attributes: ["name"] },
 								order: [["total_price", sortBy[1]]], //sort nya masuk kesini
 							});
@@ -84,11 +97,14 @@ module.exports = {
 								attributes: [
 									"user_id",
 									"createdAt",
-									"invoice_no",
-									[sequelize.fn("sum", sequelize.col("price")), "total_price"],
+									"invoice",
+									[
+										sequelize.fn("sum", sequelize.col("total_price")),
+										"total_price",
+									],
 									[sequelize.fn("sum", sequelize.col("qty")), "total_qty"],
 								],
-								group: ["invoice_no", "user_id"],
+								group: ["user_id"],
 								include: { model: db.user, attributes: ["name", "id"] },
 								where: {
 									createdAt: {
@@ -107,11 +123,14 @@ module.exports = {
 							data = await db.transaction.findAll({
 								attributes: [
 									"user_id",
-									"invoice_no",
-									[sequelize.fn("sum", sequelize.col("price")), "total_price"],
+									"invoice",
+									[
+										sequelize.fn("sum", sequelize.col("total_price")),
+										"total_price",
+									],
 									[sequelize.fn("sum", sequelize.col("qty")), "total_qty"],
 								],
-								group: ["invoice_no", "user_id"],
+								group: ["user_id"],
 								include: { model: db.user, attributes: ["name"] },
 								order: [["createdAt", sortBy[1]]], //sort nya masuk kesini
 							});
@@ -120,11 +139,14 @@ module.exports = {
 							data = await db.transaction.findAll({
 								attributes: [
 									"user_id",
-									"invoice_no",
-									[sequelize.fn("sum", sequelize.col("price")), "total_price"],
+									"invoice",
+									[
+										sequelize.fn("sum", sequelize.col("total_price")),
+										"total_price",
+									],
 									[sequelize.fn("sum", sequelize.col("qty")), "total_qty"],
 								],
-								group: ["invoice_no", "user_id"],
+								group: ["user_id"],
 								include: { model: db.user, attributes: ["name"] },
 								order: [["total_price", sortBy[1]]], //sort nya masuk kesini
 							});
@@ -133,11 +155,14 @@ module.exports = {
 							data = await db.transaction.findAll({
 								attributes: [
 									"user_id",
-									"invoice_no",
-									[sequelize.fn("sum", sequelize.col("price")), "total_price"],
+									"invoice",
+									[
+										sequelize.fn("sum", sequelize.col("total_price")),
+										"total_price",
+									],
 									[sequelize.fn("sum", sequelize.col("qty")), "total_qty"],
 								],
-								group: ["invoice_no", "user_id"],
+								group: ["user_id"],
 								include: { model: db.user, attributes: ["name"] },
 							});
 						}
@@ -154,10 +179,13 @@ module.exports = {
 									"qty",
 									"user_id",
 									"createdAt",
-									"invoice_no",
+									"invoice",
 									"product_name",
 
-									[sequelize.fn("sum", sequelize.col("price")), "total_price"],
+									[
+										sequelize.fn("sum", sequelize.col("total_price")),
+										"total_price",
+									],
 									[sequelize.fn("sum", sequelize.col("qty")), "total_qty"],
 								],
 								where: {
@@ -170,7 +198,7 @@ module.exports = {
 									},
 								},
 
-								group: ["invoice_no"],
+								group: ["invoice"],
 								order: [["createdAt", sortBy[1]]],
 							});
 							//2.1.b transaction  sort with income (asc/desc)
@@ -181,10 +209,13 @@ module.exports = {
 									"qty",
 									"user_id",
 									"createdAt",
-									"invoice_no",
+									"invoice",
 									"product_name",
 									[sequelize.fn("sum", sequelize.col("qty")), "total_qty"],
-									[sequelize.fn("sum", sequelize.col("price")), "total_price"],
+									[
+										sequelize.fn("sum", sequelize.col("total_price")),
+										"total_price",
+									],
 								],
 								where: {
 									status: "delivered",
@@ -195,7 +226,7 @@ module.exports = {
 										],
 									},
 								},
-								group: ["invoice_no"],
+								group: ["invoice"],
 								order: [["total_price", sortBy[1]]],
 							});
 							//2.1.c
@@ -221,17 +252,20 @@ module.exports = {
 									["id", "transaction_id"],
 									"user_id",
 									"createdAt",
-									"invoice_no",
+									"invoice",
 									"product_name",
 
-									[sequelize.fn("sum", sequelize.col("price")), "total_price"],
+									[
+										sequelize.fn("sum", sequelize.col("total_price")),
+										"total_price",
+									],
 									[sequelize.fn("sum", sequelize.col("qty")), "total_qty"],
 								],
 								where: {
 									status: "delivered",
 								},
 
-								group: ["invoice_no"],
+								group: ["invoice"],
 								order: [["createdAt", sortBy[1]]],
 							});
 							// 2.2.b transaction  sort with income (asc/desc)
@@ -241,24 +275,39 @@ module.exports = {
 									["id", "transaction_id"],
 									"user_id",
 									"createdAt",
-									"invoice_no",
+									"invoice",
 									"product_name",
 									[sequelize.fn("sum", sequelize.col("qty")), "total_qty"],
-									[sequelize.fn("sum", sequelize.col("price")), "total_price"],
+									[
+										sequelize.fn("sum", sequelize.col("total_price")),
+										"total_price",
+									],
 								],
 								where: {
 									status: "delivered",
 								},
-								group: ["invoice_no"],
+								group: ["invoice"],
 								order: [["total_price", sortBy[1]]],
 							});
 							//2.2.c
 						} else {
 							data = await db.transaction.findAll({
+								attributes: [
+									["id", "transaction_id"],
+									"user_id",
+									"createdAt",
+									"invoice",
+									"product_name",
+									[sequelize.fn("sum", sequelize.col("qty")), "total_qty"],
+									[
+										sequelize.fn("sum", sequelize.col("total_price")),
+										"total_price",
+									],
+								],
 								where: {
 									status: "delivered",
 								},
-								group: ["invoice_no"],
+								group: ["invoice"],
 							});
 						}
 					}
@@ -273,7 +322,10 @@ module.exports = {
 									"product_name",
 									"createdAt",
 									[sequelize.fn("sum", sequelize.col("qty")), "qty_sold"],
-									[sequelize.fn("sum", sequelize.col("price")), "income_money"],
+									[
+										sequelize.fn("sum", sequelize.col("total_price")),
+										"income_money",
+									],
 								],
 
 								include: { model: db.branch, attributes: ["location"] },
@@ -286,7 +338,7 @@ module.exports = {
 										],
 									},
 								},
-								group: ["product_name"],
+								group: ["product_name", "location"],
 								order: [["income_money", sortBy[1]]],
 							});
 							// 3.1.b product without any sort
@@ -296,7 +348,10 @@ module.exports = {
 									"product_name",
 									"createdAt",
 									[sequelize.fn("sum", sequelize.col("qty")), "qty_sold"],
-									[sequelize.fn("sum", sequelize.col("price")), "income_money"],
+									[
+										sequelize.fn("sum", sequelize.col("total_price")),
+										"income_money",
+									],
 								],
 
 								include: { model: db.branch, attributes: ["location"] },
@@ -309,7 +364,7 @@ module.exports = {
 										],
 									},
 								},
-								group: ["product_name"],
+								group: ["product_name", "location"],
 							});
 						}
 						// 3.2
@@ -320,11 +375,14 @@ module.exports = {
 								attributes: [
 									"product_name",
 									[sequelize.fn("sum", sequelize.col("qty")), "qty_sold"],
-									[sequelize.fn("sum", sequelize.col("price")), "income_money"],
+									[
+										sequelize.fn("sum", sequelize.col("total_price")),
+										"income_money",
+									],
 								],
 
 								include: { model: db.branch, attributes: ["location"] },
-								group: ["product_name"],
+								group: ["product_name", "location"],
 								order: [["income_money", sortBy[1]]],
 							});
 							//3.2.b product without any sort
@@ -333,11 +391,14 @@ module.exports = {
 								attributes: [
 									"product_name",
 									[sequelize.fn("sum", sequelize.col("qty")), "qty_sold"],
-									[sequelize.fn("sum", sequelize.col("price")), "income_money"],
+									[
+										sequelize.fn("sum", sequelize.col("total_price")),
+										"income_money",
+									],
 								],
 
 								include: { model: db.branch, attributes: ["location"] },
-								group: ["product_name"],
+								group: ["product_name", "location"],
 							});
 						}
 					}
@@ -352,8 +413,11 @@ module.exports = {
 								attributes: [
 									"user_id",
 									"createdAt",
-									"invoice_no",
-									[sequelize.fn("sum", sequelize.col("price")), "total_price"],
+									"invoice",
+									[
+										sequelize.fn("sum", sequelize.col("total_price")),
+										"total_price",
+									],
 									[sequelize.fn("sum", sequelize.col("qty")), "total_qty"],
 								],
 								where: {
@@ -365,7 +429,7 @@ module.exports = {
 									},
 									branch_id: admin_branch_id,
 								},
-								group: ["invoice_no", "user_id"],
+								group: ["user_id"],
 								include: { model: db.user, attributes: ["name"] },
 								order: [["createdAt", sortBy[1]]], //sort nya masuk kesini
 							});
@@ -375,8 +439,11 @@ module.exports = {
 								attributes: [
 									"user_id",
 									"createdAt",
-									"invoice_no",
-									[sequelize.fn("sum", sequelize.col("price")), "total_price"],
+									"invoice",
+									[
+										sequelize.fn("sum", sequelize.col("total_price")),
+										"total_price",
+									],
 									[sequelize.fn("sum", sequelize.col("qty")), "total_qty"],
 								],
 								where: {
@@ -388,7 +455,7 @@ module.exports = {
 									},
 									branch_id: admin_branch_id,
 								},
-								group: ["invoice_no", "user_id"],
+								group: ["user_id"],
 								include: { model: db.user, attributes: ["name"] },
 								order: [["total_price", sortBy[1]]], //sort nya masuk kesini
 							});
@@ -398,11 +465,14 @@ module.exports = {
 								attributes: [
 									"user_id",
 									"createdAt",
-									"invoice_no",
-									[sequelize.fn("sum", sequelize.col("price")), "total_price"],
+									"invoice",
+									[
+										sequelize.fn("sum", sequelize.col("total_price")),
+										"total_price",
+									],
 									[sequelize.fn("sum", sequelize.col("qty")), "total_qty"],
 								],
-								group: ["invoice_no", "user_id"],
+								group: ["user_id"],
 								include: { model: db.user, attributes: ["name", "id"] },
 								where: {
 									createdAt: {
@@ -422,14 +492,17 @@ module.exports = {
 							data = await db.transaction.findAll({
 								attributes: [
 									"user_id",
-									"invoice_no",
-									[sequelize.fn("sum", sequelize.col("price")), "total_price"],
+									"invoice",
+									[
+										sequelize.fn("sum", sequelize.col("total_price")),
+										"total_price",
+									],
 									[sequelize.fn("sum", sequelize.col("qty")), "total_qty"],
 								],
 								where: {
 									branch_id: admin_branch_id,
 								},
-								group: ["invoice_no", "user_id"],
+								group: ["user_id"],
 								include: { model: db.user, attributes: ["name"] },
 								order: [["createdAt", sortBy[1]]], //sort nya masuk kesini
 							});
@@ -438,14 +511,17 @@ module.exports = {
 							data = await db.transaction.findAll({
 								attributes: [
 									"user_id",
-									"invoice_no",
-									[sequelize.fn("sum", sequelize.col("price")), "total_price"],
+									"invoice",
+									[
+										sequelize.fn("sum", sequelize.col("total_price")),
+										"total_price",
+									],
 									[sequelize.fn("sum", sequelize.col("qty")), "total_qty"],
 								],
 								where: {
 									branch_id: admin_branch_id,
 								},
-								group: ["invoice_no", "user_id"],
+								group: ["user_id"],
 								include: { model: db.user, attributes: ["name"] },
 								order: [["total_price", sortBy[1]]], //sort nya masuk kesini
 							});
@@ -454,14 +530,17 @@ module.exports = {
 							data = await db.transaction.findAll({
 								attributes: [
 									"user_id",
-									"invoice_no",
-									[sequelize.fn("sum", sequelize.col("price")), "total_price"],
+									"invoice",
+									[
+										sequelize.fn("sum", sequelize.col("total_price")),
+										"total_price",
+									],
 									[sequelize.fn("sum", sequelize.col("qty")), "total_qty"],
 								],
 								where: {
 									branch_id: admin_branch_id,
 								},
-								group: ["invoice_no", "user_id"],
+								group: ["user_id"],
 								include: { model: db.user, attributes: ["name"] },
 							});
 						}
@@ -477,10 +556,13 @@ module.exports = {
 									["id", "transaction_id"],
 									"user_id",
 									"createdAt",
-									"invoice_no",
+									"invoice",
 									"product_name",
 
-									[sequelize.fn("sum", sequelize.col("price")), "total_price"],
+									[
+										sequelize.fn("sum", sequelize.col("total_price")),
+										"total_price",
+									],
 									[sequelize.fn("sum", sequelize.col("qty")), "total_qty"],
 								],
 								where: {
@@ -494,7 +576,7 @@ module.exports = {
 									branch_id: admin_branch_id,
 								},
 
-								group: ["invoice_no"],
+								group: ["invoice"],
 								order: [["createdAt", sortBy[1]]],
 							});
 							//2.1.b transaction  sort with income (asc/desc)
@@ -504,10 +586,13 @@ module.exports = {
 									["id", "transaction_id"],
 									"user_id",
 									"createdAt",
-									"invoice_no",
+									"invoice",
 									"product_name",
 									[sequelize.fn("sum", sequelize.col("qty")), "total_qty"],
-									[sequelize.fn("sum", sequelize.col("price")), "total_price"],
+									[
+										sequelize.fn("sum", sequelize.col("total_price")),
+										"total_price",
+									],
 								],
 								where: {
 									status: "delivered",
@@ -519,7 +604,7 @@ module.exports = {
 									},
 									branch_id: admin_branch_id,
 								},
-								group: ["invoice_no"],
+								group: ["invoice"],
 								order: [["total_price", sortBy[1]]],
 							});
 							//2.1.c
@@ -546,10 +631,13 @@ module.exports = {
 									["id", "transaction_id"],
 									"user_id",
 									"createdAt",
-									"invoice_no",
+									"invoice",
 									"product_name",
 
-									[sequelize.fn("sum", sequelize.col("price")), "total_price"],
+									[
+										sequelize.fn("sum", sequelize.col("total_price")),
+										"total_price",
+									],
 									[sequelize.fn("sum", sequelize.col("qty")), "total_qty"],
 								],
 								where: {
@@ -557,7 +645,7 @@ module.exports = {
 									branch_id: admin_branch_id,
 								},
 
-								group: ["invoice_no"],
+								group: ["invoice"],
 								order: [["createdAt", sortBy[1]]],
 							});
 							// 2.2.b transaction  sort with income (asc/desc)
@@ -567,16 +655,19 @@ module.exports = {
 									["id", "transaction_id"],
 									"user_id",
 									"createdAt",
-									"invoice_no",
+									"invoice",
 									"product_name",
 									[sequelize.fn("sum", sequelize.col("qty")), "total_qty"],
-									[sequelize.fn("sum", sequelize.col("price")), "total_price"],
+									[
+										sequelize.fn("sum", sequelize.col("total_price")),
+										"total_price",
+									],
 								],
 								where: {
 									status: "delivered",
 									branch_id: admin_branch_id,
 								},
-								group: ["invoice_no"],
+								group: ["invoice"],
 								order: [["total_price", sortBy[1]]],
 							});
 							//2.2.c
@@ -586,7 +677,7 @@ module.exports = {
 									status: "delivered",
 									branch_id: admin_branch_id,
 								},
-								group: ["invoice_no"],
+								group: ["invoice"],
 							});
 						}
 					}
@@ -600,7 +691,10 @@ module.exports = {
 									"product_name",
 									"createdAt",
 									[sequelize.fn("sum", sequelize.col("qty")), "qty_sold"],
-									[sequelize.fn("sum", sequelize.col("price")), "income_money"],
+									[
+										sequelize.fn("sum", sequelize.col("total_price")),
+										"income_money",
+									],
 								],
 
 								include: { model: db.branch, attributes: ["location"] },
@@ -624,7 +718,10 @@ module.exports = {
 									"product_name",
 									"createdAt",
 									[sequelize.fn("sum", sequelize.col("qty")), "qty_sold"],
-									[sequelize.fn("sum", sequelize.col("price")), "income_money"],
+									[
+										sequelize.fn("sum", sequelize.col("total_price")),
+										"income_money",
+									],
 								],
 
 								include: { model: db.branch, attributes: ["location"] },
@@ -648,7 +745,10 @@ module.exports = {
 								attributes: [
 									"product_name",
 									[sequelize.fn("sum", sequelize.col("qty")), "qty_sold"],
-									[sequelize.fn("sum", sequelize.col("price")), "income_money"],
+									[
+										sequelize.fn("sum", sequelize.col("total_price")),
+										"income_money",
+									],
 								],
 								where: {
 									branch_id: admin_branch_id,
@@ -663,7 +763,10 @@ module.exports = {
 								attributes: [
 									"product_name",
 									[sequelize.fn("sum", sequelize.col("qty")), "qty_sold"],
-									[sequelize.fn("sum", sequelize.col("price")), "income_money"],
+									[
+										sequelize.fn("sum", sequelize.col("total_price")),
+										"income_money",
+									],
 								],
 								where: {
 									branch_id: admin_branch_id,
@@ -690,24 +793,54 @@ module.exports = {
 		}
 	},
 
+	salesReportDetail: async (req, res) => {
+		try {
+			let { invoice } = req.query;
+			console.log(invoice);
+			const data = await db.transaction.findAll({
+				where: {
+					invoice: invoice,
+				},
+
+				include: [
+					{ model: db.branch },
+					{ model: db.product },
+					{ model: db.user },
+				],
+			});
+
+			return res.status(200).send({
+				isError: false,
+				message: "Get Data By Invoice Success",
+				data: data,
+			});
+		} catch (error) {
+			return res.status(400).send({
+				isError: true,
+				message: message.error,
+				data: data.error,
+			});
+		}
+	},
+
 	adminRegister: async (req, res) => {
 		const t = await sequelize.transaction();
 		try {
 			let { email, password, branch_id } = req.body;
-
-			let token = req.headers;
+			let token = req.uid;
+			console.log(token, "ini uid");
 
 			let admin = await db.user.findOne(
 				{
 					where: {
-						uid: token.token,
+						uid: token.uid,
 					},
 				},
 				{ transaction: t }
 			);
 
-			let role = admin.dataValues.role;
-			console.log(role, "role");
+			let role = admin.role;
+			// console.log(role, "role");
 
 			if (role === "super admin") {
 				if (!email.length || !password.length) {
@@ -733,7 +866,7 @@ module.exports = {
 					{
 						name: `branch admin ${adminBranchLocation}`,
 						email,
-						password,
+						password: await hashPassword(password),
 						role: "branch admin",
 						status: true,
 					},
@@ -845,232 +978,232 @@ module.exports = {
 		}
 	},
 
-	stockHistory: async (req, res) => {
-		try {
-			let { search, filter, sort } = req.query;
-			console.log(search, filter, sort, "test");
-			const sortBy = sort ? sort.split("-") : "";
-			const filterBy = filter ? filter.split("/") : "";
-			console.log(sortBy);
-			let response;
-			const token = req.uid;
-			let admin_branch_id;
-			console.log(token);
+	// stockHistory: async (req, res) => {
+	// 	try {
+	// 		let { search, filter, sort } = req.query;
+	// 		console.log(search, filter, sort, "test");
+	// 		const sortBy = sort ? sort.split("-") : "";
+	// 		const filterBy = filter ? filter.split("/") : "";
+	// 		console.log(sortBy);
+	// 		let response;
+	// 		const token = req.uid;
+	// 		let admin_branch_id;
+	// 		console.log(token);
 
-			let admin = await db.user.findOne({
-				where: {
-					uid: token.uid,
-				},
-				include: { model: db.branch, attributes: [["id", "branch_id"]] },
-			});
-			console.log(admin);
-			let role = admin.dataValues.role;
+	// 		let admin = await db.user.findOne({
+	// 			where: {
+	// 				uid: token.uid,
+	// 			},
+	// 			include: { model: db.branch },
+	// 		});
 
-			if (role === "branch admin") {
-				admin_branch_id = admin.dataValues.branches[0].dataValues.branch_id;
-			}
+	// 		let role = admin.role;
 
-			if (!search) {
-				res.status(200).send({
-					isError: false,
-					message: "Get Data Success",
-					data: null,
-				});
-			}
+	// 		if (role === "branch admin") {
+	// 			admin_branch_id = admin.branch.id;
+	// 		}
 
-			if (role === "super admin") {
-				// filter by
-				if (filterBy) {
-					// filter by + sort
-					if (sortBy[0] === "date") {
-						response = await db.stock_history.findAll({
-							include: [
-								{
-									model: db.product,
-									where: {
-										name: {
-											[Op.substring]: search,
-										},
-									},
-								},
-								{
-									model: db.branch,
-								},
-							],
-							where: {
-								createdAt: {
-									[Op.between]: [new Date(filterBy[0]), new Date(filterBy[1])],
-								},
-							},
-							order: [["createdAt", sortBy[1]]],
-						});
-						// filter without sort
-					} else {
-						response = await db.stock_history.findAll({
-							include: [
-								{
-									model: db.product,
-									where: {
-										name: {
-											[Op.substring]: search,
-										},
-									},
-								},
-								{
-									model: db.branch,
-								},
-							],
-							where: {
-								createdAt: {
-									[Op.between]: [new Date(filterBy[0]), new Date(filterBy[1])],
-								},
-							},
-						});
-					}
-				} else {
-					// sort without filter
-					if (sortBy[0] === "date") {
-						response = await db.stock_history.findAll({
-							include: [
-								{
-									model: db.product,
-									where: {
-										name: {
-											[Op.substring]: search,
-										},
-									},
-								},
-								{
-									model: db.branch,
-								},
-							],
-							order: [["createdAt", sortBy[1]]],
-						});
-					} else {
-						// no filter and no sort
-						response = await db.stock_history.findAll({
-							include: [
-								{
-									model: db.product,
-									where: {
-										name: {
-											[Op.substring]: search,
-										},
-									},
-								},
-								{
-									model: db.branch,
-								},
-							],
-						});
-					}
-				}
-			} else {
-				// filter by
-				if (filterBy) {
-					// filter by + sort
-					if (sortBy[0] === "date") {
-						response = await db.stock_history.findAll({
-							include: [
-								{
-									model: db.product,
-									where: {
-										name: {
-											[Op.substring]: search,
-										},
-									},
-								},
-								{
-									model: db.branch,
-								},
-							],
-							where: {
-								createdAt: {
-									[Op.between]: [new Date(filterBy[0]), new Date(filterBy[1])],
-								},
-								branch_id: admin_branch_id,
-							},
-							order: [["createdAt", sortBy[1]]],
-						});
-						// filter without sort
-					} else {
-						response = await db.stock_history.findAll({
-							include: [
-								{
-									model: db.product,
-									where: {
-										name: {
-											[Op.substring]: search,
-										},
-									},
-								},
-								{
-									model: db.branch,
-								},
-							],
-							where: {
-								createdAt: {
-									[Op.between]: [new Date(filterBy[0]), new Date(filterBy[1])],
-								},
-								branch_id: admin_branch_id,
-							},
-						});
-					}
-				} else {
-					// sort without filter
-					if (sortBy[0] === "date") {
-						response = await db.stock_history.findAll({
-							include: [
-								{
-									model: db.product,
-									where: {
-										name: {
-											[Op.substring]: search,
-										},
-									},
-								},
-								{
-									model: db.branch,
-								},
-							],
-							where: {
-								branch_id: admin_branch_id,
-							},
-							order: [["createdAt", sortBy[1]]],
-						});
-					} else {
-						// no filter and no sort
-						response = await db.stock_history.findAll({
-							include: [
-								{
-									model: db.product,
-									where: {
-										name: {
-											[Op.substring]: search,
-										},
-									},
-								},
-								{
-									model: db.branch,
-								},
-							],
-							where: {
-								branch_id: admin_branch_id,
-							},
-						});
-					}
-				}
-			}
+	// 		if (!search) {
+	// 			res.status(200).send({
+	// 				isError: false,
+	// 				message: "Get Data Success",
+	// 				data: null,
+	// 			});
+	// 		}
 
-			res.status(200).send({
-				isError: false,
-				message: "Get Stock History Success",
-				data: response,
-			});
-		} catch (error) {
-			console.log(error);
-		}
-	},
+	// 		if (role === "super admin") {
+	// 			// filter by
+	// 			if (filterBy) {
+	// 				// filter by + sort
+	// 				if (sortBy[0] === "date") {
+	// 					response = await db.stock_history.findAll({
+	// 						include: [
+	// 							{
+	// 								model: db.product,
+	// 								where: {
+	// 									name: {
+	// 										[Op.substring]: search,
+	// 									},
+	// 								},
+	// 							},
+	// 							{
+	// 								model: db.branch,
+	// 							},
+	// 						],
+	// 						where: {
+	// 							createdAt: {
+	// 								[Op.between]: [new Date(filterBy[0]), new Date(filterBy[1])],
+	// 							},
+	// 						},
+	// 						order: [["createdAt", sortBy[1]]],
+	// 					});
+	// 					// filter without sort
+	// 				} else {
+	// 					response = await db.stock_history.findAll({
+	// 						include: [
+	// 							{
+	// 								model: db.product,
+	// 								where: {
+	// 									name: {
+	// 										[Op.substring]: search,
+	// 									},
+	// 								},
+	// 							},
+	// 							{
+	// 								model: db.branch,
+	// 							},
+	// 						],
+	// 						where: {
+	// 							createdAt: {
+	// 								[Op.between]: [new Date(filterBy[0]), new Date(filterBy[1])],
+	// 							},
+	// 						},
+	// 					});
+	// 				}
+	// 			} else {
+	// 				// sort without filter
+	// 				if (sortBy[0] === "date") {
+	// 					response = await db.stock_history.findAll({
+	// 						include: [
+	// 							{
+	// 								model: db.product,
+	// 								where: {
+	// 									name: {
+	// 										[Op.substring]: search,
+	// 									},
+	// 								},
+	// 							},
+	// 							{
+	// 								model: db.branch,
+	// 							},
+	// 						],
+	// 						order: [["createdAt", sortBy[1]]],
+	// 					});
+	// 				} else {
+	// 					// no filter and no sort
+	// 					response = await db.stock_history.findAll({
+	// 						include: [
+	// 							{
+	// 								model: db.product,
+	// 								where: {
+	// 									name: {
+	// 										[Op.substring]: search,
+	// 									},
+	// 								},
+	// 							},
+	// 							{
+	// 								model: db.branch,
+	// 							},
+	// 						],
+	// 					});
+	// 				}
+	// 			}
+	// 		} else {
+	// 			// filter by
+	// 			if (filterBy) {
+	// 				// filter by + sort
+	// 				if (sortBy[0] === "date") {
+	// 					response = await db.stock_history.findAll({
+	// 						include: [
+	// 							{
+	// 								model: db.product,
+	// 								where: {
+	// 									name: {
+	// 										[Op.substring]: search,
+	// 									},
+	// 								},
+	// 							},
+	// 							{
+	// 								model: db.branch,
+	// 							},
+	// 						],
+	// 						where: {
+	// 							createdAt: {
+	// 								[Op.between]: [new Date(filterBy[0]), new Date(filterBy[1])],
+	// 							},
+	// 							branch_id: admin_branch_id,
+	// 						},
+	// 						order: [["createdAt", sortBy[1]]],
+	// 					});
+	// 					// filter without sort
+	// 				} else {
+	// 					response = await db.stock_history.findAll({
+	// 						include: [
+	// 							{
+	// 								model: db.product,
+	// 								where: {
+	// 									name: {
+	// 										[Op.substring]: search,
+	// 									},
+	// 								},
+	// 							},
+	// 							{
+	// 								model: db.branch,
+	// 							},
+	// 						],
+	// 						where: {
+	// 							createdAt: {
+	// 								[Op.between]: [new Date(filterBy[0]), new Date(filterBy[1])],
+	// 							},
+	// 							branch_id: admin_branch_id,
+	// 						},
+	// 					});
+	// 				}
+	// 			} else {
+	// 				// sort without filter
+	// 				if (sortBy[0] === "date") {
+	// 					response = await db.stock_history.findAll({
+	// 						include: [
+	// 							{
+	// 								model: db.product,
+	// 								where: {
+	// 									name: {
+	// 										[Op.substring]: search,
+	// 									},
+	// 								},
+	// 							},
+	// 							{
+	// 								model: db.branch,
+	// 							},
+	// 						],
+	// 						where: {
+	// 							branch_id: admin_branch_id,
+	// 						},
+	// 						order: [["createdAt", sortBy[1]]],
+	// 					});
+	// 				} else {
+	// 					// no filter and no sort
+	// 					response = await db.stock_history.findAll({
+	// 						include: [
+	// 							{
+	// 								model: db.product,
+	// 								where: {
+	// 									name: {
+	// 										[Op.substring]: search,
+	// 									},
+	// 								},
+	// 							},
+	// 							{
+	// 								model: db.branch,
+	// 							},
+	// 						],
+	// 						where: {
+	// 							branch_id: admin_branch_id,
+	// 						},
+	// 					});
+	// 				}
+	// 			}
+	// 		}
+
+	// 		res.status(200).send({
+	// 			isError: false,
+	// 			message: "Get Stock History Success",
+	// 			data: response,
+	// 		});
+	// 	} catch (error) {
+	// 		console.log(error);
+	// 	}
+	// },
 	branchAdminProductList: async (req, res) => {
 		const { page, sort } = req.query;
 		const token = req.uid;
@@ -1085,12 +1218,12 @@ module.exports = {
 				where: {
 					uid: token.uid,
 				},
-				include: { model: db.branch, attributes: [["id", "branch_id"]] },
+				include: { model: db.branch },
 			});
 
 			let role = admin.role;
 			if (role === "branch admin") {
-				admin_branch_id = admin.dataValues.branches[0].dataValues.branch_id;
+				admin_branch_id = admin.branch.id;
 			}
 
 			if (sort !== "") {
@@ -1153,12 +1286,12 @@ module.exports = {
 			where: {
 				uid: token.uid,
 			},
-			include: { model: db.branch, attributes: [["id", "branch_id"]] },
+			include: { model: db.branch },
 		});
 
 		let role = admin.role;
 		if (role === "branch admin") {
-			admin_branch_id = admin.dataValues.branches[0].dataValues.branch_id;
+			admin_branch_id = admin.branch.id;
 		}
 
 		try {
@@ -1207,10 +1340,11 @@ module.exports = {
 				},
 				include: { model: db.branch },
 			});
+
 			if (sort !== "") {
 				data = await db.branch_product.findAll({
 					where: {
-						branch_id: admin.branches[0].id,
+						branch_id: admin.branch.id,
 					},
 					include: [
 						{
@@ -1230,7 +1364,7 @@ module.exports = {
 			} else {
 				data = await db.branch_product.findAll({
 					where: {
-						branch_id: admin.branches[0].id,
+						branch_id: admin.branch.id,
 					},
 					include: [
 						{
@@ -1268,7 +1402,7 @@ module.exports = {
 				where: {
 					uid: token.uid,
 				},
-				include: { model: db.branch, attributes: [["id", "branch_id"]] },
+				include: { model: db.branch },
 			});
 
 			res.status(200).send({
@@ -1281,6 +1415,196 @@ module.exports = {
 				isError: true,
 				message: error.message,
 				data: data.error,
+			});
+		}
+	},
+	stockHistory2: async (req, res) => {
+		try {
+			const { search } = req.query;
+			let response;
+			const token = req.uid;
+			let admin_branch_id;
+
+			let admin = await db.user.findOne({
+				where: {
+					uid: token.uid,
+				},
+				include: { model: db.branch },
+			});
+
+			let role = admin.role;
+
+			if (role === "branch admin") {
+				admin_branch_id = admin.branch.id;
+			}
+
+			if (!search) {
+				res.status(200).send({
+					isError: false,
+					message: "Get Data Success",
+					data: null,
+				});
+			}
+
+			const data = await db.product.findAll({
+				where: {
+					name: {
+						[Op.substring]: search,
+					},
+				},
+			});
+
+			res.status(200).send({
+				isError: false,
+				message: "Get Data Success",
+				data: data,
+			});
+		} catch (error) {
+			res.status(404).send({
+				isError: true,
+				message: error.message,
+				data: error.data,
+			});
+		}
+	},
+
+	stockHistoryDetail: async (req, res) => {
+		try {
+			let { ProductId, branchId } = req.query;
+			let { filter, sort } = req.query;
+			console.log(filter, sort, "iniiii");
+			const sortBy = sort ? sort.split("-") : "";
+			const filterBy = filter ? filter.split("/") : "";
+			const token = req.uid;
+			let admin_branch_id;
+			let data;
+
+			let admin = await db.user.findOne({
+				where: {
+					uid: token.uid,
+				},
+				include: { model: db.branch },
+			});
+
+			let role = admin.role;
+
+			if (role === "branch admin") {
+				admin_branch_id = admin.branch.id;
+			}
+
+			if (role === "branch admin") {
+				if (filterBy) {
+					if (sortBy[0] === "date") {
+						data = await db.stock_history.findAll({
+							where: {
+								product_id: ProductId,
+								branch_id: admin_branch_id,
+								createdAt: {
+									[Op.between]: [new Date(filterBy[0]), new Date(filterBy[1])],
+								},
+							},
+							include: [{ model: db.branch }, { model: db.product }],
+							order: [["createdAt", sortBy[1]]],
+						});
+					} else {
+						data = await db.stock_history.findAll({
+							where: {
+								product_id: ProductId,
+								branch_id: admin_branch_id,
+								createdAt: {
+									[Op.between]: [new Date(filterBy[0]), new Date(filterBy[1])],
+								},
+							},
+							include: [{ model: db.branch }, { model: db.product }],
+						});
+					}
+				} else {
+					if (sortBy[0] === "date") {
+						data = await db.stock_history.findAll({
+							where: {
+								product_id: ProductId,
+								branch_id: admin_branch_id,
+							},
+							include: [{ model: db.branch }, { model: db.product }],
+							order: [["createdAt", sortBy[1]]],
+						});
+					} else {
+						data = await db.stock_history.findAll({
+							where: {
+								product_id: ProductId,
+								branch_id: admin_branch_id,
+							},
+							include: [{ model: db.branch }, { model: db.product }],
+						});
+					}
+				}
+			} else {
+				if (filterBy) {
+					if (sortBy[0] === "date") {
+						data = await db.stock_history.findAll({
+							where: {
+								product_id: ProductId,
+								branch_id: branchId,
+								createdAt: {
+									[Op.between]: [new Date(filterBy[0]), new Date(filterBy[1])],
+								},
+							},
+							include: [{ model: db.branch }, { model: db.product }],
+							order: [["createdAt", sortBy[1]]],
+						});
+					} else {
+						data = await db.stock_history.findAll({
+							where: {
+								product_id: ProductId,
+								branch_id: branchId,
+								createdAt: {
+									[Op.between]: [new Date(filterBy[0]), new Date(filterBy[1])],
+								},
+							},
+							include: [{ model: db.branch }, { model: db.product }],
+						});
+					}
+				} else {
+					if (sortBy[0] === "date") {
+						data = await db.stock_history.findAll({
+							where: {
+								product_id: ProductId,
+								branch_id: branchId,
+							},
+							include: [{ model: db.branch }, { model: db.product }],
+							order: [["createdAt", sortBy[1]]],
+						});
+					} else {
+						data = await db.stock_history.findAll({
+							where: {
+								product_id: ProductId,
+								branch_id: branchId,
+							},
+							include: [{ model: db.branch }, { model: db.product }],
+						});
+					}
+				}
+			}
+			// data = await db.stock_history.findAll({
+			// 	where: {
+			// 		product_id: ProductId,
+			// 		branch_id: branchId,
+			// 	},
+			// 	include: [{ model: db.branch }, { model: db.product }],
+			// 	// group: ["branch_id"],
+			// });
+
+			res.status(200).send({
+				isError: false,
+				message: "Get Data Success",
+				data: data,
+			});
+		} catch (error) {
+			console.log(error);
+			res.status(400).send({
+				isError: true,
+				message: error.message,
+				data: error.data,
 			});
 		}
 	},

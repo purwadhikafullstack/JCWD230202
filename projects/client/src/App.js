@@ -23,6 +23,8 @@ import { toast } from "react-hot-toast";
 import ProductManagement from "./pages/productManagement";
 import DiscountManagement from "./pages/discountManagement";
 import BranchAdminProductList from "./components/branchAdminProductlist";
+import NotFoundPage from "./pages/404";
+import StockHistoryDetail from "./components/stockHistoryDetail";
 
 function App() {
 	const [disable, setdisable] = useState();
@@ -34,6 +36,7 @@ function App() {
 		email: null,
 		phone_number: null,
 		profile_picture: null,
+		role: null,
 		address: null,
 	});
 	const getProfile = async () => {
@@ -86,15 +89,50 @@ function App() {
 		}
 	};
 
-	useEffect(() => {
-		getProfile();
-		// eslint-disable-next-line react-hooks/exhaustive-deps
-	}, []);
+	let onLoginAdmin = async (email, password) => {
+		try {
+			setdisable(true);
+			const { data } = await REST_API({
+				url: "/admin/login",
+				method: "POST",
+				data: {
+					email: email,
+					password: password,
+				},
+			});
+
+			localStorage.setItem("token", `${data.data.token}`);
+			toast.success(data.message);
+			// email.current.value = "";
+			// password.current.value = "";
+			email = "";
+			password = "";
+			getProfile();
+			setTimeout(() => {
+				window.location.href = "http://localhost:3000/admin";
+			}, 1000);
+		} catch (error) {
+			toast.error(error.response.data.message);
+		} finally {
+			setdisable(false);
+		}
+	};
 
 	let onLogout = () => {
 		localStorage.removeItem("token");
 		setprofile({ ...profile, name: "" });
 	};
+	useEffect(() => {
+		getProfile();
+		// if (profile.role === "super admin" || "branch admin") {
+		// 	window.location.href = "http://localhost:3000/admin";
+		// } else if (profile.role === "user") {
+		// 	window.location.href = "http://localhost:3000/home";
+		// } else {
+		// 	null;
+		// }
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, []);
 
 	return (
 		<div className="relative">
@@ -125,7 +163,10 @@ function App() {
 				<Route path="/activation/:uid" element={<Activation />} />
 				<Route path="/forgotpassword" element={<ForgotPass />} />
 				{/* Admin */}
-				<Route path="/admin" element={<Dashboard />}>
+				<Route
+					path="/admin"
+					element={<Dashboard state={{ profile }} Func={{ onLogout }} />}
+				>
 					{/* <Route path="/admin" element={<Overview />} /> */}
 					<Route path="sales-report" element={<SalesReport />} />
 					<Route
@@ -135,9 +176,17 @@ function App() {
 					<Route path="stock-history" element={<StockHistory />} />
 					<Route path="admin-product" element={<BranchAdminProductList />} />
 					<Route path="product-management" element={<ProductManagement />} />
+					<Route
+						path="stock-history-detail/:id"
+						element={<StockHistoryDetail state={{ profile }} />}
+					/>
 					<Route path="discount-management" element={<DiscountManagement />} />
 				</Route>
-				<Route path="/loginAdmin" element={<LoginAdmin />} />
+				<Route
+					path="/loginAdmin"
+					element={<LoginAdmin Func={{ onLoginAdmin }} />}
+				/>
+				<Route path="*" element={<NotFoundPage />} />
 			</Routes>
 		</div>
 	);

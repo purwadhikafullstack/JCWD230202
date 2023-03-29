@@ -3,10 +3,10 @@ import { AiFillEye, AiFillEyeInvisible } from "react-icons/ai";
 import Tokonglomerat from "../support/assets/new_login.png";
 import { toast, Toaster } from "react-hot-toast";
 import LoadingSpin from "react-loading-spin";
-import { useNavigate } from "react-router-dom";
-import axios from "axios";
+// import { useNavigate } from "react-router-dom";
+// import axios from "axios";
 
-function LoginAdmin() {
+function LoginAdmin(props) {
 	const [showPassword, setshowPassword] = useState(false);
 	const [errEmail, seterrEmail] = useState();
 	const [errPass, seterrPass] = useState();
@@ -15,30 +15,30 @@ function LoginAdmin() {
 	const email = useRef();
 	const password = useRef();
 
-	const Navigate = useNavigate();
+	// const Navigate = useNavigate();
 
-	let onLogin = async () => {
-		try {
-			setdisable(true);
+	// let onLogin = async () => {
+	// 	try {
+	// 		setdisable(true);
 
-			let { data } = await axios.post("http://localhost:5000/admin/login", {
-				email: email.current.value,
-				password: password.current.value,
-			});
+	// 		let { data } = await axios.post("http://localhost:8000/admin/login", {
+	// 			email: email.current.value,
+	// 			password: password.current.value,
+	// 		});
 
-			localStorage.setItem("token", `${data.data.token}`);
-			toast.success(data.message);
-			email.current.value = "";
-			password.current.value = "";
-			setTimeout(() => {
-				Navigate("/admin");
-			}, 1000);
-		} catch (error) {
-			toast.error(error.response.data.message);
-		} finally {
-			setdisable(false);
-		}
-	};
+	// 		localStorage.setItem("token", `${data.data.token}`);
+	// 		toast.success(data.message);
+	// 		email.current.value = "";
+	// 		password.current.value = "";
+	// 		setTimeout(() => {
+	// 			Navigate("/admin");
+	// 		}, 1000);
+	// 	} catch (error) {
+	// 		toast.error(error.response.data.message);
+	// 	} finally {
+	// 		setdisable(false);
+	// 	}
+	// };
 
 	let onValidateEmail = (value) => {
 		if (value === "") {
@@ -144,7 +144,12 @@ function LoginAdmin() {
 						</div>
 
 						<button
-							onClick={() => onLogin()}
+							onClick={() =>
+								props.Func.onLoginAdmin(
+									email.current.value,
+									password.current.value
+								)
+							}
 							disabled={disable}
 							type="submit"
 							className="inline-flex w-full items-center justify-center mt-8 px-8 py-4 font-sans font-semibold tracking-wide hover:bg-gray-300 text-white bg-red-700 rounded-lg h-[60px]"
