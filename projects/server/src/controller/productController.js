@@ -3,9 +3,70 @@ const { Op } = require("sequelize");
 const HTTPStatus = require("../helper/HTTPStatus");
 const { sequelize } = require("../sequelize/models");
 const deleteFiles = require("../helper/deleteFiles");
+const getProximity = require("../lib/proximity");
 
 module.exports = {
-	deleteProduct: async (req, res) => {},
+	editProduct: async (req, res) => {},
+	getCategoryEdit: async (req, res) => {
+		const { id } = req.query;
+		try {
+			const data = await db.category.findOne({ where: { id } });
+			new HTTPStatus(res, data).success("Get category detail").send();
+		} catch (error) {
+			new HTTPStatus(res, error).error(error.message).send();
+		}
+	},
+	getNearestBranchProduct: async (req, res) => {
+		const { uid } = req.uid;
+		try {
+			const user = await db.user.findOne({
+				where: { uid },
+				include: { model: db.user_address, where: { main_address: true } },
+			});
+			const proximity = await getProximity(
+				user.user_addresses[0].lat,
+				user.user_addresses[0].lng
+			);
+			new HTTPStatus(res, proximity).success("Get nearest branch").send();
+		} catch (error) {
+			new HTTPStatus(res, error).error(error.message).send();
+		}
+	},
+	deleteCategory: async (req, res) => {
+		const { id } = req.params;
+		try {
+			await db.category.update({ status: "deleted" }, { where: { id } });
+			new HTTPStatus(res).success("Category deleted").send();
+		} catch (error) {
+			new HTTPStatus(res, error).error(error.message).send();
+		}
+	},
+	deleteProduct: async (req, res) => {
+		const { id } = req.params;
+		const t = await sequelize.transaction();
+		try {
+			const data = await db.branch_product.findOne({ where: { id } });
+			await db.branch_product.update(
+				{
+					status: "deleted",
+				},
+				{ where: { id } },
+				{ transaction: t }
+			);
+			await db.product.update(
+				{
+					status: "deleted",
+				},
+				{ where: { id: data.product_id } },
+				{ transaction: t }
+			);
+			await t.commit();
+			new HTTPStatus(res).success("Product deleted").send();
+		} catch (error) {
+			await t.rollback();
+			new HTTPStatus(res, error).error(error.message).send();
+		}
+	},
 	createProduct: async (req, res) => {
 		const { uid } = req.uid;
 		const { name, price, category_id, stock, unit_id, description } =
@@ -53,44 +114,104 @@ module.exports = {
 		}
 	},
 	getSuggested: async (req, res) => {
+		const user = req.uid;
+		let data;
 		try {
-			const data = await db.transaction.findAll({
-				attributes: [
-					[
-						sequelize.fn("COUNT", sequelize.col("product_name")),
-						"total_transaction",
+			if (user === undefined) {
+				data = await db.transaction.findAll({
+					attributes: [
+						[
+							sequelize.fn("COUNT", sequelize.col("product_name")),
+							"total_transaction",
+						],
 					],
-				],
-				limit: 10,
-				include: [
-					{
-						model: db.product,
-						attributes: ["id", "name", "img", "price", "description"],
-						include: [{ model: db.unit }],
-					},
-					{ model: db.branch, attributes: ["id", "location"] },
-				],
-				group: ["product_name"],
-				order: [["total_transaction", "DESC"]],
-			});
+					limit: 10,
+					include: [
+						{
+							model: db.product,
+							attributes: ["id", "name", "img", "price", "description"],
+							include: [{ model: db.unit }],
+						},
+						{ model: db.branch, attributes: ["id", "location"] },
+					],
+					group: ["product_name"],
+					order: [["total_transaction", "DESC"]],
+				});
+			} else {
+				const address = await db.user.findOne({
+					where: { uid: user.uid },
+					include: { model: db.user_address },
+				});
+
+				const proximity = await getProximity(
+					address.user_addresses[0].lat,
+					address.user_addresses[0].lng
+				);
+
+				data = await db.transaction.findAll({
+					where: { branch_id: proximity[0].id },
+					attributes: [
+						[
+							sequelize.fn("COUNT", sequelize.col("product_name")),
+							"total_transaction",
+						],
+					],
+					limit: 10,
+					include: [
+						{
+							model: db.product,
+							attributes: ["id", "name", "img", "price", "description"],
+							include: [{ model: db.unit }],
+						},
+						{ model: db.branch, attributes: ["id", "location"] },
+					],
+					group: ["product_name"],
+					order: [["total_transaction", "DESC"]],
+				});
+			}
 			new HTTPStatus(res, data).success("Get best seller product").send();
 		} catch (error) {
 			new HTTPStatus(res, error).error(error.message, 400).send();
 		}
 	},
 	getRandom: async (req, res) => {
+		const user = req.uid;
+		let data;
 		try {
-			const data = await db.branch_product.findAll({
-				where: { branch_id: 1 },
-				include: [
-					{
-						model: db.product,
-					},
-					{ model: db.branch },
-				],
-				offset: Math.floor(Math.random() * 155),
-				limit: 10,
-			});
+			if (user === undefined) {
+				data = await db.branch_product.findAll({
+					where: { branch_id: 1 },
+					include: [
+						{
+							model: db.product,
+						},
+						{ model: db.branch },
+					],
+					offset: Math.floor(Math.random() * 155),
+					limit: 10,
+				});
+			} else {
+				const address = await db.user.findOne({
+					where: { uid: user.uid },
+					include: { model: db.user_address },
+				});
+
+				const proximity = await getProximity(
+					address.user_addresses[0].lat,
+					address.user_addresses[0].lng
+				);
+				data = await db.branch_product.findAll({
+					where: { branch_id: proximity[0].id },
+					include: [
+						{
+							model: db.product,
+						},
+						{ model: db.branch },
+					],
+					offset: Math.floor(Math.random() * 155),
+					limit: 10,
+				});
+			}
 			res.status(200).send({
 				isError: false,
 				message: "Get All Product",

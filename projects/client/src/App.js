@@ -1,6 +1,6 @@
 import "./App.css";
 import REST_API from "./support/services/RESTApiService";
-import { Routes, Route } from "react-router-dom";
+import { Routes, Route, useNavigate } from "react-router-dom";
 import LandingPage from "./pages/landingPage";
 import NavigationBar from "./components/navbar";
 import Profile from "./pages/profile";
@@ -20,11 +20,13 @@ import Transaction from "./pages/transaction";
 import LoginAdmin from "./pages/loginAdmin";
 import StockHistory from "./components/stockHistory";
 import { toast } from "react-hot-toast";
-import ProductManagement from "./pages/productManagement";
 import DiscountManagement from "./pages/discountManagement";
 import BranchAdminProductList from "./components/branchAdminProductlist";
+import PaymentProof from "./pages/paymentProof";
+import TransactionAdmin from "./components/transaction";
 
 function App() {
+	const navigate = useNavigate();
 	const [disable, setdisable] = useState();
 	const [profile, setprofile] = useState({
 		id: null,
@@ -86,56 +88,59 @@ function App() {
 		}
 	};
 
+	let onLogout = () => {
+		localStorage.removeItem("token");
+		setprofile({
+			id: null,
+			name: null,
+			birthdate: null,
+			gender: null,
+			email: null,
+			phone_number: null,
+			profile_picture: null,
+			address: null,
+		});
+		navigate("/home");
+	};
 	useEffect(() => {
 		getProfile();
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, []);
 
-	let onLogout = () => {
-		localStorage.removeItem("token");
-		setprofile({ ...profile, name: "" });
-	};
-
 	return (
 		<div className="relative">
 			<Routes>
 				{/* User */}
-				<Route
-					path="/"
-					element={<NavigationBar state={{ profile }} Func={{ onLogout }} />}
-				>
+				<Route path="/" element={<NavigationBar state={{ profile }} Func={{ onLogout }} />}>
 					<Route path="home" element={<LandingPage />} />
 					<Route
 						path="profile"
-						element={
-							<Profile func={{ getProfile }} state={{ profile, setprofile }} />
-						}
+						element={<Profile func={{ getProfile }} state={{ profile, setprofile }} />}
 					/>
 					<Route path="category/:product" element={<ProductCategory />} />
-					<Route path="checkout" element={<Checkout />} />
 					<Route path="cart" element={<Cart />} />
 					<Route path="transaction" element={<Transaction />} />
 				</Route>
-				<Route
-					path="/login"
-					element={<Login MyFunc={{ onLogin }} isDisable={{ disable }} />}
-				/>
+				<Route path="checkout" element={<Checkout />} />
+				<Route path="/login" element={<Login MyFunc={{ onLogin }} isDisable={{ disable }} />} />
 				<Route path="/updatePassword/:uid" element={<UpdatePassword />} />
 				<Route path="/register" element={<Register />} />
 				<Route path="/activation/:uid" element={<Activation />} />
 				<Route path="/forgotpassword" element={<ForgotPass />} />
+				<Route path="/uploadpayment" element={<PaymentProof />} />
 				{/* Admin */}
 				<Route path="/admin" element={<Dashboard />}>
 					{/* <Route path="/admin" element={<Overview />} /> */}
 					<Route path="sales-report" element={<SalesReport />} />
-					<Route
-						path="branch-admin-register"
-						element={<BranchAdminRegister />}
-					/>
+					<Route path="branch-admin-register" element={<BranchAdminRegister />} />
 					<Route path="stock-history" element={<StockHistory />} />
 					<Route path="admin-product" element={<BranchAdminProductList />} />
-					<Route path="product-management" element={<ProductManagement />} />
+					<Route
+						path="product-management"
+						element={<BranchAdminProductList />}
+					/>
 					<Route path="discount-management" element={<DiscountManagement />} />
+					<Route path="transaction" element={<TransactionAdmin />} />
 				</Route>
 				<Route path="/loginAdmin" element={<LoginAdmin />} />
 			</Routes>

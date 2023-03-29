@@ -3,11 +3,13 @@ import { AiFillEye, AiFillEyeInvisible } from "react-icons/ai";
 import tokonglomerat from "../support/assets/new_login.png";
 import {  Toaster } from "react-hot-toast";
 import LoadingSpin from "react-loading-spin";
+import { useNavigate } from "react-router-dom";
 
 function Login(props) {
 	const [showPassword, setshowPassword] = useState(false);
 	const [errEmail, seterrEmail] = useState();
 	const [errPass, seterrPass] = useState();
+	const Navigate = useNavigate()
 	
 	const email = useRef();
 	const password = useRef();
@@ -34,8 +36,8 @@ function Login(props) {
 	};
 	return (
 		<div className=" max-h-screen overflow-hidden ">
-			<div className=" flex justify-center content-center mt-[32px] font-bold text-4xl font-mandalaFont text-red-700 ">
-				tokonglomerat
+			<div className=" flex justify-center content-center mt-[32px] font-bold text-4xl font-mandalaFont text-[#0095DA] ">
+				<button onClick={() => Navigate("/home")}>tokonglomerat</button>
 			</div>
 			<div className=" flex flex-col xl:max-w-[816px] h-screen xl:h-[612px] mt-8 xl:mt-[42px] mx-auto relative ">
 				<img
@@ -96,7 +98,7 @@ function Login(props) {
 							</div>
 						</div>
 						<a
-							className=" text-red-700 flex justify-end content-end mt-[18px] "
+							className=" text-[#0095DA] flex justify-end content-end mt-[18px] "
 							href="/forgotpassword"
 						>
 							Forgot Password?
@@ -105,17 +107,17 @@ function Login(props) {
 							onClick={() => props.MyFunc.onLogin(email.current.value, password.current.value)}
 							disabled={props.isDisable.disable}
 							type="submit"
-							className="inline-flex w-full items-center justify-center mt-8 px-8 py-4 font-sans font-semibold tracking-wide hover:bg-gray-300 text-white bg-red-700 rounded-lg h-[60px]"
+							className="inline-flex w-full items-center justify-center mt-8 px-8 py-4 font-sans font-semibold tracking-wide hover:bg-gray-300 text-white bg-[#0095DA] rounded-lg h-[60px]"
 						>
 							{props.isDisable.disable ? (
-								<LoadingSpin size={"30px"} primaryColor={"red"} secondaryColor={"gray"} />
+								<LoadingSpin size={"30px"} primaryColor={"#38ADE3"} secondaryColor={"gray"} />
 							) : (
 								"Login"
 							)}
 						</button>
 
 						<a
-							className=" justify-center underline text-[14px] text-red-700 flex mt-[12px] "
+							className=" justify-center underline text-[14px] text-[#0095DA] flex mt-[12px] "
 							href="/loginadmin"
 						>
 							Log in as admin
@@ -123,7 +125,7 @@ function Login(props) {
 
 						<div className=" mt-[15px] flex items-center justify-center text-slate-400 text-[12px] ">
 							<p>Don't have an account Tokonglomerat?</p>
-							<a href="/register" className=" text-red-700 underline">
+							<a href="/register" className=" text-[#0095DA] underline">
 								Register now
 							</a>
 							<Toaster />

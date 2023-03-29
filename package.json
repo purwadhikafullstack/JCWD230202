@@ -21,6 +21,10 @@
     "projects/*"
   ],
   "dependencies": {
+    "@chakra-ui/react": "^2.5.3",
+    "@emotion/react": "^11.10.6",
+    "@emotion/styled": "^11.10.6",
+    "framer-motion": "^10.9.1",
     "react-icons": "^4.7.1"
   }
 }
