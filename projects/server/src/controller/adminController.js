@@ -2,6 +2,7 @@ const db = require("../sequelize/models");
 // const sequelize = require("sequelize");
 const { Op } = require("sequelize");
 const { sequelize } = require("../sequelize/models");
+const HTTPStatus = require("../helper/HTTPStatus");
 
 const { hashPassword, matchPassword } = require("../lib/hash");
 // Import JWT
@@ -14,8 +15,7 @@ module.exports = {
 		const { filter, report, sort } = req.query;
 		const filterBy = filter ? filter.split("/") : "";
 		const sortBy = sort ? sort.split("-") : "";
-		console.log(filterBy);
-		console.log(token.uid);
+
 		let admin_branch_id;
 		let data;
 
@@ -27,15 +27,12 @@ module.exports = {
 				include: { model: db.branch },
 			});
 
-			console.log(admin.role, "masuk");
-			// console.log(admin.branch.id), "ini apaa";
-
 			let role = admin.role;
+
+			
 			if (role === "branch admin") {
 				admin_branch_id = admin.branch.id;
 			}
-
-			console.log(admin_branch_id, "dari sini");
 			if (role === "super admin") {
 				// 1. Report by User
 				if (report === "user") {
@@ -839,8 +836,10 @@ module.exports = {
 				{ transaction: t }
 			);
 
+
 			let role = admin.role;
 			// console.log(role, "role");
+
 
 			if (role === "super admin") {
 				if (!email.length || !password.length) {
@@ -874,7 +873,6 @@ module.exports = {
 				);
 
 				let userIdUpdate = resCreateAdmin.id;
-				console.log(userIdUpdate, "tess id");
 
 				await db.branch.update(
 					{
@@ -978,236 +976,9 @@ module.exports = {
 		}
 	},
 
-	// stockHistory: async (req, res) => {
-	// 	try {
-	// 		let { search, filter, sort } = req.query;
-	// 		console.log(search, filter, sort, "test");
-	// 		const sortBy = sort ? sort.split("-") : "";
-	// 		const filterBy = filter ? filter.split("/") : "";
-	// 		console.log(sortBy);
-	// 		let response;
-	// 		const token = req.uid;
-	// 		let admin_branch_id;
-	// 		console.log(token);
-
-	// 		let admin = await db.user.findOne({
-	// 			where: {
-	// 				uid: token.uid,
-	// 			},
-	// 			include: { model: db.branch },
-	// 		});
-
-	// 		let role = admin.role;
-
-	// 		if (role === "branch admin") {
-	// 			admin_branch_id = admin.branch.id;
-	// 		}
-
-	// 		if (!search) {
-	// 			res.status(200).send({
-	// 				isError: false,
-	// 				message: "Get Data Success",
-	// 				data: null,
-	// 			});
-	// 		}
-
-	// 		if (role === "super admin") {
-	// 			// filter by
-	// 			if (filterBy) {
-	// 				// filter by + sort
-	// 				if (sortBy[0] === "date") {
-	// 					response = await db.stock_history.findAll({
-	// 						include: [
-	// 							{
-	// 								model: db.product,
-	// 								where: {
-	// 									name: {
-	// 										[Op.substring]: search,
-	// 									},
-	// 								},
-	// 							},
-	// 							{
-	// 								model: db.branch,
-	// 							},
-	// 						],
-	// 						where: {
-	// 							createdAt: {
-	// 								[Op.between]: [new Date(filterBy[0]), new Date(filterBy[1])],
-	// 							},
-	// 						},
-	// 						order: [["createdAt", sortBy[1]]],
-	// 					});
-	// 					// filter without sort
-	// 				} else {
-	// 					response = await db.stock_history.findAll({
-	// 						include: [
-	// 							{
-	// 								model: db.product,
-	// 								where: {
-	// 									name: {
-	// 										[Op.substring]: search,
-	// 									},
-	// 								},
-	// 							},
-	// 							{
-	// 								model: db.branch,
-	// 							},
-	// 						],
-	// 						where: {
-	// 							createdAt: {
-	// 								[Op.between]: [new Date(filterBy[0]), new Date(filterBy[1])],
-	// 							},
-	// 						},
-	// 					});
-	// 				}
-	// 			} else {
-	// 				// sort without filter
-	// 				if (sortBy[0] === "date") {
-	// 					response = await db.stock_history.findAll({
-	// 						include: [
-	// 							{
-	// 								model: db.product,
-	// 								where: {
-	// 									name: {
-	// 										[Op.substring]: search,
-	// 									},
-	// 								},
-	// 							},
-	// 							{
-	// 								model: db.branch,
-	// 							},
-	// 						],
-	// 						order: [["createdAt", sortBy[1]]],
-	// 					});
-	// 				} else {
-	// 					// no filter and no sort
-	// 					response = await db.stock_history.findAll({
-	// 						include: [
-	// 							{
-	// 								model: db.product,
-	// 								where: {
-	// 									name: {
-	// 										[Op.substring]: search,
-	// 									},
-	// 								},
-	// 							},
-	// 							{
-	// 								model: db.branch,
-	// 							},
-	// 						],
-	// 					});
-	// 				}
-	// 			}
-	// 		} else {
-	// 			// filter by
-	// 			if (filterBy) {
-	// 				// filter by + sort
-	// 				if (sortBy[0] === "date") {
-	// 					response = await db.stock_history.findAll({
-	// 						include: [
-	// 							{
-	// 								model: db.product,
-	// 								where: {
-	// 									name: {
-	// 										[Op.substring]: search,
-	// 									},
-	// 								},
-	// 							},
-	// 							{
-	// 								model: db.branch,
-	// 							},
-	// 						],
-	// 						where: {
-	// 							createdAt: {
-	// 								[Op.between]: [new Date(filterBy[0]), new Date(filterBy[1])],
-	// 							},
-	// 							branch_id: admin_branch_id,
-	// 						},
-	// 						order: [["createdAt", sortBy[1]]],
-	// 					});
-	// 					// filter without sort
-	// 				} else {
-	// 					response = await db.stock_history.findAll({
-	// 						include: [
-	// 							{
-	// 								model: db.product,
-	// 								where: {
-	// 									name: {
-	// 										[Op.substring]: search,
-	// 									},
-	// 								},
-	// 							},
-	// 							{
-	// 								model: db.branch,
-	// 							},
-	// 						],
-	// 						where: {
-	// 							createdAt: {
-	// 								[Op.between]: [new Date(filterBy[0]), new Date(filterBy[1])],
-	// 							},
-	// 							branch_id: admin_branch_id,
-	// 						},
-	// 					});
-	// 				}
-	// 			} else {
-	// 				// sort without filter
-	// 				if (sortBy[0] === "date") {
-	// 					response = await db.stock_history.findAll({
-	// 						include: [
-	// 							{
-	// 								model: db.product,
-	// 								where: {
-	// 									name: {
-	// 										[Op.substring]: search,
-	// 									},
-	// 								},
-	// 							},
-	// 							{
-	// 								model: db.branch,
-	// 							},
-	// 						],
-	// 						where: {
-	// 							branch_id: admin_branch_id,
-	// 						},
-	// 						order: [["createdAt", sortBy[1]]],
-	// 					});
-	// 				} else {
-	// 					// no filter and no sort
-	// 					response = await db.stock_history.findAll({
-	// 						include: [
-	// 							{
-	// 								model: db.product,
-	// 								where: {
-	// 									name: {
-	// 										[Op.substring]: search,
-	// 									},
-	// 								},
-	// 							},
-	// 							{
-	// 								model: db.branch,
-	// 							},
-	// 						],
-	// 						where: {
-	// 							branch_id: admin_branch_id,
-	// 						},
-	// 					});
-	// 				}
-	// 			}
-	// 		}
-
-	// 		res.status(200).send({
-	// 			isError: false,
-	// 			message: "Get Stock History Success",
-	// 			data: response,
-	// 		});
-	// 	} catch (error) {
-	// 		console.log(error);
-	// 	}
-	// },
 	branchAdminProductList: async (req, res) => {
 		const { page, sort } = req.query;
 		const token = req.uid;
-		console.log(sort);
 
 		try {
 			let admin_branch_id;
@@ -1267,7 +1038,7 @@ module.exports = {
 			res.status(200).send({
 				isError: false,
 				message: "Get Data Product Success",
-				data: { data, page },
+				data: { data, totalPage },
 			});
 		} catch (error) {
 			res.status(400).send({
@@ -1418,6 +1189,7 @@ module.exports = {
 			});
 		}
 	},
+
 	stockHistory2: async (req, res) => {
 		try {
 			const { search } = req.query;
@@ -1606,6 +1378,63 @@ module.exports = {
 				message: error.message,
 				data: error.data,
 			});
+		}},
+
+
+	updateCategoryImage: async (req, res) => {
+		const { id } = req.params;
+
+		try {
+			let { img } = await db.category.findOne({
+				where: {
+					id,
+				},
+			});
+			await db.category.update(
+				{
+					img: req.files.images[0].path,
+				},
+				{
+					where: {
+						uid,
+					},
+				}
+			);
+
+			deleteFiles(img);
+			new HTTPStatus(res).success("Update Products Success!").send();
+		} catch (error) {
+			deleteFiles(req.files.images[0].path);
+			new HTTPStatus(res, error).error(error.message).send();
+		}
+	},
+	updateCategoryData: async (req, res) => {
+		const { id, name } = req.body;
+		try {
+			await db.category.update({ name }, { where: { id } });
+			new HTTPStatus(res).success("Category detail updated");
+		} catch (error) {
+			new HTTPStatus(res, error).error(error.message).send();
+		}
+	},
+	getProductEdit: async (req, res) => {
+		const { id } = req.query;
+		const { uid } = req.uid;
+		try {
+			const admin = await db.user.findOne({
+				where: { uid },
+				include: { model: db.branch },
+			});
+			const data = await db.branch_product.findOne({
+				where: {
+					[Op.and]: [{ branch_id: admin.branch.id }, { product_id: id }],
+				},
+				include: { model: db.product },
+			});
+			new HTTPStatus(res, data).success("Get product details for edit").send();
+		} catch (error) {
+			new HTTPStatus(res, error).error(error.message).send();
+
 		}
 	},
 };

@@ -10,6 +10,7 @@ export default function Cart() {
 	const [data, setdata] = useState([]);
 	const [sum, setsum] = useState(0);
 	const [disc, setdisc] = useState(0);
+	const [disable, setdisable] = useState(false);
 	const Navigate = useNavigate();
 
 	let onGetCart = async () => {
@@ -51,6 +52,7 @@ export default function Cart() {
 
 	let updateQuantity = async (value, operation, quantity) => {
 		try {
+			setdisable(true);
 			if (operation === "+") {
 				const { data } = await REST_API({
 					url: "/cart/inc",
@@ -78,12 +80,12 @@ export default function Cart() {
 		} catch (error) {
 			console.log(error);
 		} finally {
-			setTimeout(() => {});
+			setTimeout(() => {
+				setdisable(false);
+			}, 1500);
 		}
 	};
 	useEffect(() => {
-		localStorage.getItem("token")
-		console.log(localStorage.getItem("token"))
 		onGetCart();
 	}, []);
 	return (
@@ -148,8 +150,12 @@ export default function Cart() {
 															<div className=" flex items-center pt-4 gap-1">
 																<button
 																	className=" disabled:text-slate-500 enabled:text-green-500"
-																	disabled={value.qty <= 1 ? true : false}
-																	onClick={() => updateQuantity(value.id, "-", value.qty)}
+																	disabled={disable || value.qty <= 1 ? true : false}
+																	onClick={() =>
+																		setTimeout(() => {
+																			updateQuantity(value.id, "-", value.qty);
+																		}, 1000)
+																	}
 																>
 																	<RxMinusCircled size={20} />
 																</button>
@@ -160,11 +166,15 @@ export default function Cart() {
 																<button
 																	className=" disabled:text-slate-500 enabled:text-green-500"
 																	disabled={
-																		value.qty >= value.product.branch_products[0].stock
+																		disable || value.qty >= value.product.branch_products[0].stock
 																			? true
 																			: false
 																	}
-																	onClick={() => updateQuantity(value.id, "+", value.qty)}
+																	onClick={() =>
+																		setTimeout(() => {
+																			updateQuantity(value.id, "+", value.qty);
+																		}, 1000)
+																	}
 																>
 																	<RxPlusCircled size={20} />
 																</button>
@@ -204,7 +214,7 @@ export default function Cart() {
 							</p>
 							<button
 								onClick={() => Navigate("/checkout")}
-								className=" mt-6 h-12 w-full text-white bg-red-700 rounded-lg "
+								className=" mt-6 h-12 w-full text-white bg-[#0095DA] rounded-lg "
 							>
 								Checkout
 							</button>
@@ -213,7 +223,7 @@ export default function Cart() {
 					{data.length > 0 ? null : (
 						<div className="mt-[71px] h-fit flex flex-col justify-center items-center w-full">
 							<img
-								alt="Kerjang Kosong"
+								alt="Keranjang Kosong"
 								className=" h-[141px] w-[200px]"
 								src="https://assets.tokopedia.net/assets-tokopedia-lite/v2/zeus/kratos/60adc47d.jpg"
 							/>
@@ -225,7 +235,7 @@ export default function Cart() {
 							</p>
 							<button
 								onClick={() => Navigate("/home")}
-								className=" bg-red-700 text-white font-semibold rounded-md h-10 w-[200px] mt-4 "
+								className=" bg-[#0095DA] text-white font-semibold rounded-md h-10 w-[200px] mt-4 "
 							>
 								Shope Now
 							</button>
