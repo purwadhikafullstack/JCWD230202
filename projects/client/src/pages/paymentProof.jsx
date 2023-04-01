@@ -1,169 +1,166 @@
-import { Button, Label, Modal } from "flowbite-react";
-import { useEffect, useState } from "react";
-import { toast, Toaster } from "react-hot-toast";
+import {
+	Accordion,
+	AccordionButton,
+	AccordionIcon,
+	AccordionItem,
+	AccordionPanel,
+	Box,
+} from "@chakra-ui/react";
+import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import tokonglomerat from "../support/assets/edit_register_new.png";
-import REST_API from "../support/services/RESTApiService";
+import FooterBar from "../components/footer";
+import IconMandiri from "../support/assets/icon-mandiri.png";
+
 export default function PaymentProof() {
-	const [data, setdata] = useState();
-	const [sum, setsum] = useState();
-	const [disc, setdisc] = useState();
-	const [img, setimg] = useState();
-	const [show, setshow] = useState();
-
+	const [showDetail, setshowDetail] = useState(false);
 	const Navigate = useNavigate();
-
-	let onGetCart = async () => {
-		try {
-			let { data } = await REST_API({
-				url: "/cart/get",
-				method: "GET",
-			});
-			let total = 0;
-			console.log(data.data);
-			data.data.forEach((value, index) => {
-				total += value.qty * value.product.price;
-			});
-			console.log(total);
-			setsum(total);
-			setdisc(5000);
-			setdata(data.data);
-		} catch (error) {
-			console.log(error);
-		}
-	};
-
-	const validateImage = (e) => {
-		const err = {
-			msg1: "Select 1 Image only!",
-			msg2: `${e.target.files[0].name} more than 1MB`,
-		};
-		try {
-			if (e.target.files > 1) throw err.msg1;
-
-			if (e.target.files[0].size > 1000000) throw err.msg2;
-			setimg(e.target.files[0]);
-		} catch (error) {
-			toast.error(error);
-		}
-	};
-
-	const onSubmitPP = async () => {
-		const fd = new FormData();
-		try {
-			fd.append("images", img);
-			await REST_API({
-				url: "/user/profile/picture",
-				method: "PATCH",
-				data: fd,
-			});
-			toast("Profile picture updated");
-		} catch (error) {
-			toast.error("Upload image failed");
-		}
-	};
-
-	useEffect(() => {
-		onGetCart();
-	}, []);
 	return (
-		<div className=" max-h-screen overflow-hidden ">
-			<div className=" mt-[20px] mb-[25px] flex content-center justify-center">
-				<h1 className=" font-bold text-4xl font-mandalaFont text-[#0095DA] ">
-					<button onClick={() => Navigate("/home")}>tokonglomerat</button>
-				</h1>
-			</div>
-			<div className="  flex content-center justify-center max-w-sm h-screen xl:max-w-screen-2xl mx-auto">
-				<div className=" hidden xl:flex-row xl:block">
-					<img
-						className=" mt-[173px] h-[303px] w-[360px] mr-[149px] "
-						src={tokonglomerat}
-						alt="Gambar Tokonglomerat"
-					/>
-					<p className=" font-tokpedFont mr-[130px] mt-[30px] font-bold text-[22px] ">
-						{" "}
-						Easy Buying and Selling Only at Tokonglomerat
-					</p>
-					<p className=" font-tokpedFont ml-[15px] mt-[13px] text-[#6d7588] text-[13px]">
-						Join and feel the convenience of making transactions at Tokonglomerat
-					</p>
-				</div>
-				{data ? (
-					<div className=" font-tokpedFont w-[400px] h-fit ml-[45px] mt-[173px] px-4 py-4 rounded-lg border shadow-xl">
-						<p className=" font-semibold text-[14px]">Shopping Summary</p>
-						<div className=" h-fit my-4 flex justify-between">
-							<div>
-								{data
-									? data.map((value, index) => {
-											return (
-												<p key={index} className=" mb-2 text-[14px] ">
-													{`${value.product.name} x ${value.qty}`}
-												</p>
-											);
-									  })
-									: null}
-								<p className=" mt-2 text-[14px]">Shipping Cost</p>
-								<p className=" mt-2 text-[14px] ">Promo </p>
-							</div>
-							<div>
-								{data
-									? data.map((value, index) => {
-											return (
-												<p className=" flex gap-1 mb-2 text-[14px]">
-													Rp. {(value.product.price*value.qty).toLocaleString()}{" "}
-												</p>
-											);
-									  })
-									: null}
-								<p className=" mt-2 text-[14px]">Rp. 64,000</p>
-								<p className=" mt-2 font-semibold text-[14px]">Buy 1 Get 1</p>
-							</div>
-						</div>
-						<div className=" border-t flex justify-between h-[37px] items-end ">
-							<p className=" font-semibold text-[16px] ">Total Bill</p>
-							<p className=" font-semibold text-[16px] ">Rp. {(sum + 64000).toLocaleString()} </p>
-						</div>
-						<p className=" mt-4 text-slate-500 text-[11px]">
-							Dengan mengaktifkan asuransi, Saya menyetujui{" "}
-							<p className=" text-red-700">syarat dan ketentuan yang berlaku.</p>
+		<div className=" overflow-hidden">
+			<div className=" flex justify-center items-center pt-[50px]">
+				<div className=" flex flex-col justify-center items-center w-[1190px] mt-[82px] ">
+					<div className="w-[600px] h-[147px] px-4">
+						<h1 className=" flex justify-center items-center w-full  mt-4 text-[20px] font-tokpedFont font-extrabold">
+							Complete Payment in
+						</h1>
+						<p className=" flex justify-center items-center w-full mt-2 text-[20px] text-red-600 font-tokpedFont font-semibold">
+							19:00:23
 						</p>
+						<p className=" flex justify-center items-center w-full  mt-4 text-[16px] text-gray-500 font-tokpedFont ">
+							Payment Deadline
+						</p>
+						<p className=" flex justify-center items-center w-full  mt-2 text-[18px] font-tokpedFont font-extrabold ">
+							Sabtu, 1 April 2023 18:39
+						</p>
+					</div>
+					<div className=" rounded-lg border w-[600px] mt-[41px] ">
+						<div className=" flex px-4 items-center justify-between border-b-[1px] h-[51px]">
+							<h1 className=" font-tokpedFont font-semibold text-[16px]">
+								Mandiri Virtual Account
+							</h1>
+							<img src={IconMandiri} className=" h-[18px] w-[64px]"></img>
+						</div>
+						<div className=" text-left mt-4 mx-4 h-[77px]">
+							<p className=" mt-4 text-[14px] font-tokpedFont text-gray-500">
+								Virtual Account Number
+							</p>
+							<p className=" mt-2 text-[18px] font-tokpedFont font-semibold">8870887805667895</p>
+						</div>
+						<div className=" text-left mb-4 mx-4 h-[77px]">
+							<p className=" pt-4 text-[14px] font-tokpedFont text-gray-500">Total Payment</p>
+							<div className=" flex justify-between w-full h-[29px]">
+								<p className=" mt-2 text-[18px] font-tokpedFont font-semibold">Rp. 166.900</p>
+								<button
+									onClick={() => setshowDetail(true)}
+									className=" font-tokpedFont font-semibold text-[16px] text-[#0095DA]"
+								>
+									See Details
+								</button>
+							</div>
+						</div>
+					</div>
+					<div className=" h-[112px] flex items-center w-[600px] justify-between">
 						<button
-							onClick={() => setshow(true)}
-							className=" mt-6 h-12 w-full text-white bg-[#0095DA] rounded-lg "
+							onClick={() => Navigate("/transaction")}
+							className=" w-[293px] border border-[#0095DA] rounded-xl outline-[#0095DA] text-[#0095DA] h-10 "
 						>
-							Upload Payment
+							Cek Payment Status
+						</button>
+						<button
+							onClick={() => Navigate("/home")}
+							className=" w-[291px] border bg-[#0095DA] rounded-xl text-white h-10"
+						>
+							Shop Again
 						</button>
 					</div>
-				) : null}
-				<Modal show={show} size="md" popup={true} onClose={() => setshow(false)} id="name modal">
-					<Modal.Header />
-					<Modal.Body>
-						<div className="space-y-6 px-6 pb-4 sm:pb-6 lg:px-8 xl:pb-8">
-							<h3 className="text-xl font-semibold font-tokpedFont text-gray-900 dark:text-white">
-								Upload Your Payment
-							</h3>
-							<div className="space-y-2">
-								<div className="mb-2 block">
-									<Label htmlFor="password" value="Upload image" />
-								</div>
-								<input
-									type="file"
-									name="myImage"
-									accept="image/png, image/gif, image/jpeg, image/jpg"
-									onChange={(e) => validateImage(e)}
-									className="rounded-lg bg-slate-500 text-white"
-								/>
-								<p className="text-xs">Upload image with .jpg, .png, .jpeg</p>
-								<p className="text-xs">Max size 1MB</p>
-							</div>
-							<div className="w-full flex justify-end">
-								<Button onClick={() => onSubmitPP()}>Submit</Button>
-							</div>
-						</div>
-					</Modal.Body>
-				</Modal>
-				<Toaster />
+					<div className=" w-[600px] h-[21px]">
+						<p className=" font-tokpedFont font-semibold text-[18px] ">Payment Method</p>
+					</div>
+					<div className=" mt-4 w-[600px] px-4 ">
+						<p className=" mt-11 h-[13px] font-tokpedFont font-semibold text-[12px]">
+							PAYMENT GUIDE
+						</p>
+						<Accordion mt="19px" defaultIndex={[0]} allowToggle>
+							<AccordionItem border={"none"}>
+								<h2>
+									<AccordionButton _hover={"none"}>
+										<Box
+											fontWeight={"bold"}
+											textColor={"gray.500"}
+											fontSize={"14px"}
+											as="span"
+											flex="1"
+											textAlign="left"
+										>
+											ATM Mandiri
+										</Box>
+										<AccordionIcon />
+									</AccordionButton>
+								</h2>
+								<AccordionPanel borderBottom={"1px"} borderBottomColor="gray.300">
+									<div className=" text-[14px] mt-4 mb-6 pl-3 flex flex-col gap-2 font-tokpedFont ">
+										<p>1. Masukkan kartu ATM dan PIN </p>
+										<p>2. Pilih menu "Bayar/Beli" </p>
+										<p>3. Pilih menu "Lainnya", hingga menemukan menu "Multipayment"</p>
+										<p>4. Masukkan Kode Biller Tokonglomerat (88708), lalu pilih Benar </p>
+										<p>
+											5. Masukkan "Nomor Virtual Account" Tokonglomerat, lalu pilih tombol Benar
+										</p>
+										<p>6. Masukkan Angka "1" untuk memilih tagihan, lalu pilih tombol Ya </p>
+										<p>7. Akan muncul konfirmasi pembayaran, lalu pilih tombol Ya </p>
+										<p>8. Simpan struk sebagai bukti pembayaran Anda</p>
+									</div>
+								</AccordionPanel>
+							</AccordionItem>
+							<AccordionItem border={"none"}>
+								<h2>
+									<AccordionButton _hover={"none"}>
+										<Box
+											fontWeight={"bold"}
+											textColor={"gray.500"}
+											fontSize={"14px"}
+											as="span"
+											flex="1"
+											textAlign="left"
+										>
+											Mandiri Internet Banking / Livin' By Mandiri
+										</Box>
+										<AccordionIcon />
+									</AccordionButton>
+								</h2>
+								<AccordionPanel borderBottom={"1px"} borderBottomColor="gray.300">
+									<div className=" text-[14px] mt-4 pb-[14px] pl-3 flex flex-col border-b-[1px] border-b-black gap-2 font-tokpedFont ">
+										<p>1. Login Livin' By Mandiri dengan memasukkan Username dan Password </p>
+										<p>2. Pilih menu "Pembayaran" </p>
+										<p>3. Pilih menu "Multipayment"</p>
+										<p>4. Pilih penyedia jasa "Tokonglomerat" </p>
+										<p>
+											5. Masukkan "Nomor Virtual Account" dan "Nominal" yang akan dibayarkan, lalu
+											pilih Lanjut
+										</p>
+										<p>6. Setelah muncul tagihan, pilih Konfirmasi </p>
+										<p>7. Masukkan PIN / Challenge Code Token </p>
+										<p>8. Transaksi selesai, simpan bukti bayar Anda</p>
+									</div>
+									<p className="mt-2 text-[14px] font-tokpedFont">
+										Jangan gunakan fitur "Simpan Daftar Transfer" untuk pembayaran melalui Internet
+										Banking karena dapat mengganggu proses pembayaran berikutnya.
+									</p>
+									<p className="mt-4 text-[14px] font-tokpedFont">
+										Untuk menghapus daftar transfer tersimpan ikuti langkah berikut:
+									</p>
+									<div className=" text-[14px] mt-2 pb-6 pl-3 flex flex-col gap-2 font-tokpedFont ">
+										<p>1. Login Livin' By Mandiri</p>
+										<p>2. Pilih ke menu Pembayaran </p>
+										<p>3. Pilih menu Daftar Pembayaran</p>
+										<p>4. Pilih pada pembayaran yang tersimpan, lalu pilih menu untuk hapus </p>
+									</div>
+								</AccordionPanel>
+							</AccordionItem>
+						</Accordion>
+					</div>
+				</div>
 			</div>
+			<FooterBar />
 		</div>
 	);
 }

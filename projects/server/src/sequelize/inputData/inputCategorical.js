@@ -1,13 +1,17 @@
 require("dotenv").config();
 const db = require("../models");
 const axios = require("axios");
+const { hashPassword } = require("../lib/hash");
 
 const user = async () => {
+	let pass_1 = "Aswin123456";
+	let pass_2 = "Ashfi123456";
+	let pass_3 = "Nathan123456";
 	await db.user.bulkCreate([
 		{
 			name: "aswin",
 			email: "aswin05.aw@gmail.com",
-			password: "Aswin123456",
+			password: await hashPassword(pass_1),
 			phone_number: "087805667895",
 			role: "super admin",
 			status: "Verified",
@@ -15,7 +19,7 @@ const user = async () => {
 		{
 			name: "ashfi",
 			email: "ashfimzk@gmail.com",
-			password: "Ashfi123456",
+			password: await hashPassword(pass_2),
 			phone_number: "085156004326",
 			role: "super admin",
 			status: "Verified",
@@ -23,7 +27,7 @@ const user = async () => {
 		{
 			name: "nathan",
 			email: "veanusnathan.work@gmail.com",
-			password: "Nathan123456",
+			password: await hashPassword(pass_3),
 			phone_number: "082246704951",
 			role: "super admin",
 			status: "Verified",
@@ -142,8 +146,9 @@ const branch = async () => {
 		location: "Jakarta",
 		address:
 			"Jl. Puri Indah Raya, RT.3/RW.2, Kembangan Sel., Kec. Kembangan, Kota Jakarta Barat, Daerah Khusus Ibukota Jakarta",
-		lat: branch1.data.results[0].annotations.Mercator.x,
-		lng: branch1.data.results[0].annotations.Mercator.y,
+		lat: branch1.data.results[0].geometry.lat,
+		lng: branch1.data.results[0].geometry.lng,
+		city_code: "151.Jakarta Barat",
 	});
 
 	const branch2 = await axios.get(
@@ -152,8 +157,9 @@ const branch = async () => {
 	await db.branch.create({
 		location: "Bandung",
 		address: "Jl. Braga No.99-101, Braga, Kec. Sumur Bandung, Kota Bandung, Jawa Barat",
-		lat: branch2.data.results[0].annotations.Mercator.x,
-		lng: branch2.data.results[0].annotations.Mercator.y,
+		lat: branch2.data.results[0].geometry.lat,
+		lng: branch2.data.results[0].geometry.lng,
+		city_code: "23.Bandung",
 	});
 
 	const branch3 = await axios.get(
@@ -163,8 +169,9 @@ const branch = async () => {
 		location: "Yogyakarta",
 		address:
 			"Jl. Mataram No.31, Suryatmajan, Kec. Danurejan, Kota Yogyakarta, Daerah Istimewa Yogyakarta",
-		lat: branch3.data.results[0].annotations.Mercator.x,
-		lng: branch3.data.results[0].annotations.Mercator.y,
+		lat: branch3.data.results[0].geometry.lat,
+		lng: branch3.data.results[0].geometry.lng,
+		city_code: "501.Yogyakarta",
 	});
 
 	const branch4 = await axios.get(
@@ -173,8 +180,9 @@ const branch = async () => {
 	await db.branch.create({
 		location: "Semarang",
 		address: "Jl. Pemuda No.118, Sekayu, Kec. Semarang Tengah, Kota Semarang, Jawa Tengah",
-		lat: branch4.data.results[0].annotations.Mercator.x,
-		lng: branch4.data.results[0].annotations.Mercator.y,
+		lat: branch4.data.results[0].geometry.lat,
+		lng: branch4.data.results[0].geometry.lng,
+		city_code: "399.Semarang",
 	});
 
 	const branch5 = await axios.get(
@@ -184,8 +192,9 @@ const branch = async () => {
 		location: "Kalimantan",
 		address:
 			"Jl. Untung Suropati No.08, Karang Asam Ulu, Kec. Sungai Kunjang, Kota Samarinda, Kalimantan Timur",
-		lat: branch5.data.results[0].annotations.Mercator.x,
-		lng: branch5.data.results[0].annotations.Mercator.y,
+		lat: branch5.data.results[0].geometry.lat,
+		lng: branch5.data.results[0].geometry.lng,
+		city_code: "387.Samarinda",
 	});
 
 	const branch6 = await axios.get(
@@ -194,8 +203,9 @@ const branch = async () => {
 	await db.branch.create({
 		location: "Sulawesi",
 		address: "Jl. Metro Tj. Bunga No.2, Panambungan, Kec. Mariso, Kota Makassar, Sulawesi Selatan",
-		lat: branch6.data.results[0].annotations.Mercator.x,
-		lng: branch6.data.results[0].annotations.Mercator.y,
+		lat: branch6.data.results[0].geometry.lat,
+		lng: branch6.data.results[0].geometry.lng,
+		city_code: "254.Makassar",
 	});
 };
 

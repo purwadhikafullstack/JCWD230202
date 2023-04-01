@@ -4,6 +4,8 @@ const adminRouter = require("./adminRouter");
 const cartRouter = require("./cartRouter");
 const transactionRouter = require("./transactionRouter");
 const courierRouter = require("./courierRouter")
+const thirdpartyRouter = require("./thirdpartyRouter")
+const adminTransactionRouter = require('./adminTransactionRouter')
 
 module.exports = {
 	// export all router here
@@ -12,5 +14,7 @@ module.exports = {
 	adminRouter,
 	cartRouter,
 	transactionRouter,
-	courierRouter
+	courierRouter,
+	thirdpartyRouter,
+	adminTransactionRouter
 };

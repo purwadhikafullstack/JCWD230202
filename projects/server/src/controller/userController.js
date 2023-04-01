@@ -23,6 +23,7 @@ module.exports = {
 				img,
 				user_addresses,
 				role,
+				status
 			} = await db.user.findOne({
 				where: { uid },
 				include: { model: db.user_address },
@@ -35,6 +36,7 @@ module.exports = {
 				phone_number,
 				img,
 				role,
+				status,
 				user_addresses: {
 					main_address: user_addresses.filter((value) => {
 						return value.main_address === true;

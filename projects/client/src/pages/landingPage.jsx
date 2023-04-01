@@ -256,10 +256,7 @@ export default function LandingPage() {
 										<div
 											onClick={() =>
 												navigate(
-													`/category/category=${value.id}&branch=${
-														product ? product[0].branch.id : ""
-													}`
-												)
+													`/category/category=${value.id}`)
 											}
 											className="flex flex-col justify-center items-center space-y-1"
 										>
