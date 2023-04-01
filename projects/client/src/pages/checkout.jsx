@@ -12,6 +12,7 @@ import { useForm } from "react-hook-form";
 import { toast, Toaster } from "react-hot-toast";
 import LoadingSpin from "react-loading-spin";
 import { useNavigate } from "react-router-dom";
+import FooterBar from "../components/footer";
 import REST_API from "../support/services/RESTApiService";
 
 export default function Checkout(props) {
@@ -25,6 +26,13 @@ export default function Checkout(props) {
 	const [JNE, setJNE] = useState();
 	const [POS, setPOS] = useState();
 	const [TIKI, setTIKI] = useState();
+	const [courier, setcourier] = useState();
+	const [branch_id, setbranch_id] = useState();
+	const [product_name, setproduct_name] = useState();
+	const [qty, setqty] = useState();
+	const [total_price, settotal_price] = useState();
+	const [product_id, setproduct_id] = useState();
+	const [disablePayment, setdisablePayment] = useState();
 	const [address, setaddress] = useState();
 	const [rakir, setrakir] = useState({
 		province: null,
@@ -36,12 +44,7 @@ export default function Checkout(props) {
 		addAddress: false,
 	});
 
-	const {
-		register,
-		handleSubmit,
-		formState: { errors },
-		setValue,
-	} = useForm();
+	const { register, handleSubmit, setValue } = useForm();
 
 	const Navigate = useNavigate();
 
@@ -53,10 +56,24 @@ export default function Checkout(props) {
 			});
 			let total = 0;
 			let berat = 0;
+			let product_name = []
+			let qty = []
+			let total_price = []
+			let product_id = []
 			data.data.forEach((value, index) => {
 				total += value.qty * value.product.price;
 				berat += value.qty * 1000;
+				product_name.push(value.product.name)
+				qty.push(value.qty)
+				total_price.push(value.qty*value.product.price)
+				product_id.push(value.product_id)
 			});
+
+			setbranch_id(data.data[0].branch_id)
+			setproduct_name(product_name)
+			setqty(qty)
+			settotal_price(total_price)
+			setproduct_id(product_id)
 			setsum(total);
 			setweight(berat);
 			setdata(data.data);
@@ -102,7 +119,8 @@ export default function Checkout(props) {
 	};
 
 	let onSelectedCourier = async (value) => {
-		setcosts(value);
+		setcosts(Number(value.split("+")[3]));
+		setcourier(value)
 	};
 
 	const deleteAddress = async (id) => {
@@ -191,6 +209,30 @@ export default function Checkout(props) {
 		setshow({ ...show, changeAddress: false });
 	};
 
+	const onSubmit = async () => {
+			setdisablePayment(true)
+		try {
+			const {data} = await REST_API.post('/transaction/add',{
+				product_name: product_name,
+				qty: qty,
+				total_price: total_price,
+				user_address: address? address.address : props.state.profile.address?.main_address[0]?.address,
+				courier: courier,
+				branch_id: branch_id,
+				product_id: product_id
+			})
+			toast.success(data.message)
+			setTimeout(() => {
+				Navigate("/uploadpayment")
+			})
+		} catch (error) {
+			console.log(error)
+			toast.error(error.response.data.message);
+		}finally{
+			setdisablePayment(false)
+		}
+	}
+
 	useEffect(() => {
 		onGetCart();
 		rakirProvince();
@@ -198,15 +240,13 @@ export default function Checkout(props) {
 	return (
 		<div className=" max-w-screen h-max pb-10 flex justify-center flex-col">
 			<div className=" w-screen border-b">
-				<div className="mx-auto flex justify-start items-center w-[1120px] h-[60px] font-mandalaFont text-red-700 font-bold text-3xl ">
+				<div className="mx-auto flex justify-start items-center w-[1120px] h-[60px] font-mandalaFont text-[#0095DA] font-bold text-3xl ">
 					<button onClick={() => Navigate("/home")}>tokonglomerat</button>
 				</div>
 			</div>
 			<div className=" mx-auto flex px-5 w-[1120px]">
 				<div className=" w-[685px]">
-					<div className="mt-10 font-tokpedFont text-[20px] font-bold">
-						Checkout
-					</div>
+					<div className="mt-10 font-tokpedFont text-[20px] font-bold">Checkout</div>
 					<div className="flex justify-start h-[31px] items-start border-b mt-[29px] font-tokpedFont font-semibold text-[14px] w-[685px] ">
 						Shipping Address
 					</div>
@@ -271,8 +311,8 @@ export default function Checkout(props) {
 																<button
 																	key={index}
 																	disabled={disable}
-																	value={value.cost[0] ? value.cost[0].value : null}
-																	onClick={(e) => onSelectedCourier(Number(e.target.value))}
+																	value={value.cost[0] ? `JNE+${value.service}+${value.cost[0].etd}+${value.cost[0].value}`  : null}
+																	onClick={(e) => onSelectedCourier(e.target.value)}
 																	className=" flex justify-between w-[270px] h-[60px] pt-3"
 																>
 																	<div className=" text-left ">
@@ -296,8 +336,8 @@ export default function Checkout(props) {
 																<button
 																	key={index}
 																	disabled={disable}
-																	value={value.cost[0] ? value.cost[0].value : null}
-																	onClick={(e) => onSelectedCourier(Number(e.target.value))}
+																	value={value.cost[0] ? `POS+${value.service}+${value.cost[0].etd}+${value.cost[0].value}` : null}
+																	onClick={(e) => onSelectedCourier(e.target.value)}
 																	className=" flex justify-between h-[60px] w-[270px] pt-3"
 																>
 																	<div className=" text-left ">
@@ -318,13 +358,13 @@ export default function Checkout(props) {
 										{TIKI ? (
 											TIKI.map((value, index) => {
 												return (
-													<AccordionItem >
+													<AccordionItem>
 														<AccordionButton w="258px">
 															<button
 																key={index}
 																disabled={disable}
-																value={value.cost[0] ? value.cost[0].value : null}
-																onClick={(e) => onSelectedCourier(Number(e.target.value))}
+																value={value.cost[0] ? `TIKI+${value.service}+${value.cost[0].etd}+${value.cost[0].value}` : null}
+																onClick={(e) => onSelectedCourier(e.target.value)}
 																className=" flex justify-between h-[60px] w-[270px] pt-3"
 															>
 																<div className=" text-left ">
@@ -379,7 +419,7 @@ export default function Checkout(props) {
 														<p className=" pl-[15px] flex gap-1 font-tokpedFont text-[12px]">
 															per{" "}
 															<p className=" font-semibold">
-																{value.product.unit.name}
+																{value.product.unit.price_at} {value.product.unit.name}
 															</p>
 														</p>
 														<p className=" pl-[15px] font-semibold font-tokpedFont text-[14px]">
@@ -397,8 +437,7 @@ export default function Checkout(props) {
 											<div className=" h-14 my-[6px] flex justify-between items-center">
 												<p className=" font-semibold text-[14px]">Subtotal</p>
 												<p className=" font-semibold text-[14px]">
-													Rp.{" "}
-													{(value.product.price * value.qty).toLocaleString()}{" "}
+													Rp. {(value.product.price * value.qty).toLocaleString()}{" "}
 												</p>
 											</div>
 										</div>
@@ -414,12 +453,10 @@ export default function Checkout(props) {
 						<div>
 							<p className=" text-[14px] ">Total price ({data ? data.length : null} Products)</p>
 							{costs ? <p className=" mt-2 text-[14px] ">Shipping Cost </p> : null}
-							<p className=" mt-2 text-[14px] ">Promo</p>
 						</div>
 						<div>
 							<p className=" flex gap-1 text-[14px]">Rp. {sum.toLocaleString()} </p>
 							{costs ? <p className=" mt-2 text-[14px]">Rp. {costs.toLocaleString()}</p> : null}
-							<p className=" flex mt-2 font-semibold text-[14px]"> By 1 Get 1 </p>
 						</div>
 					</div>
 					<div className=" border-t flex justify-between h-[37px] items-end ">
@@ -430,7 +467,11 @@ export default function Checkout(props) {
 						Dengan mengaktifkan asuransi, Saya menyetujui{" "}
 						<p className=" text-red-700">syarat dan ketentuan yang berlaku.</p>
 					</p>
-					<button className=" mt-6 h-12 w-full text-white bg-[#0095DA] rounded-lg ">Payment</button>
+					<button onClick={() => onSubmit() } className=" mt-6 h-12 w-full text-white bg-[#0095DA] rounded-lg ">{disablePayment ? (
+									<LoadingSpin size={"30px"} primaryColor={"#38ADE3"} secondaryColor={"gray"} />
+								) : (
+									"Checkout"
+								)}</button>
 				</div>
 			</div>
 			<Modal
@@ -639,6 +680,7 @@ export default function Checkout(props) {
 				</Modal.Body>
 			</Modal>
 			<Toaster />
+			<FooterBar />
 		</div>
 	);
 }

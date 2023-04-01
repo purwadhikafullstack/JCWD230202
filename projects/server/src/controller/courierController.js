@@ -6,7 +6,7 @@ module.exports = {
 	getJNE: async (req, res) => {
 		let { origin, destination, weight } = req.body;
 		let { uid } = req.uid;
-		let key = "4b6e60a265f072c392f96596c655cc4e"
+		let key = "fea367e998c52f08d1281e2cd99f145e";
 		try {
 			if (destination === 0) {
 				let { user_addresses } = await db.user.findOne({
@@ -28,7 +28,7 @@ module.exports = {
 				const { data } = await axios.post(
 					"https://api.rajaongkir.com/starter/cost",
 					{ origin, destination, weight, courier: "jne" },
-					{ headers: { key : key } }
+					{ headers: { key: key } }
 				);
 				res.status(201).send({
 					isError: false,
@@ -47,7 +47,7 @@ module.exports = {
 	getPOS: async (req, res) => {
 		let { origin, destination, weight } = req.body;
 		const { uid } = req.uid;
-		let key = "4b6e60a265f072c392f96596c655cc4e" 
+		let key = "fea367e998c52f08d1281e2cd99f145e";
 		try {
 			if (destination === 0) {
 				let { user_addresses } = await db.user.findOne({
@@ -88,7 +88,7 @@ module.exports = {
 	getTIKI: async (req, res) => {
 		let { origin, destination, weight } = req.body;
 		const { uid } = req.uid;
-		let key = "4b6e60a265f072c392f96596c655cc4e"
+		let key = "fea367e998c52f08d1281e2cd99f145e";
 		try {
 			if (destination === 0) {
 				let { user_addresses } = await db.user.findOne({
