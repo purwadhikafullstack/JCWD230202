@@ -26,10 +26,13 @@ import NotFoundPage from "./pages/404";
 import StockHistoryDetail from "./components/stockHistoryDetail";
 import PaymentProof from "./pages/paymentProof";
 import TransactionAdmin from "./components/transaction";
+import ProfileSideBar from "./components/profileSideBar";
+import SuperAdminDiscountManagement from "./pages/superAdminDiscountManagement";
 
 function App() {
 	const navigate = useNavigate();
 	const [disable, setdisable] = useState();
+	const [selected, setselected] = useState();
 	const [profile, setprofile] = useState({
 		id: null,
 		name: null,
@@ -133,28 +136,58 @@ function App() {
 		<div className="relative">
 			<Routes>
 				{/* User */}
-				<Route path="/" element={<NavigationBar state={{ profile }} Func={{ onLogout }} />}>
+				<Route
+					path="/"
+					element={<NavigationBar state={{ profile }} Func={{ onLogout }} />}
+				>
 					<Route path="home" element={<LandingPage />} />
 					<Route
-						path="profile"
-						element={<Profile func={{ getProfile }} state={{ profile, setprofile }} />}
-					/>
+						path="user"
+						element={
+							<ProfileSideBar
+								state={{ profile, selected, setselected }}
+								func={{ getProfile }}
+							/>
+						}
+					>
+						<Route
+							path="profile"
+							element={
+								<Profile
+									func={{ getProfile }}
+									state={{ profile, setprofile, setselected }}
+								/>
+							}
+						/>
+						<Route
+							path="transaction"
+							element={<Transaction state={{ setselected }} />}
+						/>
+					</Route>
 					<Route path="category/:product" element={<ProductCategory />} />
 					<Route path="cart" element={<Cart state={{ profile }} />} />
-					<Route path="transaction" element={<Transaction />} />
 					<Route path="uploadpayment" element={<PaymentProof />} />
 				</Route>
-				<Route path="checkout" element={<Checkout state={{profile}} />} />
-				<Route path="/login" element={<Login MyFunc={{ onLogin }} isDisable={{ disable }} />} />
+				<Route path="checkout" element={<Checkout state={{ profile }} />} />
+				<Route
+					path="/login"
+					element={<Login MyFunc={{ onLogin }} isDisable={{ disable }} />}
+				/>
 				<Route path="/updatePassword/:uid" element={<UpdatePassword />} />
 				<Route path="/register" element={<Register />} />
 				<Route path="/activation/:uid" element={<Activation />} />
 				<Route path="/forgotpassword" element={<ForgotPass />} />
 				{/* Admin */}
-				<Route path="/admin" element={<Dashboard state={{ profile }} Func={{ onLogout }} />}>
+				<Route
+					path="/admin"
+					element={<Dashboard state={{ profile }} Func={{ onLogout }} />}
+				>
 					{/* <Route path="/admin" element={<Overview />} /> */}
 					<Route path="sales-report" element={<SalesReport />} />
-					<Route path="branch-admin-register" element={<BranchAdminRegister />} />
+					<Route
+						path="branch-admin-register"
+						element={<BranchAdminRegister />}
+					/>
 					<Route path="stock-history" element={<StockHistory />} />
 					<Route path="admin-product" element={<BranchAdminProductList />} />
 
@@ -162,11 +195,28 @@ function App() {
 						path="stock-history-detail/:id"
 						element={<StockHistoryDetail state={{ profile }} />}
 					/>
-					<Route path="product-management" element={<BranchAdminProductList />} />
-					<Route path="discount-management" element={<DiscountManagement />} />
+					<Route
+						path="product-management"
+						element={<BranchAdminProductList />}
+					/>
+					<Route
+						path="discount-management"
+						element={
+							profile ? (
+								profile.role === "Branch Admin" ? (
+									<DiscountManagement />
+								) : profile.role === "Super Admin" ? (
+									<SuperAdminDiscountManagement />
+								) : null
+							) : null
+						}
+					/>
 					<Route path="transaction" element={<TransactionAdmin />} />
 				</Route>
-				<Route path="/loginAdmin" element={<LoginAdmin Func={{ onLoginAdmin }} />} />
+				<Route
+					path="/loginAdmin"
+					element={<LoginAdmin Func={{ onLoginAdmin }} />}
+				/>
 				<Route path="*" element={<NotFoundPage />} />
 			</Routes>
 		</div>

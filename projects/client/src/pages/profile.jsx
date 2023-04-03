@@ -10,7 +10,6 @@ import {
 } from "flowbite-react";
 import { AiFillEye, AiFillEyeInvisible } from "react-icons/ai";
 import { useForm } from "react-hook-form";
-import FooterBar from "../components/footer";
 import { FaFemale, FaMale } from "react-icons/fa";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
@@ -19,7 +18,6 @@ import REST_API from "../support/services/RESTApiService";
 
 export default function Profile(props) {
 	const [date, setdate] = useState();
-	const [img, setimg] = useState();
 	const [rakir, setrakir] = useState({
 		province: null,
 		city: null,
@@ -65,38 +63,6 @@ export default function Profile(props) {
 			toast.error("Something went wrong");
 		} finally {
 			setshow({ ...show, loading: false, edit: false });
-		}
-	};
-
-	const validateImage = (e) => {
-		const err = {
-			msg1: "Select 1 Image only!",
-			msg2: `${e.target.files[0].name} more than 1MB`,
-		};
-		try {
-			if (e.target.files > 1) throw err.msg1;
-
-			if (e.target.files[0].size > 1000000) throw err.msg2;
-			setimg(e.target.files[0]);
-		} catch (error) {
-			toast.error(error);
-		}
-	};
-
-	const onSubmitPP = async () => {
-		const fd = new FormData();
-		try {
-			fd.append("images", img);
-			await REST_API({
-				url: "/user/profile/picture",
-				method: "PATCH",
-				data: fd,
-			});
-			toast("Profile picture updated");
-			props.func.getProfile();
-			setshow({ ...show, changeProfilePic: false });
-		} catch (error) {
-			toast.error("Upload image failed");
 		}
 	};
 
@@ -194,90 +160,98 @@ export default function Profile(props) {
 		setValue("email", props.state.profile.email);
 		setValue("phone_number", props.state.profile.phone_number);
 		rakirProvince();
+		props.state.setselected("profile");
 		// eslint-disable-next-line
 	}, []);
 	return (
 		<>
-			<div className="pt-20 flex justify-center font-tokpedFont items-center h-screen">
-				<div className=" max-w-screen-xl w-full grid grid-cols-3 rounded-lg border-[1px] h-[600px]">
-					<div className=" col-span-1 shadow-md m-5 rounded-lg">
-						<div className="flex justify-center p-5">
-							<img
-								src={
-									props.state.profile.profile_picture
-										? `http://localhost:8000/${props.state.profile.profile_picture}`
-										: ""
-								}
-								alt="Profile"
-								className="h-80 w-80 shadow-md object-cover"
-							/>
-						</div>
-						<div className="flex flex-col justify-center py-3 px-5 space-y-5">
-							<button
-								onClick={() => setshow({ ...show, changeProfilePic: true })}
-								className="border border-gray-400 text-[#6D7588] rounded-lg px-2 py-1 w-full"
-							>
-								Change Profile Picture
-							</button>
-							<button
-								onClick={() => setshow({ ...show, changePassword: true })}
-								className="border border-gray-400 text-[#6D7588] rounded-lg px-2 py-1 w-full"
-							>
-								Change Password
-							</button>
-							<button
-								onClick={() => setshow({ ...show, changeAddress: true })}
-								className="border border-gray-400 text-[#6D7588] rounded-lg px-2 py-1 w-full"
-							>
-								Change Addresses
-							</button>
-						</div>
+			<div className="pt-10 flex flex-col justify-start font-tokpedFont items-start pl-10">
+				<div className=" max-w-screen-sm w-full space-y-5">
+					<div className="relative">
+						<p className="absolute z-10 left-3 top-2 text-xs text-[#0095da] font-semibold tracking-wider">
+							Full name
+						</p>
+						<input
+							type="text"
+							disabled={true}
+							className="bg-gray-50 w-full border pt-6 border-gray-300 text-gray-900 text-sm rounded-lg"
+							placeholder={props.state.profile.name}
+						/>
 					</div>
-					<div className=" col-span-2 m-5 p-5">
-						<div>
-							<h3 className="text-2xl text-[#6D7588]">Change Profile</h3>
-						</div>
-						<table className="w-full mt-5 text-left text-[#848893]">
-							<tbody>
-								<tr>
-									<th className="py-5 font-medium">Name</th>
-									<td>{props.state.profile.name}</td>
-								</tr>
-								<tr>
-									<th className="py-5 font-medium">Birthdate</th>
-									<td>
-										{props.state.profile.birthdate
-											? props.state.profile.birthdate
-											: " "}
-									</td>
-								</tr>
-								<tr>
-									<th className="py-5 font-medium">Gender</th>
-									<td>
-										{props.state.profile.gender
-											? props.state.profile.gender
-											: " "}
-									</td>
-								</tr>
-								<tr>
-									<th className="py-5 font-medium">Email</th>
-									<td>{props.state.profile.email}</td>
-								</tr>
-								<tr>
-									<th className="py-5 font-medium">Phone</th>
-									<td> {props.state.profile.phone_number}</td>
-								</tr>
-							</tbody>
-						</table>
-						<div className="flex justify-end space-x-5">
-							<button
-								onClick={() => setshow({ ...show, edit: true })}
-								className="border border-black p-2 rounded-lg bg-red-700 text-white"
-							>
-								Edit profile
-							</button>
-						</div>
+					<div className="relative">
+						<p className="absolute z-10 left-3 top-2 text-xs text-[#0095da] font-semibold tracking-wider">
+							Email
+						</p>
+						<input
+							type="text"
+							disabled={true}
+							className="bg-gray-50 w-full border pt-6 border-gray-300 text-gray-900 text-sm rounded-lg"
+							placeholder={props.state.profile.email}
+						/>
 					</div>
+					<div className="relative">
+						<p className="absolute z-10 left-3 top-2 text-xs text-[#0095da] font-semibold tracking-wider">
+							Phone number
+						</p>
+						<input
+							type="text"
+							className="bg-gray-50 w-full border pt-6 border-gray-300 text-gray-900 text-sm rounded-lg"
+							placeholder={props.state.profile.phone_number}
+							disabled={true}
+						/>
+					</div>
+					<div className="relative">
+						<button
+							onClick={() => setshow({ ...show, changePassword: true })}
+							className="absolute z-10 right-3 top-5 text-xs text-[#0095da] font-semibold tracking-wider"
+						>
+							Change
+						</button>
+						<input
+							type="text"
+							disabled={true}
+							className="bg-gray-50 w-full border py-4 border-gray-300 text-gray-900 text-sm rounded-lg"
+							placeholder="Password"
+						/>
+					</div>
+					<div className="relative">
+						<p className="absolute z-10 left-3 top-2 text-xs text-[#0095da] font-semibold tracking-wider">
+							Gender
+						</p>
+						<input
+							type="text"
+							disabled={true}
+							className="bg-gray-50 w-full border pt-7 border-gray-300 text-gray-900 text-sm rounded-lg"
+							placeholder={props.state.profile.gender}
+						/>
+					</div>
+					<div className="relative">
+						<p className="absolute z-10 left-3 top-2 text-xs text-[#0095da] font-semibold tracking-wider">
+							Birthdate
+						</p>
+						<input
+							type="text"
+							disabled={true}
+							className="bg-gray-50 w-full border pt-7 border-gray-300 text-gray-900 text-sm rounded-lg"
+							placeholder={props.state.profile.birthdate}
+						/>
+					</div>
+				</div>
+				<div className="flex justify-end max-w-screen-sm w-full mt-2">
+					<button
+						onClick={() => setshow({ ...show, changeAddress: true })}
+						className="text-[#0095da] rounded-lg text-sm font-semibold tracking-wider"
+					>
+						manage your address
+					</button>
+				</div>
+				<div className="flex justify-start space-x-5">
+					<button
+						onClick={() => setshow({ ...show, edit: true })}
+						className="p-2 rounded-lg bg-[#0095da] text-white"
+					>
+						Edit profile
+					</button>
 				</div>
 				<Modal
 					show={show.edit}
@@ -423,45 +397,7 @@ export default function Profile(props) {
 						</form>
 					</Modal.Body>
 				</Modal>
-				<Modal
-					show={show.changeProfilePic}
-					size="md"
-					popup={true}
-					onClose={() => setshow({ ...show, changeProfilePic: false })}
-					id="name modal"
-				>
-					<Modal.Header />
-					<Modal.Body>
-						<div className="space-y-6 px-6 pb-4 sm:pb-6 lg:px-8 xl:pb-8">
-							<h3 className="text-xl font-medium text-gray-900 dark:text-white">
-								Change your profile picture
-							</h3>
-							<div className="space-y-2">
-								<div className="mb-2 block">
-									<Label htmlFor="password" value="Upload image" />
-								</div>
-								<input
-									type="file"
-									name="myImage"
-									accept="image/png, image/gif, image/jpeg, image/jpg"
-									onChange={(e) => validateImage(e)}
-									className="rounded-lg bg-slate-500 text-white"
-								/>
-								<p className="text-xs">Upload image with .jpg, .png, .jpeg</p>
-								<p className="text-xs">Max size 1MB</p>
-							</div>
-							<div className="w-full flex justify-end">
-								{show.loading ? (
-									<button>
-										<Spinner aria-label="Default status example" />
-									</button>
-								) : (
-									<Button onClick={() => onSubmitPP()}>Submit</Button>
-								)}
-							</div>
-						</div>
-					</Modal.Body>
-				</Modal>
+
 				<Modal
 					show={show.changePassword}
 					size="md"
@@ -679,7 +615,7 @@ export default function Profile(props) {
 						<div className="space-y-6 px-6 pb-4 sm:pb-6 lg:px-8 xl:pb-8">
 							<div className="flex justify-between">
 								<h3 className="text-xl font-medium text-gray-900 dark:text-white">
-									Manage your addresses
+									Manage your address
 								</h3>
 								<Button
 									className="!bg-[#0095DA]"
@@ -779,7 +715,6 @@ export default function Profile(props) {
 				</Modal>
 				<Toaster />
 			</div>
-			<FooterBar />
 		</>
 	);
 }

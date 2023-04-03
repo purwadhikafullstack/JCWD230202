@@ -22,10 +22,12 @@ function BranchAdminProductList() {
 	const [selectedCategoryEdit, setSelectedCategoryEdit] = useState();
 	const [sort, setSort] = useState();
 	const [img, setimg] = useState();
+	const [unit, setunit] = useState();
 	const [editedcategoryname, seteditedcategoryname] = useState();
 	const [show, setshow] = useState({
 		editCategory: false,
 		editProduct: false,
+		addProduct: false,
 		loading: false,
 		popUpDeleteCategory: false,
 		popUpDeleteProduct: false,
@@ -37,6 +39,14 @@ function BranchAdminProductList() {
 		stock: null,
 		price: null,
 		img: null,
+		description: null,
+	});
+	const [newProduct, setNewProduct] = useState({
+		name: null,
+		price: null,
+		category_id: null,
+		stock: null,
+		unit_id: null,
 		description: null,
 	});
 
@@ -175,7 +185,7 @@ function BranchAdminProductList() {
 			setSelectedProduct({
 				...selectedProduct,
 				branch_id: data.data.branch_id,
-				id: data.data.id,
+				id: data.data.product.id,
 				name: data.data.product.name,
 				stock: data.data.stock,
 				price: data.data.product.price,
@@ -186,6 +196,18 @@ function BranchAdminProductList() {
 			console.log(error);
 		} finally {
 			setshow({ ...show, editProduct: true });
+		}
+	};
+
+	const getUnit = async () => {
+		try {
+			const { data } = await REST_API({
+				url: "/admin/unit",
+				method: "GET",
+			});
+			setunit(data.data);
+		} catch (error) {
+			console.log(error);
 		}
 	};
 
@@ -207,15 +229,43 @@ function BranchAdminProductList() {
 			setshow({ ...show, editProduct: false });
 		}
 	};
+	const createProduct = async () => {
+		setshow({ ...show, loading: true });
+		const fd = new FormData();
+		fd.append("images", img);
+		fd.append("data", JSON.stringify(newProduct));
+		try {
+			await REST_API({
+				url: "/admin/create-product",
+				method: "POST",
+				data: fd,
+			});
+			toast.success("Product added");
+		} catch (error) {
+			console.log(error);
+		} finally {
+			setshow({ ...show, editProduct: false });
+		}
+	};
+
+	function PreviewImage() {
+		var oFReader = new FileReader();
+		oFReader.readAsDataURL(document.getElementById("uploadImage").files[0]);
+
+		oFReader.onload = function (oFREvent) {
+			document.getElementById("uploadPreview").src = oFREvent.target.result;
+		};
+	}
 
 	useEffect(() => {
 		getAllProduct(1);
-		// getTotalPage();
 		getCategory();
+		getUnit();
+		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, []);
 
 	return (
-		<div className="max-w-screen-xl w-full pl-4 pt-4">
+		<div className="max-w-screen-2xl w-full pl-4 pt-4">
 			<button
 				onClick={() => {
 					getAllProduct(1);
@@ -242,11 +292,11 @@ function BranchAdminProductList() {
 										}}
 										className="w-full bg-[#0095DA] py-1 rounded-l-lg "
 									>
-										<p className="text-sm">{value.name}</p>
+										<p className="text-md">{value.name}</p>
 									</button>
 									<button
 										onClick={() => editCategory(value.id)}
-										className="bg-[#0095DA] rounded-r-lg pr-1 py-[6px]"
+										className="bg-[#0095DA] rounded-r-lg pr-1 py-2"
 									>
 										<GrEdit className="text-white" />
 									</button>
@@ -255,8 +305,12 @@ function BranchAdminProductList() {
 					  })
 					: null}
 			</div>
-			<div className="mb-2">
-				<Dropdown className="" label="Sort" dismissOnClick={false}>
+			<div className="mb-2 flex space-x-2">
+				<Dropdown
+					class="bg-[#0095da] rounded-md text-white"
+					label="Sort"
+					dismissOnClick={false}
+				>
 					<Dropdown.Item
 						onClick={() => {
 							selectedCategory
@@ -306,6 +360,12 @@ function BranchAdminProductList() {
 						Lowest Price
 					</Dropdown.Item>
 				</Dropdown>
+				<Button
+					onClick={() => setshow({ ...show, addProduct: true })}
+					class="bg-[#0095da] rounded-md text-white"
+				>
+					Add product
+				</Button>
 			</div>
 			<div className="grid grid-cols-4 gap-7 h-[1100px]">
 				{product
@@ -353,7 +413,7 @@ function BranchAdminProductList() {
 					  })
 					: null}
 			</div>
-			<div className="mt-24 flex justify-center items-center my-5">
+			<div className="mt-24 pb-4 flex justify-center items-center my-5">
 				<label className="p-1">page</label>
 				<button
 					className="bg-[#0095DA]  border-y-[1px] border-l-[1px] p-2 rounded-l-lg"
@@ -378,7 +438,7 @@ function BranchAdminProductList() {
 					className="w-8 p-1 border-0"
 				/>
 				<button
-					className="bg-red-500  border-y-[1px] border-r-[1px] p-2 rounded-r-lg"
+					className="bg-[#0095da]  border-y-[1px] border-r-[1px] p-2 rounded-r-lg"
 					onClick={
 						selectedCategory
 							? () =>
@@ -465,6 +525,169 @@ function BranchAdminProductList() {
 								>
 									Submit
 								</Button>
+							)}
+						</div>
+					</div>
+				</Modal.Body>
+			</Modal>
+			<Modal
+				show={show.addProduct}
+				size="6xl"
+				onClose={() => setshow({ ...show, addProduct: false })}
+				id="name modal"
+			>
+				<Modal.Header />
+				<Modal.Body>
+					<div className="space-y-6 px-6 pb-4 sm:pb-6 lg:px-8 xl:pb-8">
+						<h3 className="text-lg font-medium text-gray-900 dark:text-white">
+							Add product
+						</h3>
+						<div className="space-y-2 grid grid-cols-2 gap-10">
+							<div>
+								<div className="mb-2 block">
+									<Label htmlFor="name" value="Edit product name" />
+								</div>
+								<TextInput
+									value={newProduct.name}
+									onChange={(e) =>
+										setNewProduct({ ...newProduct, name: e.target.value })
+									}
+									type="text"
+								/>
+								<div className="flex space-x-3">
+									<div className="w-full">
+										<div className="mb-2 block">
+											<Label htmlFor="price" value="Edit product price" />
+										</div>
+										<TextInput
+											value={newProduct.price}
+											onChange={(e) =>
+												setNewProduct({ ...newProduct, price: e.target.value })
+											}
+											type="number"
+										/>
+									</div>
+									<div className="w-full">
+										<div className="mb-2 block">
+											<Label
+												htmlFor="countries"
+												value="Select product category"
+											/>
+										</div>
+										<select
+											id="category"
+											onChange={(e) =>
+												setNewProduct({
+													...newProduct,
+													category_id: e.target.value,
+												})
+											}
+											className="bg-gray-50 w-full border py-[8.5px] border-gray-300 text-gray-900 text-md rounded-lg "
+										>
+											<option selected disabled={true}>
+												Choose category
+											</option>
+											{category?.map((value, index) => {
+												return (
+													<option key={index} value={value.id}>
+														{value.name}
+													</option>
+												);
+											})}
+										</select>
+									</div>
+								</div>
+								<div className="flex space-x-3">
+									<div className="w-full">
+										<div className="mb-2 block">
+											<Label htmlFor="stock" value="Edit product stock" />
+										</div>
+										<TextInput
+											value={newProduct.stock}
+											onChange={(e) =>
+												setNewProduct({ ...newProduct, stock: e.target.value })
+											}
+											type="number"
+										/>
+									</div>
+									<div className="w-full">
+										<div className="mb-2 block">
+											<Label htmlFor="countries" value="Select product unit" />
+										</div>
+										<select
+											id="unit"
+											onChange={(e) =>
+												setNewProduct({
+													...newProduct,
+													unit_id: e.target.value,
+												})
+											}
+											className="bg-gray-50 w-full border py-[8.5px] border-gray-300 text-gray-900 text-md rounded-lg "
+										>
+											<option selected disabled={true}>
+												Choose unit
+											</option>
+											{unit?.map((value, index) => {
+												return (
+													<option key={index} value={value.id}>
+														{value.name}
+													</option>
+												);
+											})}
+										</select>
+									</div>
+								</div>
+								<div className="mb-2 block">
+									<Label
+										htmlFor="description"
+										value="Edit product description"
+									/>
+								</div>
+								<Textarea
+									value={newProduct.description}
+									onChange={(e) =>
+										setNewProduct({
+											...newProduct,
+											description: e.target.value,
+										})
+									}
+									rows={5}
+								/>
+							</div>
+							<div>
+								<div className="flex justify-center">
+									<img
+										src="#"
+										alt="new product"
+										id="uploadPreview"
+										className="rounded-md"
+									/>
+								</div>
+								<div className="mb-2 block">
+									<Label htmlFor="password" value="Edit product image" />
+								</div>
+								<input
+									type="file"
+									name="myImage"
+									id="uploadImage"
+									accept="image/png, image/gif, image/jpeg, image/jpg"
+									onChange={(e) => {
+										validateImage(e);
+										PreviewImage();
+									}}
+									className="rounded-lg bg-slate-500 text-white w-full"
+								/>
+								<p className="text-xs">Upload image with .jpg, .png, .jpeg</p>
+								<p className="text-xs">Max size 1MB</p>
+							</div>
+						</div>
+						<div className="w-full flex justify-end space-x-2">
+							{show.loading ? (
+								<button>
+									<Spinner aria-label="Default status example" />
+								</button>
+							) : (
+								<Button onClick={() => createProduct()}>Submit</Button>
 							)}
 						</div>
 					</div>

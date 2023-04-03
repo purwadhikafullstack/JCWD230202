@@ -6,7 +6,47 @@ const deleteFiles = require("../helper/deleteFiles");
 const getProximity = require("../lib/proximity");
 
 module.exports = {
-	editProduct: async (req, res) => {},
+	editProduct: async (req, res) => {
+		const { branch_id, id, name, stock, price, description } = JSON.parse(
+			req.body.data
+		);
+		const t = await sequelize.transaction();
+		try {
+			await db.product.update(
+				{
+					name,
+					price,
+					description,
+					img: req.files.images[0].path,
+				},
+				{ where: { id } },
+				{ transaction: t }
+			);
+			await db.branch_product.update(
+				{
+					stock,
+					branch_id,
+					product_id: id,
+				},
+				{ where: { [Op.and]: [{ branch_id }, { product_id: id }] } },
+				{ transaction: t }
+			);
+			await db.stock_history.create(
+				{
+					stock,
+					branch_id: branch_id,
+					product_id: id,
+				},
+				{ transaction: t }
+			);
+			await t.commit();
+			new HTTPStatus(res).success("Product created").send();
+		} catch (error) {
+			await t.rollback();
+			deleteFiles(req.files.images[0].path);
+			new HTTPStatus(res, error).error(error.message, 400).send();
+		}
+	},
 	getCategoryEdit: async (req, res) => {
 		const { id } = req.query;
 		try {
@@ -64,6 +104,14 @@ module.exports = {
 			new HTTPStatus(res).success("Product deleted").send();
 		} catch (error) {
 			await t.rollback();
+			new HTTPStatus(res, error).error(error.message).send();
+		}
+	},
+	getUnit: async (req, res) => {
+		try {
+			const data = await db.unit.findAll();
+			new HTTPStatus(res, data).success("Get all unit").send();
+		} catch (error) {
 			new HTTPStatus(res, error).error(error.message).send();
 		}
 	},
@@ -130,12 +178,17 @@ module.exports = {
 						{
 							model: db.product,
 							attributes: ["id", "name", "img", "price", "description"],
-							include: [{ model: db.unit }],
+							include: [
+								{ model: db.unit },
+								{
+									model: db.discount_history,
+								},
+							],
 						},
 						{ model: db.branch, attributes: ["id", "location"] },
 					],
 					group: ["product_name"],
-					order: [["total_transaction", "DESC"]],
+					// order: [["total_transaction", "DESC"]],
 				});
 			} else {
 				const address = await db.user.findOne({
@@ -161,14 +214,20 @@ module.exports = {
 						{
 							model: db.product,
 							attributes: ["id", "name", "img", "price", "description"],
-							include: [{ model: db.unit }],
+							include: [
+								{ model: db.unit },
+								{
+									model: db.discount_history,
+								},
+							],
 						},
 						{ model: db.branch, attributes: ["id", "location"] },
 					],
 					group: ["product_name"],
-					order: [["total_transaction", "DESC"]],
+					// order: [["total_transaction", "DESC"]],
 				});
 			}
+
 			new HTTPStatus(res, data).success("Get best seller product").send();
 		} catch (error) {
 			new HTTPStatus(res, error).error(error.message, 400).send();
@@ -205,13 +264,19 @@ module.exports = {
 					include: [
 						{
 							model: db.product,
+							include: {
+								model: db.discount_history,
+								where: { status: "Active" },
+								required: false,
+							},
 						},
 						{ model: db.branch },
 					],
-					offset: Math.floor(Math.random() * 155),
+					offset: 3,
 					limit: 10,
 				});
 			}
+			// Math.floor(Math.random() * 155)
 			res.status(200).send({
 				isError: false,
 				message: "Get All Product",
