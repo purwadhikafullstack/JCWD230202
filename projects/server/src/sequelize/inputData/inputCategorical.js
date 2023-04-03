@@ -156,10 +156,10 @@ const branch = async () => {
 	);
 	await db.branch.create({
 		location: "Bandung",
-		address:
-			"Jl. Braga No.99-101, Braga, Kec. Sumur Bandung, Kota Bandung, Jawa Barat",
-		lat: branch2.data.results[0].annotations.Mercator.x,
-		lng: branch2.data.results[0].annotations.Mercator.y,
+		address: "Jl. Braga No.99-101, Braga, Kec. Sumur Bandung, Kota Bandung, Jawa Barat",
+		lat: branch2.data.results[0].geometry.lat,
+		lng: branch2.data.results[0].geometry.lng,
+		city_code: "23.Bandung",
 	});
 
 	const branch3 = await axios.get(
@@ -179,10 +179,10 @@ const branch = async () => {
 	);
 	await db.branch.create({
 		location: "Semarang",
-		address:
-			"Jl. Pemuda No.118, Sekayu, Kec. Semarang Tengah, Kota Semarang, Jawa Tengah",
-		lat: branch4.data.results[0].annotations.Mercator.x,
-		lng: branch4.data.results[0].annotations.Mercator.y,
+		address: "Jl. Pemuda No.118, Sekayu, Kec. Semarang Tengah, Kota Semarang, Jawa Tengah",
+		lat: branch4.data.results[0].geometry.lat,
+		lng: branch4.data.results[0].geometry.lng,
+		city_code: "399.Semarang",
 	});
 
 	const branch5 = await axios.get(
@@ -202,10 +202,10 @@ const branch = async () => {
 	);
 	await db.branch.create({
 		location: "Sulawesi",
-		address:
-			"Jl. Metro Tj. Bunga No.2, Panambungan, Kec. Mariso, Kota Makassar, Sulawesi Selatan",
-		lat: branch6.data.results[0].annotations.Mercator.x,
-		lng: branch6.data.results[0].annotations.Mercator.y,
+		address: "Jl. Metro Tj. Bunga No.2, Panambungan, Kec. Mariso, Kota Makassar, Sulawesi Selatan",
+		lat: branch6.data.results[0].geometry.lat,
+		lng: branch6.data.results[0].geometry.lng,
+		city_code: "254.Makassar",
 	});
 };
 
