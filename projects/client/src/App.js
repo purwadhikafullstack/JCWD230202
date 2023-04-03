@@ -43,7 +43,6 @@ function App() {
 		profile_picture: null,
 		role: null,
 		address: null,
-		role: null,
 	});
 	const getProfile = async () => {
 		try {
