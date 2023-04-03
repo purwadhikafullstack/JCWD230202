@@ -1,11 +1,12 @@
 import React from "react";
 import { BiPhoneCall, BiMailSend } from "react-icons/bi";
+import { SlEarphonesAlt } from "react-icons/sl";
 import { Button } from "flowbite-react";
 
 export default function FooterBar() {
 	return (
 		<footer className="border-t-8 border-[#0095da] mt-36 mb-5">
-			<div className="pt-3 px-72 text-sm grid grid-cols-5">
+			<div className="hidden pt-3 px-72 text-sm lg:grid grid-cols-5">
 				<div className="space-y-1">
 					<h2 className="font-semibold pb-1">BANTUAN</h2>
 					<p>Pembayaran</p>
@@ -27,7 +28,7 @@ export default function FooterBar() {
 						<BiMailSend />
 						<p>customer-care@tokonglomerat.com</p>
 					</div>
-					<Button className="bg-[#0095da]">Pusat Bantuan</Button>
+					<Button className="!bg-[#0095da]">Pusat Bantuan</Button>
 					<h2 className="font-semibold pb-1 pt-2">
 						LAYANAN PENGADUAN KONSUMEN
 					</h2>
@@ -84,6 +85,29 @@ export default function FooterBar() {
 							src={require("../support/assets/logo/download (5).png")}
 							alt=""
 						/>
+					</div>
+				</div>
+			</div>
+			<div className="lg:hidden pt-2 space-y-3">
+				<div className="flex items-center space-x-1 justify-center">
+					<SlEarphonesAlt />
+					<p>Butuh bantuan?</p>
+					<p className="text-[#0095da]">Hubungi kami</p>
+				</div>
+				<div className="px-4">
+					<p className="text-xs">
+						Blibli, Toko Online Terlengkap & Terpercaya Dengan Beragam Produk
+						Pilihan Serta Promo Menarik
+					</p>
+				</div>
+				<div className="bg-gray-200 p-3 flex flex-col justify-center items-center">
+					<p className="text-xs">
+						tokonglomerat © 2023 | Toko online dengan sensasi belanja ala mall.
+					</p>
+					<div className="flex space-x-1 text-xs text-[#0095da]">
+						<p>Syarat & Ketentuan</p>
+						<p>|</p>
+						<p>Kebijakan Privasi</p>
 					</div>
 				</div>
 			</div>

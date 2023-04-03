@@ -1,20 +1,23 @@
 import { BiSearchAlt, BiCart } from "react-icons/bi";
-import {
-	AiOutlineUser,
-	AiOutlineShopping,
-	AiOutlineLogout,
-} from "react-icons/ai";
-import { Outlet, useNavigate } from "react-router-dom";
+import { AiOutlineLogout } from "react-icons/ai";
+import { CgProfile } from "react-icons/cg";
+import { Outlet, useLocation, useNavigate } from "react-router-dom";
+import { useEffect } from "react";
 import { Dropdown } from "flowbite-react";
 
 export default function NavigationBar(props) {
 	const navigate = useNavigate();
+	const location = useLocation();
+	useEffect(() => {
+		if (location.pathname === "/") navigate("/home");
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, []);
 	return (
 		<>
 			<div className="grid grid-cols-12 fixed py-6 px-8 shadow-md max-w-screen w-full bg-[#0095DA] z-50">
 				<button
 					onClick={() => navigate("/home")}
-					className=" col-span-3 font-mandalaFont font-extrabold text-xl text-white xl:text-4xl"
+					className="hidden lg:block col-span-3 font-mandalaFont font-extrabold text-xl text-white xl:text-4xl"
 				>
 					<p className="drop-shadow-md tracking-wide">tokonglomerat</p>
 				</button>
@@ -38,37 +41,36 @@ export default function NavigationBar(props) {
 					</button>
 				</div>
 				{localStorage.getItem("token") ? (
-					<div className="col-span-2 pr-20 flex text-white items-center justify-end space-x-4">
-						<Dropdown
-							inline={true}
-							label={props.state.profile.name}
-							dismissOnClick={true}
-						>
-							<Dropdown.Item
-								onClick={() => navigate("/profile")}
-								className="flex items-center px-3 space-x-2"
-							>
-								<AiOutlineUser className="text-xl" />
-								<p>Profile</p>
-							</Dropdown.Item>
-							<Dropdown.Item
-								onClick={() => navigate("/transaction")}
-								className="flex items-center px-3 space-x-2"
-							>
-								<AiOutlineShopping className="text-xl" />
-								<p>Transaction</p>
-							</Dropdown.Item>
-							<Dropdown.Item
-								onClick={() => props.Func.onLogout()}
-								className="flex items-center px-3 space-x-2"
-							>
-								<AiOutlineLogout className="text-xl" />
-								<p>Log out</p>
-							</Dropdown.Item>
-						</Dropdown>
-					</div>
+					<>
+						<div className="sm:hidden col-span-2 pr-20 lg:flex text-white items-center justify-end space-x-2">
+							<button onClick={() => navigate("/user/profile")}>
+								{props.state.profile.name}
+							</button>
+							<button onClick={() => props.Func.onLogout()}>
+								<AiOutlineLogout className="text-md" />
+							</button>
+						</div>
+						<div className="flex items-center justify-center lg:hidden">
+							<Dropdown className="!text-[#0095da]" inline={true}>
+								<Dropdown.Item
+									onClick={() => navigate("/user/profile")}
+									className="flex space-x-1"
+								>
+									<CgProfile />
+									<p>Profile</p>
+								</Dropdown.Item>
+								<Dropdown.Item
+									onClick={() => props.Func.onLogout()}
+									className="flex space-x-1"
+								>
+									<AiOutlineLogout />
+									<p>Log Out</p>
+								</Dropdown.Item>
+							</Dropdown>
+						</div>
+					</>
 				) : (
-					<div className="col-span-3 grid grid-cols-2 gap-4">
+					<div className="col-span-2 grid grid-cols-2 gap-4">
 						<button
 							onClick={() => navigate("/login")}
 							className="font-semibold border-[2px] text-white rounded-lg px-2 py-1"

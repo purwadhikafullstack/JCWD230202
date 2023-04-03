@@ -16,7 +16,7 @@ import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import { Toaster, toast } from "react-hot-toast";
 
-export default function DiscountManagement() {
+export default function SuperAdminDiscountManagement() {
 	const [page, setpage] = useState();
 	const [selectedpage, setselectedpage] = useState(1);
 	const [type, settype] = useState();
@@ -110,6 +110,31 @@ export default function DiscountManagement() {
 			setall(data.data);
 		} catch (error) {}
 	};
+
+	const approveDiscount = async (id) => {
+		try {
+			await REST_API({
+				url: "/admin/approve-discount",
+				method: "PATCH",
+				data: { id },
+			});
+			toast.success("Discount Active");
+		} catch (error) {
+			console.log(error);
+		}
+	};
+	const declineDiscount = async (id) => {
+		try {
+			await REST_API({
+				url: "/admin/decline-discount",
+				method: "PATCH",
+				data: { id },
+			});
+			toast.success("Discount Declined");
+		} catch (error) {
+			console.log(error);
+		}
+	};
 	useEffect(() => {
 		getAllDiscount(0);
 		getDiscountType();
@@ -201,7 +226,7 @@ export default function DiscountManagement() {
 					</Tabs.Item>
 					<Tabs.Item title="Waiting Approval">
 						<div className="rounded-lg max-w-screen-xl relative">
-							<div className="sticky w-full max-w-screen-xl grid grid-cols-5 bg-[#0095da] text-white px-3 rounded-md text-lg py-2 z-50">
+							<div className="sticky w-full max-w-screen-xl grid grid-cols-6 bg-[#0095da] text-white px-3 rounded-md text-lg py-2 z-50">
 								<Dropdown label="Type" inline={true}>
 									<Dropdown.Item onClick={() => sortBy("type-asc")}>
 										Ascending
@@ -242,12 +267,13 @@ export default function DiscountManagement() {
 										Descending
 									</Dropdown.Item>
 								</Dropdown>
+								<p className="inline">Action</p>
 							</div>
 							<div className="space-y-2 pt-4 max-w-screen-xl w-full">
 								{all?.map((value, index) => {
 									return (
 										<div
-											className="grid grid-cols-5 border-[2px] px-2 py-1 rounded-md"
+											className="grid grid-cols-6 border-[2px] px-2 py-1 rounded-md"
 											key={index}
 										>
 											<h3 className="w-full">
@@ -261,6 +287,20 @@ export default function DiscountManagement() {
 											<h3 className="w-full">{value.percent}</h3>
 											<h3 className="w-full">{value.product.name}</h3>
 											<h3 className="w-full">{value.expired}</h3>
+											<div className="flex space-x-2">
+												<button
+													onClick={() => approveDiscount(value.id)}
+													className="bg-[#0095da] px-2 rounded-md text-white"
+												>
+													Approve
+												</button>
+												<button
+													onClick={() => declineDiscount(value.id)}
+													className="bg-red-500 px-2 rounded-md text-white"
+												>
+													Decline
+												</button>
+											</div>
 										</div>
 									);
 								})}

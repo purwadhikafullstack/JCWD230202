@@ -24,10 +24,13 @@ import DiscountManagement from "./pages/discountManagement";
 import BranchAdminProductList from "./components/branchAdminProductlist";
 import PaymentProof from "./pages/paymentProof";
 import TransactionAdmin from "./components/transaction";
+import ProfileSideBar from "./components/profileSideBar";
+import SuperAdminDiscountManagement from "./pages/superAdminDiscountManagement";
 
 function App() {
 	const navigate = useNavigate();
 	const [disable, setdisable] = useState();
+	const [selected, setselected] = useState();
 	const [profile, setprofile] = useState({
 		id: null,
 		name: null,
@@ -37,6 +40,7 @@ function App() {
 		phone_number: null,
 		profile_picture: null,
 		address: null,
+		role: null,
 	});
 	const getProfile = async () => {
 		try {
@@ -111,18 +115,42 @@ function App() {
 		<div className="relative">
 			<Routes>
 				{/* User */}
-				<Route path="/" element={<NavigationBar state={{ profile }} Func={{ onLogout }} />}>
+				<Route
+					path="/"
+					element={<NavigationBar state={{ profile }} Func={{ onLogout }} />}
+				>
 					<Route path="home" element={<LandingPage />} />
 					<Route
-						path="profile"
-						element={<Profile func={{ getProfile }} state={{ profile, setprofile }} />}
-					/>
+						path="user"
+						element={
+							<ProfileSideBar
+								state={{ profile, selected, setselected }}
+								func={{ getProfile }}
+							/>
+						}
+					>
+						<Route
+							path="profile"
+							element={
+								<Profile
+									func={{ getProfile }}
+									state={{ profile, setprofile, setselected }}
+								/>
+							}
+						/>
+						<Route
+							path="transaction"
+							element={<Transaction state={{ setselected }} />}
+						/>
+					</Route>
 					<Route path="category/:product" element={<ProductCategory />} />
 					<Route path="cart" element={<Cart />} />
-					<Route path="transaction" element={<Transaction />} />
 				</Route>
 				<Route path="checkout" element={<Checkout />} />
-				<Route path="/login" element={<Login MyFunc={{ onLogin }} isDisable={{ disable }} />} />
+				<Route
+					path="/login"
+					element={<Login MyFunc={{ onLogin }} isDisable={{ disable }} />}
+				/>
 				<Route path="/updatePassword/:uid" element={<UpdatePassword />} />
 				<Route path="/register" element={<Register />} />
 				<Route path="/activation/:uid" element={<Activation />} />
@@ -132,14 +160,28 @@ function App() {
 				<Route path="/admin" element={<Dashboard />}>
 					{/* <Route path="/admin" element={<Overview />} /> */}
 					<Route path="sales-report" element={<SalesReport />} />
-					<Route path="branch-admin-register" element={<BranchAdminRegister />} />
+					<Route
+						path="branch-admin-register"
+						element={<BranchAdminRegister />}
+					/>
 					<Route path="stock-history" element={<StockHistory />} />
 					<Route path="admin-product" element={<BranchAdminProductList />} />
 					<Route
 						path="product-management"
 						element={<BranchAdminProductList />}
 					/>
-					<Route path="discount-management" element={<DiscountManagement />} />
+					<Route
+						path="discount-management"
+						element={
+							profile ? (
+								profile.role === "Branch Admin" ? (
+									<DiscountManagement />
+								) : profile.role === "Super Admin" ? (
+									<SuperAdminDiscountManagement />
+								) : null
+							) : null
+						}
+					/>
 					<Route path="transaction" element={<TransactionAdmin />} />
 				</Route>
 				<Route path="/loginAdmin" element={<LoginAdmin />} />

@@ -2,8 +2,9 @@ import React from "react";
 import toast, { Toaster } from "react-hot-toast";
 import { useState } from "react";
 import { useEffect } from "react";
-import { useNavigate, useParams } from "react-router-dom";
-import { Modal } from "flowbite-react";
+import { useNavigate } from "react-router-dom";
+// import { useNavigate, useParams } from "react-router-dom";
+import { Badge, Modal } from "flowbite-react";
 import Carousel from "react-multi-carousel";
 import FooterBar from "../components/footer";
 import { SlClose } from "react-icons/sl";
@@ -26,14 +27,14 @@ import car10 from "../support/assets/carousell/SoKlin-liquid-blm-10mar-C1.jpg";
 import car11 from "../support/assets/carousell/Sparkle-blm-27feb-C1.jpg";
 import car12 from "../support/assets/carousell/telur-blm-mar09-c1.jpg";
 export default function LandingPage() {
-	const params = useParams();
+	// const params = useParams();
 	const Navigate = useNavigate();
 	const [product, setproduct] = useState();
 	const [random, setrandom] = useState();
 	const [category, setcategory] = useState();
 	const [detail, setdetail] = useState();
 	const [show, setshow] = useState(false);
-	const [unit, setunit] = useState();
+	// const [unit, setunit] = useState();
 	const [disable, setdisable] = useState(false);
 
 	const [quantity, setquantity] = useState(1);
@@ -61,7 +62,7 @@ export default function LandingPage() {
 		},
 		mobile: {
 			breakpoint: {
-				max: 464,
+				max: 640,
 				min: 0,
 			},
 			items: 1,
@@ -78,7 +79,7 @@ export default function LandingPage() {
 		},
 		mobile: {
 			breakpoint: {
-				max: 464,
+				max: 640,
 				min: 0,
 			},
 			items: 3,
@@ -156,6 +157,8 @@ export default function LandingPage() {
 				url: `/product/foryou`,
 				method: "GET",
 			});
+			console.log(data.data);
+
 			setrandom(data.data);
 		} catch (error) {
 			console.log(error);
@@ -176,25 +179,25 @@ export default function LandingPage() {
 			console.log(error);
 		}
 	};
-	let onGetUnit = async () => {
-		try {
-			const { data } = await REST_API({
-				url: `product/getallproduct?category=${params.product
-					.split("&")[0]
-					.slice(-1)}`,
-				method: "GET",
-			});
-			setunit(data.data[0]);
-		} catch (error) {
-			console.log(error);
-		}
-	};
+	// let onGetUnit = async () => {
+	// 	try {
+	// 		const { data } = await REST_API({
+	// 			url: `product/getallproduct?category=${params.product
+	// 				.split("&")[0]
+	// 				.slice(-1)}`,
+	// 			method: "GET",
+	// 		});
+	// 		setunit(data.data[0]);
+	// 	} catch (error) {
+	// 		console.log(error);
+	// 	}
+	// };
 
 	useEffect(() => {
 		getSuggested();
 		getCategory();
 		forYou();
-		onGetUnit();
+		// onGetUnit();
 		getProfile();
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, []);
@@ -205,7 +208,7 @@ export default function LandingPage() {
 					<div className="h-56 sm:h-64 xl:h-64 w-full">
 						<Carousel
 							additionalTransfrom={0}
-							arrows
+							arrows={false}
 							autoPlay={true}
 							autoPlaySpeed={2500}
 							centerMode
@@ -248,7 +251,6 @@ export default function LandingPage() {
 					</div>
 				</div>
 				<div className="grid grid-cols-10 gap-5 py-10">
-					{console.log(product)}
 					{category
 						? category.map((value, index) => {
 								return (
@@ -348,7 +350,6 @@ export default function LandingPage() {
 					<h2 className="text-xl font-semibold py-3">For you</h2>
 				</div>
 				<div className="h-56 sm:h-64 xl:h-64 w-full">
-					{console.log(random)}
 					<Carousel
 						additionalTransfrom={0}
 						arrows
@@ -376,18 +377,88 @@ export default function LandingPage() {
 											src={value.product.img}
 											alt="product"
 										/>
-										<div className="px-5 pb-5 flex flex-col justify-start items-start">
+										<div className="px-5 pb-5 flex flex-col justify-start items-start space-y-1">
 											<h5 className="text-sm tracking-tight text-gray-900">
 												{value.product.name.slice(0, 17)}...
 											</h5>
-											<div className="flex flex-col justify-start items-start">
-												<span className="text-lg font-bold text-gray-900">
-													Rp. {value.product.price.toLocaleString()}
-												</span>
-												<h4 className="text-xs font-thin">
-													Toko {value.branch.location}
-												</h4>
-											</div>
+											{value.product.discount_histories.length === 1 ? (
+												value.product.discount_histories[0].discount_id ===
+												3 ? (
+													<div className="flex flex-col justify-start items-start space-y-1 relative">
+														<p className="text-md font-bold text-gray-900">
+															Rp.{" "}
+															{(
+																value.product.price -
+																(value.product.price *
+																	value.product.discount_histories[0].percent) /
+																	100
+															).toLocaleString()}
+														</p>
+														<div className="flex items-center space-x-2">
+															<p className="text-[10px] font-bold text-gray-900 line-through">
+																Rp. {value.product.price.toLocaleString()}
+															</p>
+															<Badge className="text-[9px]">
+																{value.product.discount_histories[0].percent}%
+															</Badge>
+														</div>
+														<h4 className="text-xs font-thin">
+															Toko {value.branch.location}
+														</h4>
+													</div>
+												) : value.product.discount_histories[0].discount_id ===
+												  2 ? (
+													<div className="flex flex-col justify-start items-start space-y-1 relative">
+														<p className="text-md font-bold text-gray-900">
+															Rp.{" "}
+															{(
+																value.product.price -
+																(value.product.price *
+																	value.product.discount_histories[0].percent) /
+																	100
+															).toLocaleString()}
+														</p>
+														<div className="flex items-center space-x-2">
+															<p className="text-[10px] font-bold text-gray-900 line-through">
+																Rp. {value.product.price.toLocaleString()}
+															</p>
+															<Badge className="text-[9px]">
+																{value.product.discount_histories[0].percent}%
+															</Badge>
+														</div>
+														<p className="text-[10px] text-red-700">
+															Minimum{" "}
+															{value.product.discount_histories[0].min_purchase}{" "}
+															item
+														</p>
+														<h4 className="text-xs font-thin">
+															Toko {value.branch.location}
+														</h4>
+													</div>
+												) : value.product.discount_histories[0].discount_id ===
+												  1 ? (
+													<div className="flex flex-col justify-start items-start space-y-1">
+														<p className="text-md font-bold text-gray-900">
+															Rp. {value.product.price.toLocaleString()}
+														</p>
+														<p className="text-[10px] text-red-700">
+															BUY 1 FREE 1
+														</p>
+														<h4 className="text-xs font-thin">
+															Toko {value.branch.location}
+														</h4>
+													</div>
+												) : null
+											) : (
+												<div className="flex flex-col justify-start items-start space-y-1">
+													<span className="text-md font-bold text-gray-900">
+														Rp. {value.product.price.toLocaleString()}
+													</span>
+													<h4 className="text-xs font-thin">
+														Toko {value.branch.location}
+													</h4>
+												</div>
+											)}
 										</div>
 									</button>
 								);
@@ -416,7 +487,7 @@ export default function LandingPage() {
 					</h2>
 					<p className=" mt-1 text-[12px] text-slate-400 ">
 						{" "}
-						per {unit ? unit.unit.name : null}
+						{/* per {unit ? unit.unit.name : null} */}
 					</p>
 					<h2 className=" mt-1 text-[16px] font-semibold">Description</h2>
 					<p className=" text-[12px] mt-2 text-slate-400">

@@ -521,6 +521,14 @@ module.exports = {
 		} = req.body;
 		try {
 			const { id } = await db.user.findOne({ where: { uid } });
+			const { data } = await axios.get(
+				`https://api.opencagedata.com/geocode/v1/json?q=${city
+					.split(".")[1]
+					.replace(
+						/ /g,
+						"+"
+					)}&key=58ed1690dc1141a1bfb80cfb21b1d18a&language=en&pretty=1`
+			);
 			if (main_address) {
 				await db.user_address.update(
 					{ main_address: false },
@@ -537,6 +545,8 @@ module.exports = {
 					receiver_phone,
 					main_address,
 					user_id: id,
+					lat: data.results[0].geometry.lat,
+					lng: data.results[0].geometry.lng,
 				},
 				{ transaction: t }
 			);
@@ -548,11 +558,7 @@ module.exports = {
 			});
 		} catch (error) {
 			t.rollback();
-			res.status(400).send({
-				isError: true,
-				message: error.message,
-				data: error,
-			});
+			new HTTPStatus(res, error).error(error.message).send();
 		}
 	},
 };
