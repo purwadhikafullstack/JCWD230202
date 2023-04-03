@@ -19,10 +19,10 @@ function BranchAdminRegister() {
 	let getBranchAvailable = async () => {
 		try {
 			let response = await axios.get(
-				`http://localhost:5000/admin/branch-admin-available`,
+				`http://localhost:8000/admin/branch-admin-available`,
 				{
 					headers: {
-						token: "4e3f5a55-14ba-42ca-a485-b29a13f4404d",
+						token: localStorage.getItem("token"),
 					},
 				}
 			);
@@ -40,7 +40,7 @@ function BranchAdminRegister() {
 		try {
 			setdisable(true);
 			let { data } = await axios.post(
-				"http://localhost:5000/admin/register",
+				"http://localhost:8000/admin/register",
 				{
 					email: inputEmail.current.value,
 					password: inputPassword.current.value,
@@ -48,7 +48,7 @@ function BranchAdminRegister() {
 				},
 				{
 					headers: {
-						token: "4e3f5a55-14ba-42ca-a485-b29a13f4404d",
+						token: localStorage.getItem("token"),
 					},
 				}
 			);

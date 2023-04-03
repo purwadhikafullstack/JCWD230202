@@ -5,12 +5,16 @@ import { useEffect, useState } from "react";
 import REST_API from "../support/services/RESTApiService";
 import { toast, Toaster } from "react-hot-toast";
 import { useNavigate } from "react-router-dom";
+import keranjang_empty from "../support/assets/KeranjangKosong.jpg";
+import FooterBar from "../components/footer";
+import LoadingSpin from "react-loading-spin";
 
-export default function Cart() {
+export default function Cart(props) {
 	const [data, setdata] = useState([]);
 	const [sum, setsum] = useState(0);
 	const [disc, setdisc] = useState(0);
 	const [disable, setdisable] = useState(false);
+	const [disableCheckout, setdisableCheckout] = useState();
 	const Navigate = useNavigate();
 
 	let onGetCart = async () => {
@@ -85,6 +89,24 @@ export default function Cart() {
 			}, 1500);
 		}
 	};
+
+	let checkStatus = async () => {
+		try {
+			setdisableCheckout(true);
+			if (props.state.profile.status === "Verified") {
+				toast.success("Redirect To Checkout page...");
+				setTimeout(() => {
+					Navigate("/checkout");
+				}, 1500);
+			} else {
+				toast.error("Please Check Your Email and Activate Your Account");
+			}
+		} catch (error) {
+			console.log(error);
+		} finally {
+			setdisableCheckout(false);
+		}
+	};
 	useEffect(() => {
 		onGetCart();
 	}, []);
@@ -123,7 +145,10 @@ export default function Cart() {
 																	{value.product.name}
 																</p>
 																<p className=" flex gap-1 pl-[15px] font-tokpedFont text-[12px]">
-																	per <p className=" font-semibold">{value.product.unit.name}</p>
+																	per{" "}
+																	<p className=" font-semibold">
+																		{value.product.unit.price_at} {value.product.unit.name}
+																	</p>
 																</p>
 																<p className=" pl-[15px] font-semibold font-tokpedFont text-[14px]">
 																	Rp. {value.product.price.toLocaleString()}
@@ -197,36 +222,30 @@ export default function Cart() {
 									<p className=" text-[14px] ">
 										Total price ({data ? data.length : null} Products)
 									</p>
-									<p className=" mt-2 text-[14px] ">Discount Product </p>
 								</div>
 								<div>
 									<p className=" flex gap-1 text-[14px]">Rp. {sum.toLocaleString()} </p>
-									<p className=" mt-2 text-[14px]">Rp. {disc.toLocaleString()}</p>
 								</div>
 							</div>
 							<div className=" border-t flex justify-between h-[37px] items-end ">
-								<p className=" font-semibold text-[16px] ">Total Bill</p>
-								<p className=" font-semibold text-[16px] ">Rp. {(sum - disc).toLocaleString()} </p>
+								<p className=" font-semibold text-[16px] ">Total Price</p>
+								<p className=" font-semibold text-[16px] ">Rp. {sum.toLocaleString()} </p>
 							</div>
-							<p className=" mt-4 text-slate-500 text-[11px]">
-								Dengan mengaktifkan asuransi, Saya menyetujui{" "}
-								<p className=" text-red-700">syarat dan ketentuan yang berlaku.</p>
-							</p>
 							<button
-								onClick={() => Navigate("/checkout")}
+								onClick={() => checkStatus()}
 								className=" mt-6 h-12 w-full text-white bg-[#0095DA] rounded-lg "
 							>
-								Checkout
+								{disableCheckout ? (
+									<LoadingSpin size={"30px"} primaryColor={"#38ADE3"} secondaryColor={"gray"} />
+								) : (
+									"Checkout"
+								)}
 							</button>
 						</div>
 					) : null}
 					{data.length > 0 ? null : (
 						<div className="mt-[71px] h-fit flex flex-col justify-center items-center w-full">
-							<img
-								alt="Keranjang Kosong"
-								className=" h-[141px] w-[200px]"
-								src="https://assets.tokopedia.net/assets-tokopedia-lite/v2/zeus/kratos/60adc47d.jpg"
-							/>
+							<img alt="Keranjang Kosong" className=" h-[141px] w-[200px]" src={keranjang_empty} />
 							<h1 className=" font-tokpedFont font-semibold text-[24px] mt-5  ">
 								Wow, your shopping cart is empty
 							</h1>
@@ -244,6 +263,7 @@ export default function Cart() {
 				</div>
 				<Toaster />
 			</div>
+			<FooterBar />
 		</div>
 	);
 }

@@ -5,6 +5,7 @@ import { SlClose } from "react-icons/sl";
 import LoadingSpin from "react-loading-spin";
 import { toast, Toaster } from "react-hot-toast";
 import REST_API from "../support/services/RESTApiService";
+import FooterBar from "../components/footer";
 
 export default function ProductCategory() {
 	const params = useParams();
@@ -18,46 +19,23 @@ export default function ProductCategory() {
 	const [unit, setunit] = useState();
 	const [show, setshow] = useState(false);
 	const [order, setorder] = useState("");
-	const [profile, setprofile] = useState({
-		uid: "",
-		id: "",
-		name: "",
-		birthdate: "",
-		gender: "",
-		email: "",
-		phone_number: "",
-		profile_picture: "",
-		address: "",
-	});
 
 	const Navigate = useNavigate();
 
-	const getProfile = async () => {
+	const getCategory = async () => {
 		const { data } = await REST_API({
-			url: "/user/profile",
+			url: "product/category",
 			method: "GET",
 		});
-		console.log(data);
-		setprofile({
-			...profile,
-			uid: data.data.uid,
-			id: data.data.id,
-			name: data.data.name,
-			birthdate: data.data.birthdate,
-			gender: data.data.gender,
-			email: data.data.email,
-			phone_number: data.data.phone_number,
-			profile_picture: data.data.img,
-			address: data.data.user_addresses,
-		});
+		setcategory(data.data);
 	};
 
 	let onGetData = async (page, sortby) => {
 		try {
 			const { data } = await REST_API({
-				url: `product/sortby?category=${params.product
-					.split("&")[0]
-					.slice(-1)}&branch=${params.product.split("&")[1].slice(-1)}&page=${page}&sortby=${
+				url: `product/sortby?category=${
+					params.product.split("&")[0].split("=")[1]
+				}&page=${page}&sortby=${
 					sortby ? sortby : ""
 				}`,
 				method: "GET",
@@ -71,13 +49,12 @@ export default function ProductCategory() {
 	};
 
 	let onSortby = async (page, sortby) => {
-		console.log(page, sortby);
 		try {
 			setorder(sortby);
 			const { data } = await REST_API({
-				url: `product/sortby?category=${params.product
-					.split("&")[0]
-					.slice(-1)}&branch=${params.product.split("&")[1].slice(-1)}&page=${page}&sortby=${
+				url: `product/sortby?category=${
+					params.product.split("&")[0].split("=")[1]
+				}&page=${page}&sortby=${
 					sortby ? sortby : ""
 				}`,
 				method: "GET",
@@ -93,9 +70,8 @@ export default function ProductCategory() {
 	let onGetPage = async () => {
 		try {
 			const { data } = await REST_API({
-				url: `product/pageCategory?branch=${params.product
-					.split("&")[1]
-					.slice(-1)}&category=${params.product.split("&")[0].slice(-1)}`,
+				url: `product/pageCategory?category=${params.product.split("&")[0].split("=")[1]}
+				`,
 				method: "GET",
 			});
 
@@ -108,17 +84,16 @@ export default function ProductCategory() {
 	};
 
 	let onGetDetail = async (branch, products) => {
-		console.log(branch);
-		console.log(products);
 		try {
 			const { data } = await REST_API({
 				url: `product/detail?branch=${branch}&product=${products}`,
 				method: "GET",
 			});
 			console.log(data.data[0].product);
-			console.log(data.data[0].branch);
-			console.log(data.data[0]);
+			// console.log(data.data[0].branch);
+			// console.log(data.data[0]);
 			setdetail(data.data[0]);
+			setunit(data.data[0].product)
 			setquantity(1);
 			setshow(true);
 		} catch (error) {
@@ -126,29 +101,17 @@ export default function ProductCategory() {
 		}
 	};
 
-	let onGetUnit = async () => {
-		try {
-			const { data } = await REST_API({
-				url: `product/getallproduct?category=${params.product.split("&")[0].slice(-1)}`,
-				method: "GET",
-			});
-			console.log(data.data[0]);
-			setunit(data.data[0]);
-		} catch (error) {
-			console.log(error);
-		}
-	};
-
 	let onSubmit = async () => {
 		try {
-			if (localStorage.getItem("token")) {
+			let token = localStorage.getItem("token");
+
+			if (token) {
 				setdisable(true);
 				const { data } = await REST_API({
 					url: "/cart/add",
 					method: "POST",
 					data: {
 						qty: quantity,
-						user_id: profile.id,
 						branch_id: detail.branch_id,
 						product_id: detail.product_id,
 					},
@@ -168,44 +131,35 @@ export default function ProductCategory() {
 		}
 	};
 
-	const getCategory = async () => {
-		const { data } = await REST_API({
-			url: "product/category",
-			method: "GET",
-		});
-		setcategory(data.data);
-	};
+	
 
 	useEffect(() => {
-		onGetData(1);
 		getCategory();
+		onGetData(1)
 		onGetPage();
-		onGetUnit();
-		getProfile();
 	}, []);
 
 	return (
 		<div>
 			<div className=" bg-slate-200">
 				<div className="pt-[45px] max-w-screen-xl mx-auto ">
-					<div className="grid grid-cols-10 gap-4 bg-white  rounded-lg shadow-2xl my-8 py-10">
+					<div className=" bg-white  rounded-lg shadow-2xl grid grid-cols-10 gap-5 px-5 mt-20 py-10">
 						{category
 							? category.map((value, index) => {
 									return (
-										<a
-											href={`/category/category=${value.id}&branch=${
-												product ? product[0].branch_products[0].branch_id : ""
-											}`}
-										>
-											<button key={index} className="space-y-2">
+										<button key={index} className="space-y-2 h-max">
+											<a
+												href={`/category/category=${value.id}`}
+												className="flex flex-col justify-center items-center space-y-1"
+											>
 												<img
 													src={value.img}
 													alt={value.name}
-													className="w-11/12 rounded-full overflow-visible shadow-lg"
+													className="w-11/12 rounded-full overflow-visible"
 												/>
-												<p className="font-semibold font-mandalaFont text-xl">{value.name}</p>
-											</button>
-										</a>
+												<p className=" font-medium font-tokpedFont text-sm">{value.name}</p>
+											</a>
+										</button>
 									);
 							  })
 							: null}
@@ -217,10 +171,10 @@ export default function ProductCategory() {
 								onChange={(e) => onSortby(1, e.target.value)}
 								className="rounded-md w-[200px] focus:ring-0 focus:ring-transparent focus:border-red-700 pl-2"
 							>
-								<option  value="name-ASC">Name - Ascending</option>
-								<option  value="name-DESC">Name - Descending</option>
-								<option  value="price-ASC">Price - Ascending</option>
-								<option  value="price-DESC">Price - Descending</option>
+								<option value="name-ASC">Name - Ascending</option>
+								<option value="name-DESC">Name - Descending</option>
+								<option value="price-ASC">Price - Ascending</option>
+								<option value="price-DESC">Price - Descending</option>
 							</select>
 						</div>
 					</div>
@@ -287,7 +241,7 @@ export default function ProductCategory() {
 						Rp. {detail ? detail.product.price.toLocaleString() : null}
 					</h1>
 					<h2 className=" mt-1 text-[16px] font-semibold">{detail ? detail.product.name : null}</h2>
-					<p className=" mt-1 text-[12px] text-slate-400 "> per {unit ? unit.unit.name : null}</p>
+					<p className=" mt-1 text-[12px] text-slate-400 "> per {unit? unit.unit.price_at: null} {unit ? unit.unit.name : null}</p>
 					<h2 className=" mt-1 text-[16px] font-semibold">Description</h2>
 					<p className=" text-[12px] mt-2 text-slate-400">
 						{detail ? detail.product.description : null}
@@ -396,6 +350,7 @@ export default function ProductCategory() {
 					</button>
 				</div>
 			</Modal>
+			<FooterBar />
 			<Toaster />
 		</div>
 	);

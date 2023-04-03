@@ -2,6 +2,8 @@ import axios from "axios";
 import { useEffect, useRef, useState } from "react";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
+import { Empty } from "antd";
+import { useNavigate } from "react-router-dom";
 
 function StockHistory() {
 	const [data, setData] = useState([]);
@@ -19,10 +21,26 @@ function StockHistory() {
 	});
 
 	let inputSearch = useRef();
+	let Navigate = useNavigate();
+
+	let onGetDataKey = async (e, value) => {
+		if (e.key === "Enter") {
+			let response = await axios.get(
+				`http://localhost:8000/admin/history-stock?search=${value}`,
+				{
+					headers: {
+						token: localStorage.getItem("token"),
+					},
+				}
+			);
+
+			setData(response.data.data);
+		}
+	};
 
 	let onGetData = async (value, filter, sort = "") => {
 		let response = await axios.get(
-			`http://localhost:5000/admin/stock-history?search=${value}&filter=${filter}&sort=${sort}`,
+			`http://localhost:8000/admin/history-stock?search=${value}`,
 			{
 				headers: {
 					token: localStorage.getItem("token"),
@@ -63,7 +81,14 @@ function StockHistory() {
 					<input
 						ref={inputSearch}
 						type="text"
-						// id="simple-search"
+						onKeyPress={(e) =>
+							onGetDataKey(
+								e,
+								inputSearch.current.value
+								// dateFrom === "" && dateTo === "" ? "" : `${dateFrom}/${dateTo}`
+							)
+						}
+						id="simple-search"
 						class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full pl-10 p-2.5  dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
 						placeholder="Search Product"
 						required
@@ -95,7 +120,7 @@ function StockHistory() {
 					<span class="sr-only">Search Product</span>
 				</button>
 			</div>
-			<div>
+			{/* <div className="flex">
 				<select
 					onChange={(e) =>
 						onGetData(
@@ -104,7 +129,7 @@ function StockHistory() {
 							e.target.value
 						)
 					}
-					class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+					class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-24 p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
 				>
 					<option disabled selected>
 						sort by
@@ -112,39 +137,87 @@ function StockHistory() {
 					<option value="date-asc">date ascending</option>
 					<option value="date-desc">date descending</option>
 				</select>
-			</div>
-			<div>
+				<DatePicker
+					placeholderText="Select Date From"
+					showMonthDropdown={true}
+					showYearDropdown={true}
+					locale="id-ID"
+					scrollableYearDropdown={true}
+					selected={selectedDate.from === "" ? null : selectedDate.from}
+					className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg w-36"
+					onChange={(date) => {
+						setDateFrom(date.toISOString().split("T")[0]);
+						setSelectedDate({ ...selectedDate, from: date });
+					}}
+				/>
+				{console.log(dateFrom, "ini from")}
+				<DatePicker
+					placeholderText="Select Date To"
+					showMonthDropdown={true}
+					showYearDropdown={true}
+					locale="id-ID"
+					scrollableYearDropdown={true}
+					selected={selectedDate.to === "" ? null : selectedDate.to}
+					className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg w-36"
+					onChange={(date) => {
+						setDateTo(date.toISOString().split("T")[0]);
+						setSelectedDate({ ...selectedDate, to: date });
+					}}
+				/>
 				<div className="flex justify-between">
-					<DatePicker
-						placeholderText="Select Date From"
-						showMonthDropdown={true}
-						showYearDropdown={true}
-						scrollableYearDropdown={true}
-						selected={selectedDate.from === "" ? null : selectedDate.from}
-						className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg w-full"
-						onChange={(date) => {
-							setDateFrom(date.toISOString().split("T")[0]);
-							setSelectedDate({ ...selectedDate, from: date });
-						}}
-					/>
-					{console.log(dateFrom, "ini from")}
-					<DatePicker
-						placeholderText="Select Date To"
-						showMonthDropdown={true}
-						showYearDropdown={true}
-						scrollableYearDropdown={true}
-						selected={selectedDate.to === "" ? null : selectedDate.to}
-						className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg w-full"
-						onChange={(date) => {
-							setDateTo(date.toISOString().split("T")[0]);
-							setSelectedDate({ ...selectedDate, to: date });
-						}}
-					/>
 					{console.log(dateTo, "ini to")}
 				</div>
+			</div> */}
+			<div className="grid grid-cols-4 gap-7 h-auto">
+				{data.length !== 0 ? (
+					data.map((value, index) => {
+						return (
+							<div
+								key={index}
+								className="flex flex-col shadow-md justify-between w-full max-w-sms h-64 bg-white border border-gray-200 rounded-lg dark:bg-gray-800 dark:border-gray-700 mt-10"
+							>
+								<img
+									className="rounded-t-lg h-32"
+									src={value.img}
+									alt="product"
+								/>
+								<div className="px-5 pb-5">
+									<h5 className="text-xs font-semibold tracking-tight text-gray-900 dark:text-white">
+										{value.name}
+									</h5>
+									{/* <h4 className="text-xs">Jumlah Stok {value.stock}</h4> */}
+									<div className="flex items-center justify-between">
+										<span className="text-xs font-bold text-gray-900 dark:text-white">
+											Rp. {value.price.toLocaleString()}
+										</span>
+									</div>
+								</div>
+								<div className="flex justify-end px-2 mb-4">
+									<button
+										onClick={() =>
+											Navigate(`/admin/stock-history-detail/${value.id}`)
+										}
+										className="bg-blue-700 rounded-xl text-white px-2"
+									>
+										Check History
+									</button>
+								</div>
+							</div>
+						);
+					})
+				) : (
+					<div className="col-span-4 h-[450px] flex items-center justify-center">
+						<div>
+							<Empty image={Empty.PRESENTED_IMAGE_SIMPLE} description={false} />
+							<h1 className="text-center text-red-600">
+								YOU MUST SEARCH THE PRODUCT FIRST
+							</h1>
+						</div>
+					</div>
+				)}
 			</div>
 			<div>
-				<table className="mx-auto w-full mt-10">
+				{/* <table className="mx-auto w-full mt-10">
 					<thead>
 						<tr className="border">
 							<th className="px-2">Product Id</th>
@@ -176,7 +249,7 @@ function StockHistory() {
 							</tr>
 						)}
 					</tbody>
-				</table>
+				</table> */}
 			</div>
 		</div>
 	);

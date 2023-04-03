@@ -3,8 +3,28 @@ const { Op } = require("sequelize");
 
 module.exports = {
 	addToCart: async (req, res) => {
-		const { qty, branch_id, user_id, product_id } = req.body;
+		const { qty, branch_id, product_id } = req.body;
+		const { uid } = req.uid;
 		try {
+			const { id } = await db.user.findOne({ where: { uid } });
+
+			const findCart = await db.cart.findAll({ where: {user_id : id}})
+
+			if(findCart.length > 0){
+				const findBranch = await db.cart.findAll({
+					where: { user_id: id },
+				});
+
+				if (findBranch[0].dataValues.branch_id != branch_id) {
+					throw {
+						message: "Cannot Add Product With Diffrent Branch, Please Remove Product in Cart",
+					};
+				}
+			}else{
+				var data = await db.cart.create({ qty, branch_id, user_id: id, product_id });
+			}
+
+
 			const branch_product = await db.branch_product.findOne({
 				where: {
 					[Op.and]: [{ branch_id: branch_id }, { product_id: product_id }],
@@ -41,7 +61,7 @@ module.exports = {
 					}
 				);
 			} else {
-				var data = await db.cart.create({ qty, branch_id, user_id, product_id });
+				var data = await db.cart.create({ qty, branch_id, user_id: id, product_id });
 			}
 
 			res.status(201).send({
@@ -68,15 +88,12 @@ module.exports = {
 				where: { user_id: id },
 			});
 
-			console.log(cart)
-
-			if(cart.length === 0){
-
-			return res.status(201).send({
+			if (cart.length === 0) {
+				return res.status(201).send({
 					isError: false,
 					message: "Cart Empty",
-					data: []
-				})
+					data: [],
+				});
 			}
 
 			const data = await db.cart.findAll({

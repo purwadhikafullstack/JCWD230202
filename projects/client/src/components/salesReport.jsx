@@ -1,9 +1,26 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import axios from "axios";
-import DatePicker from "react-datepicker";
-import "react-datepicker/dist/react-datepicker.css";
+// import DatePicker from "react-datepicker";
+// import "react-datepicker/dist/react-datepicker.css";
+import { Tabs, Table } from "flowbite-react";
+import { Empty, Modal, Button, Divider, Card, DatePicker } from "antd";
+import REST_API from "../support/services/RESTApiService";
+const { RangePicker } = DatePicker;
 
 function SalesReport() {
+	const [isModalOpen, setIsModalOpen] = useState(false);
+	const showModal = () => {
+		setIsModalOpen(true);
+	};
+	const handleOk = () => {
+		setIsModalOpen(false);
+	};
+	const handleCancel = () => {
+		setIsModalOpen(false);
+	};
+
+	const [transactionDetail, setTransactionDetail] = useState();
+	let sum = 0;
 	// transaction
 	const [dataTransaction, setDataTransaction] = useState([]);
 
@@ -12,22 +29,27 @@ function SalesReport() {
 
 	// product
 	const [dataProduct, setDataProduct] = useState([]);
-	const [date, setDate] = useState({
-		from: "",
-		to: "",
-	});
+	// const [date, setDate] = useState({
+	// 	from: "",
+	// 	to: "",
+	// });
+	const [dateFrom, setDateFrom] = useState("");
+	const [dateTo, setDateTo] = useState("");
 	const [selectedDate, setSelectedDate] = useState({
 		from: "",
 		to: "",
 	});
 
+	const tabsRef = useRef();
+
 	let onGetData = async (filter, sort) => {
 		try {
+			// let localStorage.getItem("token") = localStorage.getItem("token");
 			let responseTransaction = await axios.get(
 				`http://localhost:8000/admin/sales-report?report=transaction&filter=${filter}&sort=${sort}`,
 				{
 					headers: {
-						token: "4e3f5a55-14ba-42ca-a485-b29a13f4404d",
+						token: localStorage.getItem("token"),
 					},
 				}
 			);
@@ -36,7 +58,7 @@ function SalesReport() {
 				`http://localhost:8000/admin/sales-report?report=product&filter=${filter}&sort=${sort}`,
 				{
 					headers: {
-						token: "4e3f5a55-14ba-42ca-a485-b29a13f4404d",
+						token: localStorage.getItem("token"),
 					},
 				}
 			);
@@ -45,7 +67,7 @@ function SalesReport() {
 				`http://localhost:8000/admin/sales-report?report=user&filter=${filter}&sort=${sort}`,
 				{
 					headers: {
-						token: "4e3f5a55-14ba-42ca-a485-b29a13f4404d",
+						token: localStorage.getItem("token"),
 					},
 				}
 			);
@@ -53,257 +75,283 @@ function SalesReport() {
 			setDataTransaction(responseTransaction.data.data);
 			setDataProduct(responseProduct.data.data);
 			setDataUser(responseUser.data.data);
+
+			console.log(responseTransaction.data.data, "trans");
+			console.log(responseProduct.data.data);
+			console.log(responseUser.data.data);
 		} catch (error) {
 			console.log(error);
 		}
 	};
 
-	// let onGetDataUser = async () => {
-	// 	try {
-	// 		let response = await axios.get(
-	// 			`http://localhost:8000/admin/sales-report?report=user`,
-	// 			{
-	// 				headers: {
-	// 					token: "4e3f5a55-14ba-42ca-a485-b29a13f4404d",
-	// 				},
-	// 			}
-	// 		);
-	// 		console.log(response.data.data, "userr");
-	// 		setDataUser(response.data.data);
-	// 	} catch (error) {}
-	// };
+	let onGetDetailTransaction = async (invoiceNumber) => {
+		try {
+			const { data } = await REST_API({
+				url: `/admin/sales-report-detail?invoice=${invoiceNumber}`,
+				method: "GET",
+			});
 
-	// let onGetDataProduct = async () => {
-	// 	try {
-	// 		let response = await axios.get(
-	// 			`http://localhost:8000/admin/sales-report?report=product`,
-	// 			{
-	// 				headers: {
-	// 					token: "4e3f5a55-14ba-42ca-a485-b29a13f4404d",
-	// 				},
-	// 			}
-	// 		);
-	// 		console.log(response.data.data, "product");
-	// 		setDataProduct(response.data.data);
-	// 	} catch (error) {}
-	// };
+			setTransactionDetail(data.data);
+		} catch (error) {
+			console.log(error);
+		}
+	};
 
 	useEffect(() => {
-		onGetData("", "");
+		onGetData(``, "");
 	}, []);
 
 	return (
-		<div className="bg-white px-10">
+		<div className="bg-white ">
 			<div>
-				<div>
-					{/* <h1>Sales Report {dataProduct[0].branch? dataProduct[0].branch.location :null }</h1> */}
-					<DatePicker
-						showMonthDropdown={true}
-						showYearDropdown={true}
-						scrollableYearDropdown={true}
-						selected={selectedDate.from === "" ? null : selectedDate.from}
-						className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg w-full"
-						onChange={(date) => {
-							setDate({ ...date, from: date.toISOString().split("T")[0] });
-							setSelectedDate({ ...selectedDate, from: date });
-						}}
-					/>
-					<DatePicker
-						showMonthDropdown={true}
-						showYearDropdown={true}
-						scrollableYearDropdown={true}
-						selected={selectedDate.to === "" ? null : selectedDate.to}
-						className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg w-full"
-						onChange={(date) => {
-							setDate({ ...date, to: date.toISOString().split("T")[0] });
-							setSelectedDate({ ...selectedDate, to: date });
-						}}
-					/>
-				</div>
-
-				<div>
-					<h1>Transaction</h1>
-					<button onClick={() => test()}>set date</button>
-
-					<label
-						htmlFor="countries"
-						className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
-					>
-						Select an option
-					</label>
-					<select
-						id="countries"
-						onChange={(e) =>
-							onGetData(
-								date.from === "" && date.to === ""
-									? ""
-									: `${date.from}/${date.to}`,
-								e.target.value
-							)
-						}
-						className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-					>
-						<option defaultValue="">sort by</option>
-						<option value="date-asc">date ascending</option>
-						<option value="date-desc">date descending</option>
-						<option value="income-asc">income ascending</option>
-						<option value="income-desc">income descending</option>
-					</select>
-				</div>
-				<div>
-					{dataTransaction ? (
-						<table className=" border border-collapse ">
-							{/* <thead >
-						<tr>
-							<th>
-								<td>transaction id</td>
-								<td>product name</td>
-								<td>qty</td>
-								<td>invoice</td>
-								<td>date</td>
-							</th>
-						</tr>
-					</thead> */}
-
-							<thead>
-								<tr className="border">
-									<th className="px-2">ID</th>
-									<th className=" px-10 flex justify-center">Product name</th>
-									<th className="px-2">Quantity</th>
-									<th className="px-2">Invoice</th>
-									<th className="px-2">Date</th>
-								</tr>
-							</thead>
-
-							{dataTransaction
-								? dataTransaction.map((value, index) => {
-										return (
-											<tbody>
-												<tr>
-													<td className="text-center">
-														{value.id ? value.id : value.transaction_id}
-													</td>
-													<td className="text">{value.product_name}</td>
-													<td className="text-center">
-														{value.qty ? value.qty : value.total_qty}
-													</td>
-													<td className="text-center">{value.invoice_no}</td>
-													<td className="text-center">
-														{value.createdAt.split("T")[0]}
-													</td>
-												</tr>
-											</tbody>
-										);
-								  })
-								: null}
-						</table>
-					) : null}
-				</div>
-			</div>
-			<div className="mt-10">
-				<h1>Sales Report</h1>
-
-				<div>
-					<h1>User</h1>
-				</div>
-				<div>
-					{dataUser ? (
-						<table className=" border border-collapse ">
-							{/* <thead >
-						<tr>
-							<th>
-								<td>transaction id</td>
-								<td>product name</td>
-								<td>qty</td>
-								<td>invoice</td>
-								<td>date</td>
-							</th>
-						</tr>
-					</thead> */}
-
-							<thead>
-								<tr className="border">
-									<th className="px-2">ID</th>
-									<th className="pr-60 flex justify-center">User Name</th>
-									<th className="px-2">Quantity</th>
-									<th className="px-2">Invoice</th>
-									<th className="px-2">Total income</th>
-								</tr>
-							</thead>
-
-							{dataTransaction
-								? dataUser.map((value, index) => {
-										return (
-											<tbody>
-												<tr>
-													<td className="text-center">{value.user_id}</td>
-													<td className="text-center">{value.user.name}</td>
-													<td className="text-center">{value.total_qty}</td>
-													<td className="text-center">{value.invoice_no}</td>
-													<td className="text-center">{value.total_price}</td>
-												</tr>
-											</tbody>
-										);
-								  })
-								: null}
-						</table>
-					) : null}
-				</div>
-			</div>
-			<div>
-				<div className="mt-10">
-					<h1>Sales Report</h1>
-					<div>
-						<h1>Product</h1>
+				<div className="flex justify-between  h-12  items-center">
+					<div className="flex items-center gap-3">
+						<RangePicker
+							onChange={(date) => {
+								setDateFrom(date[0].toISOString().split("T")[0]);
+								setDateTo(date[1].toISOString().split("T")[0]);
+							}}
+						/>
 					</div>
-					<div>
-						{dataProduct ? (
-							<table className=" border border-collapse ">
-								{/* <thead >
-						<tr>
-							<th>
-								<td>transaction id</td>
-								<td>product name</td>
-								<td>qty</td>
-								<td>invoice</td>
-								<td>date</td>
-							</th>
-						</tr>
-					</thead> */}
+					<div className="flex items-center gap-3">
+						<h1>Sort</h1>
+						<select
+							onChange={(e) =>
+								onGetData(
+									dateFrom === "" && dateTo === ""
+										? ""
+										: `${dateFrom}/${dateTo}`,
+									e.target.value
+								)
+							}
+							className=" w-24 bg-gray-50 border border-gray-300 text-gray-900  text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block  dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500 h-9	"
+						>
+							<option selected>sort by</option>
+							<option value="date-asc">date ascending</option>
+							<option value="date-desc">date descending</option>
+							<option value="income-asc">income ascending</option>
+							<option value="income-desc">income descending</option>
+						</select>
+					</div>
+				</div>
+			</div>
+			<div className="mt-10"></div>
 
-								<thead>
-									<tr className="border">
-										<th className="pr-72 flex justify-center">Product name</th>
-										<th className="px-2">Quantity</th>
-										<th className="px-2">Total Income</th>
-										<th className="px-2">Location</th>
-									</tr>
-								</thead>
+			<div>
+				<Tabs.Group aria-label="Default tabs" ref={tabsRef} style="underline">
+					<Tabs.Item active title="Transaction">
+						<div className="">
+							{dataTransaction ? (
+								<Table>
+									<Table.Head>
+										<Table.HeadCell>ID</Table.HeadCell>
+										{/* <Table.HeadCell>Product name</Table.HeadCell> */}
+										<Table.HeadCell>Quantity</Table.HeadCell>
+										<Table.HeadCell>Invoice</Table.HeadCell>
+										<Table.HeadCell>Date</Table.HeadCell>
+									</Table.Head>
 
-								{dataProduct
-									? dataProduct.map((value, index) => {
+									{dataTransaction !== 0 ? (
+										dataTransaction.map((value, index) => {
 											return (
-												<tbody>
-													<tr>
-														<td className="text-center">
-															{value.product_name}
-														</td>
-														<td className="text-center">{value.qty_sold}</td>
-														<td className="text-center">
-															{value.income_money}
-														</td>
-														<td className="text-center">
-															{value.branch.location}
-														</td>
-													</tr>
-												</tbody>
+												<Table.Body className="divide-y">
+													<Table.Row className="bg-white dark:border-gray-700 dark:bg-gray-800">
+														<Table.Cell className="whitespace-nowrap font-medium text-gray-900 dark:text-white">
+															{value.id ? value.id : value.transaction_id}
+														</Table.Cell>
+														{/* <Table.Cell>{value.product_name}</Table.Cell> */}
+														<Table.Cell>
+															{value.qty ? value.qty : value.total_qty}
+														</Table.Cell>
+														<Table.Cell>
+															<Button
+																className="bg-white text-black"
+																type="primary"
+																onClick={() => {
+																	onGetDetailTransaction(value.invoice);
+																	showModal();
+																}}
+															>
+																{value.invoice}
+															</Button>
+														</Table.Cell>
+														<Table.Cell>
+															{new Date(value.createdAt).toUTCString()}
+														</Table.Cell>
+													</Table.Row>
+												</Table.Body>
 											);
-									  })
-									: null}
-							</table>
-						) : null}
-					</div>
-				</div>
+										})
+									) : (
+										<Table.Body className="divide-y">
+											<Table.Row className="bg-white dark:border-gray-700 dark:bg-gray-800">
+												<Table.Cell className="text-center">
+													<Empty image={Empty.PRESENTED_IMAGE_SIMPLE} />
+												</Table.Cell>
+											</Table.Row>
+										</Table.Body>
+									)}
+								</Table>
+							) : null}
+						</div>
+					</Tabs.Item>
+					<Tabs.Item title="User">
+						<div>
+							{dataUser ? (
+								<Table>
+									<Table.Head>
+										<Table.HeadCell>ID</Table.HeadCell>
+										<Table.HeadCell>Username</Table.HeadCell>
+										<Table.HeadCell>Total Income</Table.HeadCell>
+										<Table.HeadCell>Price</Table.HeadCell>
+									</Table.Head>
+
+									{dataUser.length !== 0 ? (
+										dataUser.map((value, index) => {
+											return (
+												<Table.Body className="divide-y">
+													<Table.Row className="bg-white dark:border-gray-700 dark:bg-gray-800">
+														<Table.Cell className="whitespace-nowrap font-medium text-gray-900 dark:text-white">
+															{value.user_id}
+														</Table.Cell>
+														<Table.Cell>{value.user.name}</Table.Cell>
+														<Table.Cell> {value.total_price}</Table.Cell>
+													</Table.Row>
+												</Table.Body>
+											);
+										})
+									) : (
+										<Table.Body className="divide-y">
+											<Table.Row className="bg-white dark:border-gray-700 dark:bg-gray-800">
+												<Table.Cell className="text-center">
+													<Empty image={Empty.PRESENTED_IMAGE_SIMPLE} />
+												</Table.Cell>
+											</Table.Row>
+										</Table.Body>
+									)}
+								</Table>
+							) : null}
+						</div>
+					</Tabs.Item>
+					<Tabs.Item title="Product">
+						<div>
+							{dataProduct ? (
+								<Table>
+									<Table.Head>
+										<Table.HeadCell>Product name</Table.HeadCell>
+										<Table.HeadCell>Quantity Sold</Table.HeadCell>
+										<Table.HeadCell>Total Income</Table.HeadCell>
+										<Table.HeadCell>Location</Table.HeadCell>
+									</Table.Head>
+
+									{dataProduct !== 0 ? (
+										dataProduct.map((value, index) => {
+											return (
+												<Table.Body className="divide-y">
+													<Table.Row className="bg-white dark:border-gray-700 dark:bg-gray-800">
+														<Table.Cell className="whitespace-nowrap font-medium text-gray-900 dark:text-white">
+															{value.product_name}
+														</Table.Cell>
+														<Table.Cell>{value.qty_sold}</Table.Cell>
+														<Table.Cell> {value.income_money}</Table.Cell>
+														<Table.Cell>{value.branch.location}</Table.Cell>
+													</Table.Row>
+												</Table.Body>
+											);
+										})
+									) : (
+										<Table.Body className="divide-y">
+											<Table.Row className="bg-white dark:border-gray-700 dark:bg-gray-800">
+												<Table.Cell className="text-center">
+													<Empty image={Empty.PRESENTED_IMAGE_SIMPLE} />
+												</Table.Cell>
+											</Table.Row>
+										</Table.Body>
+									)}
+								</Table>
+							) : null}
+						</div>
+					</Tabs.Item>
+				</Tabs.Group>
+			</div>
+			<div>
+				<Modal
+					title="Transaction Detail"
+					open={isModalOpen}
+					onOk={handleOk}
+					onCancel={handleCancel}
+					footer={null}
+					width={900}
+				>
+					{transactionDetail ? (
+						<div>
+							<div className="">
+								<div className="font-bold">Selesai</div>
+								<Divider dashed />
+								<div className="flex justify-between">
+									<div>Invoice Number</div>
+									<div className="text-[#0095DA]">
+										{transactionDetail[0].invoice}
+									</div>
+								</div>
+								<div className="flex justify-between">
+									<div>Tanggal Pembelian</div>
+									<div>
+										{new Date(transactionDetail[0].createdAt).toLocaleString(
+											"id-ID",
+											{ timeZone: "Asia/Jakarta" }
+										)}
+									</div>
+								</div>
+							</div>
+							<Divider />
+							<div>
+								<div>
+									<h1>Detail Product</h1>
+								</div>
+								<div className="pt-10">
+									{transactionDetail.map((value, index) => {
+										{
+											sum += value.total_price;
+										}
+
+										return (
+											<Card>
+												<div className="flex justify-between">
+													<div>
+														<img
+															className="w-[100px] h-[100px]"
+															src={value.product.img}
+															alt=""
+														/>
+													</div>
+
+													<div>
+														<h1 className="font-semibold">
+															{value.product.name}
+														</h1>
+														<h1>
+															{value.qty} X Rp
+															{value.product.price.toLocaleString("id-ID")}
+														</h1>
+														<h1>
+															Total Rp
+															{value.total_price.toLocaleString("id-ID")}
+														</h1>
+													</div>
+												</div>
+											</Card>
+										);
+									})}
+								</div>
+								<div className="flex flex-row justify-end gap-2">
+									<div>Total Belanja:</div>
+									<div>Rp.{sum.toLocaleString("id-ID")}</div>
+								</div>
+							</div>
+						</div>
+					) : null}
+				</Modal>
 			</div>
 		</div>
 	);
