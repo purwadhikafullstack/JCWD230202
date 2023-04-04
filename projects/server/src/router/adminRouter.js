@@ -83,5 +83,10 @@ Router.delete(
 );
 Router.get("/get-product-edit", tokenVerify, adminController.getProductEdit);
 Router.patch("/edit-product", tokenVerify, productController.editProduct);
+Router.get(
+	"/get-transaction-month",
+	tokenVerify,
+	adminController.getTransactionPerMonth
+);
 
 module.exports = Router;

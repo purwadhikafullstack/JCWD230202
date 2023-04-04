@@ -69,7 +69,7 @@ function LoginAdmin(props) {
 
 	return (
 		<div className="  max-h-screen overflow-hidden ">
-			<div className="  flex justify-center content-center mt-[32px] font-bold text-4xl font-mandalaFont text-red-700 ">
+			<div className="  flex justify-center content-center mt-[32px] font-bold text-4xl font-mandalaFont text-[#0095DA] ">
 				tokonglomerat
 			</div>
 			<div className=" flex flex-col xl:max-w-[816px] h-screen xl:h-[612px] mt-8 xl:mt-[42px] mx-auto relative ">
@@ -152,7 +152,7 @@ function LoginAdmin(props) {
 							}
 							disabled={disable}
 							type="submit"
-							className="inline-flex w-full items-center justify-center mt-8 px-8 py-4 font-sans font-semibold tracking-wide hover:bg-gray-300 text-white bg-red-700 rounded-lg h-[60px]"
+							className="inline-flex w-full items-center justify-center mt-8 px-8 py-4 font-sans font-semibold tracking-wide hover:bg-gray-300 text-white  bg-[#0095DA] rounded-lg h-[60px]"
 						>
 							{disable ? (
 								<LoadingSpin

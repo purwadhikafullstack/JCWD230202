@@ -2,8 +2,8 @@ import { Card, Modal, Table } from "flowbite-react";
 import Toti from "../support/assets/toti.png";
 import { TabList, TabPanel, TabPanels, Tabs, Tab } from "@chakra-ui/react";
 import { useState } from "react";
-import PaymentProof from "../support/assets/buktitf.png"
-import swal from 'sweetalert'
+import PaymentProof from "../support/assets/buktitf.png";
+import swal from "sweetalert";
 
 export default function TransactionAdmin() {
 	const [show, setShow] = useState(false);
@@ -11,7 +11,9 @@ export default function TransactionAdmin() {
 		<div className=" py-10 h-fit px-8 mr-8">
 			<div>
 				<div className="mb-4 flex items-center justify-between">
-					<h5 className="text-xl font-semibold font-tokpedFont">Transaction List</h5>
+					<h5 className="text-xl font-semibold font-tokpedFont">
+						Transaction List
+					</h5>
 				</div>
 				<Tabs>
 					<TabList
@@ -35,7 +37,9 @@ export default function TransactionAdmin() {
 											style={{ width: "32px", height: "32px" }}
 											className=" rounded-full shadow-lg h-4 w-4"
 										/>{" "}
-										<p className=" font-tokpedFont text-[14px] font-semibold ">Branz</p>
+										<p className=" font-tokpedFont text-[14px] font-semibold ">
+											Branz
+										</p>
 									</div>
 									<div className=" font-tokpedFont mt-4">
 										<div className=" pb-5 border-b flex gap-7">
@@ -98,22 +102,33 @@ export default function TransactionAdmin() {
 												<p>Courier</p>
 												<div className=" flex justify-between mt-3 w-[270px] h-[60px] px-[15px] py-3 items-center border rounded-lg">
 													<div className=" text-left ">
-														<p className=" font-bold font-tokpedFont text-[12px]">POS</p>
+														<p className=" font-bold font-tokpedFont text-[12px]">
+															POS
+														</p>
 														<p className=" font-tokpedFont text-slate-500 text text-[12px]">
 															Estimasi Hari 4-5
 														</p>
 													</div>
-													<p className=" text-[14px] font-semibold font-tokpedFont">Rp. 10,000</p>
+													<p className=" text-[14px] font-semibold font-tokpedFont">
+														Rp. 10,000
+													</p>
 												</div>
 												<div className=" mt-10">
 													<p>Total Payment</p>
 													<div className=" text-right flex mt-3 w-[270px] h-[60px] px-[15px] py-3 items-center border rounded-lg">
-														<p className=" font-tokpedFont font-semibold text-[18px]">Rp. 82,300</p>
+														<p className=" font-tokpedFont font-semibold text-[18px]">
+															Rp. 82,300
+														</p>
 													</div>
 												</div>
-                                                <div className=" mt-6"> 
-                                                <button onClick={()=> setShow(true)} className=" hover:bg-gray-300 text-center w-full bg-yellow-400 rounded-full text-white font-tokpedFont font-semibold p-3">Check Payment</button>
-                                                </div>
+												<div className=" mt-6">
+													<button
+														onClick={() => setShow(true)}
+														className=" hover:bg-gray-300 text-center w-full bg-yellow-400 rounded-full text-white font-tokpedFont font-semibold p-3"
+													>
+														Check Payment
+													</button>
+												</div>
 											</div>
 										</div>
 									</div>
@@ -130,7 +145,9 @@ export default function TransactionAdmin() {
 											style={{ width: "32px", height: "32px" }}
 											className=" rounded-full shadow-lg h-4 w-4"
 										/>{" "}
-										<p className=" font-tokpedFont text-[14px] font-semibold ">Branz</p>
+										<p className=" font-tokpedFont text-[14px] font-semibold ">
+											Branz
+										</p>
 									</div>
 									<div className=" font-tokpedFont mt-4">
 										<div className=" pb-5 border-b flex gap-7">
@@ -193,30 +210,38 @@ export default function TransactionAdmin() {
 												<p>Courier</p>
 												<div className=" flex justify-between mt-3 w-[270px] h-[60px] px-[15px] py-3 items-center border rounded-lg">
 													<div className=" text-left ">
-														<p className=" font-bold font-tokpedFont text-[12px]">POS</p>
+														<p className=" font-bold font-tokpedFont text-[12px]">
+															POS
+														</p>
 														<p className=" font-tokpedFont text-slate-500 text text-[12px]">
 															Estimasi Hari 4-5
 														</p>
 													</div>
-													<p className=" text-[14px] font-semibold font-tokpedFont">Rp. 10,000</p>
+													<p className=" text-[14px] font-semibold font-tokpedFont">
+														Rp. 10,000
+													</p>
 												</div>
 												<div className=" mt-10">
 													<p>Total Payment</p>
 													<div className=" text-right flex mt-3 w-[270px] h-[60px] px-[15px] py-3 items-center border rounded-lg">
-														<p className=" font-tokpedFont font-semibold text-[18px]">Rp. 82,300</p>
+														<p className=" font-tokpedFont font-semibold text-[18px]">
+															Rp. 82,300
+														</p>
 													</div>
 												</div>
-                                                <div className=" mt-6"> 
-                                                <p className=" text-center w-full bg-blue-400 rounded-full text-white font-tokpedFont font-semibold p-3">On Progress</p>
-                                                </div>
+												<div className=" mt-6">
+													<p className=" text-center w-full bg-blue-400 rounded-full text-white font-tokpedFont font-semibold p-3">
+														On Progress
+													</p>
+												</div>
 											</div>
 										</div>
 									</div>
 								</Card>
 							</div>
 						</TabPanel>
-                        <TabPanel>
-                        <div className=" border-b-8 pb-5 mb-5">
+						<TabPanel>
+							<div className=" border-b-8 pb-5 mb-5">
 								<Card>
 									<div className=" flex gap-2 flex-row items-center">
 										<img
@@ -225,7 +250,9 @@ export default function TransactionAdmin() {
 											style={{ width: "32px", height: "32px" }}
 											className=" rounded-full shadow-lg h-4 w-4"
 										/>{" "}
-										<p className=" font-tokpedFont text-[14px] font-semibold ">Branz</p>
+										<p className=" font-tokpedFont text-[14px] font-semibold ">
+											Branz
+										</p>
 									</div>
 									<div className=" font-tokpedFont mt-4">
 										<div className=" pb-5 border-b flex gap-7">
@@ -288,33 +315,47 @@ export default function TransactionAdmin() {
 												<p>Courier</p>
 												<div className=" flex justify-between mt-3 w-[270px] h-[60px] px-[15px] py-3 items-center border rounded-lg">
 													<div className=" text-left ">
-														<p className=" font-bold font-tokpedFont text-[12px]">POS</p>
+														<p className=" font-bold font-tokpedFont text-[12px]">
+															POS
+														</p>
 														<p className=" font-tokpedFont text-slate-500 text text-[12px]">
 															Estimasi Hari 4-5
 														</p>
 													</div>
-													<p className=" text-[14px] font-semibold font-tokpedFont">Rp. 10,000</p>
+													<p className=" text-[14px] font-semibold font-tokpedFont">
+														Rp. 10,000
+													</p>
 												</div>
 												<div className=" mt-10">
 													<p>Total Payment</p>
 													<div className=" text-right flex mt-3 w-[270px] h-[60px] px-[15px] py-3 items-center border rounded-lg">
-														<p className=" font-tokpedFont font-semibold text-[18px]">Rp. 82,300</p>
+														<p className=" font-tokpedFont font-semibold text-[18px]">
+															Rp. 82,300
+														</p>
 													</div>
 												</div>
-                                                <div className=" mt-6"> 
-                                                <p className=" text-center w-full bg-green-400 rounded-full text-white font-tokpedFont font-semibold p-3">Done</p>
-                                                </div>
+												<div className=" mt-6">
+													<p className=" text-center w-full bg-green-400 rounded-full text-white font-tokpedFont font-semibold p-3">
+														Done
+													</p>
+												</div>
 											</div>
 										</div>
 									</div>
 								</Card>
 							</div>
-                        </TabPanel>
+						</TabPanel>
 					</TabPanels>
 				</Tabs>
-				<Modal show={show} size="md" popup={true} onClose={() => setShow(false)}>
+				<Modal
+					show={show}
+					size="md"
+					popup={true}
+					onClose={() => setShow(false)}
+				>
+					<Modal.Header />
 					<div className=" flex justify-center items-center p-5">
-						<img alt="Payment Proof" src={PaymentProof} />
+						<img className="h-[600px]" alt="Payment Proof" src={PaymentProof} />
 					</div>
 					<div className=" flex justify-center pb-5 gap-4">
 						<button

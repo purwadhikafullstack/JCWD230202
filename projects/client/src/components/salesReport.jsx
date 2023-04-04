@@ -1,5 +1,6 @@
 import { useEffect, useState, useRef } from "react";
 import axios from "axios";
+import { GrNext, GrPrevious } from "react-icons/gr";
 // import DatePicker from "react-datepicker";
 // import "react-datepicker/dist/react-datepicker.css";
 import { Tabs, Table } from "flowbite-react";
@@ -8,7 +9,9 @@ import REST_API from "../support/services/RESTApiService";
 const { RangePicker } = DatePicker;
 
 function SalesReport() {
+	const [selectedpage, setselectedpage] = useState(1);
 	const [isModalOpen, setIsModalOpen] = useState(false);
+	const [sort, setSort] = useState("");
 	const showModal = () => {
 		setIsModalOpen(true);
 	};
@@ -35,18 +38,14 @@ function SalesReport() {
 	// });
 	const [dateFrom, setDateFrom] = useState("");
 	const [dateTo, setDateTo] = useState("");
-	const [selectedDate, setSelectedDate] = useState({
-		from: "",
-		to: "",
-	});
 
 	const tabsRef = useRef();
 
-	let onGetData = async (filter, sort) => {
+	let onGetData = async (page, filter, sort) => {
 		try {
 			// let localStorage.getItem("token") = localStorage.getItem("token");
 			let responseTransaction = await axios.get(
-				`http://localhost:8000/admin/sales-report?report=transaction&filter=${filter}&sort=${sort}`,
+				`http://localhost:8000/admin/sales-report?report=transaction&page=${page}&filter=${filter}&sort=${sort}`,
 				{
 					headers: {
 						token: localStorage.getItem("token"),
@@ -55,7 +54,7 @@ function SalesReport() {
 			);
 
 			let responseProduct = await axios.get(
-				`http://localhost:8000/admin/sales-report?report=product&filter=${filter}&sort=${sort}`,
+				`http://localhost:8000/admin/sales-report?report=product&page=${page}&filter=${filter}&sort=${sort}`,
 				{
 					headers: {
 						token: localStorage.getItem("token"),
@@ -64,7 +63,7 @@ function SalesReport() {
 			);
 
 			let responseUser = await axios.get(
-				`http://localhost:8000/admin/sales-report?report=user&filter=${filter}&sort=${sort}`,
+				`http://localhost:8000/admin/sales-report?report=user&page=${page}&filter=${filter}&sort=${sort}`,
 				{
 					headers: {
 						token: localStorage.getItem("token"),
@@ -75,6 +74,7 @@ function SalesReport() {
 			setDataTransaction(responseTransaction.data.data);
 			setDataProduct(responseProduct.data.data);
 			setDataUser(responseUser.data.data);
+			setselectedpage(page);
 
 			console.log(responseTransaction.data.data, "trans");
 			console.log(responseProduct.data.data);
@@ -98,7 +98,7 @@ function SalesReport() {
 	};
 
 	useEffect(() => {
-		onGetData(``, "");
+		onGetData(1, ``, "");
 	}, []);
 
 	return (
@@ -116,14 +116,16 @@ function SalesReport() {
 					<div className="flex items-center gap-3">
 						<h1>Sort</h1>
 						<select
-							onChange={(e) =>
+							onChange={(e) => {
 								onGetData(
+									selectedpage,
 									dateFrom === "" && dateTo === ""
 										? ""
 										: `${dateFrom}/${dateTo}`,
 									e.target.value
-								)
-							}
+								);
+								setSort(e.target.value);
+							}}
 							className=" w-24 bg-gray-50 border border-gray-300 text-gray-900  text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block  dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500 h-9	"
 						>
 							<option selected>sort by</option>
@@ -138,7 +140,18 @@ function SalesReport() {
 			<div className="mt-10"></div>
 
 			<div>
-				<Tabs.Group aria-label="Default tabs" ref={tabsRef} style="underline">
+				<Tabs.Group
+					aria-label="Default tabs"
+					style="underline"
+					ref={tabsRef}
+					onActiveTabChange={(tab) => {
+						onGetData(
+							1,
+							dateFrom === "" && dateTo === "" ? "" : `${dateFrom}/${dateTo}`,
+							""
+						);
+					}}
+				>
 					<Tabs.Item active title="Transaction">
 						<div className="">
 							{dataTransaction ? (
@@ -203,7 +216,6 @@ function SalesReport() {
 										<Table.HeadCell>ID</Table.HeadCell>
 										<Table.HeadCell>Username</Table.HeadCell>
 										<Table.HeadCell>Total Income</Table.HeadCell>
-										<Table.HeadCell>Price</Table.HeadCell>
 									</Table.Head>
 
 									{dataUser.length !== 0 ? (
@@ -273,6 +285,51 @@ function SalesReport() {
 						</div>
 					</Tabs.Item>
 				</Tabs.Group>
+			</div>
+			<div className="mt-24 flex justify-center items-center my-5 pb-10 ">
+				<label className="p-1">page</label>
+				<button
+					className="bg-[#0095DA] !text-white border-y-[1px] border-l-[1px] p-2 rounded-l-lg"
+					onClick={() =>
+						onGetData(
+							selectedpage - 1,
+							dateFrom === "" && dateTo === "" ? "" : `${dateFrom}/${dateTo}`,
+							sort
+						)
+					}
+					disabled={parseInt(selectedpage) === 1}
+				>
+					<GrPrevious className="!text-white" />
+				</button>
+				<input
+					type="text"
+					value={selectedpage}
+					onChange={(e) => {
+						onGetData(
+							e.target.value,
+							dateFrom === "" && dateTo === "" ? "" : `${dateFrom}/${dateTo}`,
+							sort
+						);
+						setselectedpage(e.target.value ? parseInt(e.target.value) : 0);
+					}}
+					className="w-8 p-1 border-0"
+				/>
+				<button
+					className="bg-[#0095DA] !text-white  border-y-[1px] border-r-[1px] p-2 rounded-r-lg"
+					onClick={() =>
+						onGetData(
+							selectedpage + 1,
+							dateFrom === "" && dateTo === "" ? "" : `${dateFrom}/${dateTo}`,
+							sort
+						)
+					}
+					// disabled={parseInt(selectedpage) === parseInt(page)}
+				>
+					<GrNext className="!text-white" />
+				</button>
+				<label className="p-1" htmlFor="">
+					{/* of {page} */}
+				</label>
 			</div>
 			<div>
 				<Modal
@@ -344,7 +401,7 @@ function SalesReport() {
 										);
 									})}
 								</div>
-								<div className="flex flex-row justify-end gap-2">
+								<div className="flex flex-row justify-end gap-2 text-xl">
 									<div>Total Belanja:</div>
 									<div>Rp.{sum.toLocaleString("id-ID")}</div>
 								</div>

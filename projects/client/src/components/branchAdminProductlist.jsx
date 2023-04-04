@@ -78,6 +78,7 @@ function BranchAdminProductList() {
 			});
 			setproduct(data.data);
 			setSort(sort);
+			setselectedpage(page);
 		} catch (error) {
 			console.log(error);
 		}
@@ -215,7 +216,7 @@ function BranchAdminProductList() {
 	}, []);
 
 	return (
-		<div className="max-w-screen-xl w-full pl-4 pt-4">
+		<div className=" w-full px-2 md:px-10">
 			<button
 				onClick={() => {
 					getAllProduct(1);
@@ -226,7 +227,7 @@ function BranchAdminProductList() {
 			>
 				<p className="text-md">All Category</p>
 			</button>
-			<div className="grid grid-cols-10 gap-2 pb-4">
+			<div className="grid md:grid-cols-10 grid-cols-2 gap-2 pb-4">
 				{category
 					? category.map((value, index) => {
 							return (
@@ -239,6 +240,7 @@ function BranchAdminProductList() {
 											getProductCategory(value.id, 1);
 											setSelectedCategory(value.id);
 											setSort();
+											setselectedpage(1);
 										}}
 										className="w-full bg-[#0095DA] py-1 rounded-l-lg "
 									>
@@ -307,16 +309,16 @@ function BranchAdminProductList() {
 					</Dropdown.Item>
 				</Dropdown>
 			</div>
-			<div className="grid grid-cols-4 gap-7 h-[1100px]">
+			<div className="grid grid-cols-2 md:grid-cols-4 gap-7 h-auto">
 				{product
 					? product.map((value, index) => {
 							return (
 								<div
 									key={index}
-									className="flex flex-col h-fit shadow-md justify-between w-full max-w-sms bg-white border border-gray-200 rounded-lg"
+									className="flex flex-col h-[280px] sm:h-[350px]  shadow-xl justify-between w-full  border border-gray-200 rounded-lg"
 								>
 									<img
-										className="rounded-t-lg h-32 object-cover"
+										className="rounded-t-lg h-46 object-cover"
 										src={value.product.img}
 										alt="product"
 									/>
@@ -331,10 +333,10 @@ function BranchAdminProductList() {
 											</span>
 										</div>
 									</div>
-									<div className="flex justify-end px-2 pb-4 space-x-2">
+									<div className=" flex justify-center sm:justify-end pb-4 gap-1 sm:mr-2 ">
 										<button
 											onClick={() => getProductEdit(value.product.id)}
-											className="bg-[#0095DA] rounded-md px-4 py-1 text-white"
+											className="text-[#0095DA] rounded-md px-4 py-1 hover:text-white hover:bg-[#0095DA]  !text-xs"
 										>
 											Edit
 										</button>
@@ -343,7 +345,7 @@ function BranchAdminProductList() {
 												setshow({ ...show, popUpDeleteProduct: true });
 												setDeletedProductId(value.id);
 											}}
-											className="bg-red-600 rounded-md px-4 py-1 text-white"
+											className="text-red-600 rounded-md px-4 py-1 hover:text-white hover:bg-red-700 !text-xs"
 										>
 											Delete
 										</button>
@@ -353,10 +355,10 @@ function BranchAdminProductList() {
 					  })
 					: null}
 			</div>
-			<div className="mt-24 flex justify-center items-center my-5">
+			<div className="mt-24 flex justify-center items-center my-5 pb-10 ">
 				<label className="p-1">page</label>
 				<button
-					className="bg-[#0095DA]  border-y-[1px] border-l-[1px] p-2 rounded-l-lg"
+					className="bg-[#0095DA] text-white border-y-[1px] border-l-[1px] p-2 rounded-l-lg"
 					onClick={
 						selectedCategory
 							? () => getProductCategory(selectedCategory, selectedpage - 1)
@@ -378,7 +380,7 @@ function BranchAdminProductList() {
 					className="w-8 p-1 border-0"
 				/>
 				<button
-					className="bg-red-500  border-y-[1px] border-r-[1px] p-2 rounded-r-lg"
+					className="bg-[#0095DA] text-white  border-y-[1px] border-r-[1px] p-2 rounded-r-lg"
 					onClick={
 						selectedCategory
 							? () =>
@@ -417,7 +419,7 @@ function BranchAdminProductList() {
 								/>
 							</div>
 							<TextInput
-								value={selectedCategoryEdit?.name}
+								defaultValue={selectedCategoryEdit?.name}
 								type="text"
 								onChange={(e) => seteditedcategoryname(e.target.value)}
 							/>

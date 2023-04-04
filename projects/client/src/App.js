@@ -26,7 +26,7 @@ import NotFoundPage from "./pages/404";
 import StockHistoryDetail from "./components/stockHistoryDetail";
 import PaymentProof from "./pages/paymentProof";
 import TransactionAdmin from "./components/transaction";
-
+import Overview from "./components/overview";
 
 function App() {
 	const navigate = useNavigate();
@@ -41,6 +41,7 @@ function App() {
 		profile_picture: null,
 		role: null,
 		address: null,
+		status: null,
 	});
 	const getProfile = async () => {
 		try {
@@ -48,6 +49,8 @@ function App() {
 				url: "/user/profile",
 				method: "GET",
 			});
+
+			console.log(data, "ini get profile");
 			setprofile({
 				...profile,
 				id: data.data.id,
@@ -59,6 +62,7 @@ function App() {
 				profile_picture: data.data.img,
 				role: data.data.role,
 				address: data.data.user_addresses,
+				status: data.data.status,
 			});
 		} catch (error) {
 			console.log(error);
@@ -92,7 +96,6 @@ function App() {
 		}
 	};
 
-
 	let onLoginAdmin = async (email, password) => {
 		try {
 			setdisable(true);
@@ -116,7 +119,7 @@ function App() {
 				window.location.href = "http://localhost:3000/admin";
 			}, 1000);
 		} catch (error) {
-			toast.error(error.response.data.message);
+			toast.error(error.response.message);
 		} finally {
 			setdisable(false);
 		}
@@ -135,18 +138,26 @@ function App() {
 		<div className="relative">
 			<Routes>
 				{/* User */}
-				<Route path="/" element={<NavigationBar state={{ profile }} Func={{ onLogout }} />}>
+				<Route
+					path="/"
+					element={<NavigationBar state={{ profile }} Func={{ onLogout }} />}
+				>
 					<Route path="home" element={<LandingPage />} />
 					<Route
 						path="profile"
-						element={<Profile func={{ getProfile }} state={{ profile, setprofile }} />}
+						element={
+							<Profile func={{ getProfile }} state={{ profile, setprofile }} />
+						}
 					/>
 					<Route path="category/:product" element={<ProductCategory />} />
-					<Route path="cart" element={<Cart />} />
+					<Route path="cart" element={<Cart state={{ profile }} />} />
 					<Route path="transaction" element={<Transaction />} />
 				</Route>
-				<Route path="checkout" element={<Checkout />} />
-				<Route path="/login" element={<Login MyFunc={{ onLogin }} isDisable={{ disable }} />} />
+				<Route path="checkout" element={<Checkout state={{ profile }} />} />
+				<Route
+					path="/login"
+					element={<Login MyFunc={{ onLogin }} isDisable={{ disable }} />}
+				/>
 				<Route path="/updatePassword/:uid" element={<UpdatePassword />} />
 				<Route path="/register" element={<Register />} />
 				<Route path="/activation/:uid" element={<Activation />} />
@@ -157,18 +168,23 @@ function App() {
 					path="/admin"
 					element={<Dashboard state={{ profile }} Func={{ onLogout }} />}
 				>
-					{/* <Route path="/admin" element={<Overview />} /> */}
+					<Route path="overview" element={<Overview />} />
 					<Route path="sales-report" element={<SalesReport />} />
-					<Route path="branch-admin-register" element={<BranchAdminRegister />} />
+					<Route
+						path="branch-admin-register"
+						element={<BranchAdminRegister />}
+					/>
 					<Route path="stock-history" element={<StockHistory />} />
 					<Route path="admin-product" element={<BranchAdminProductList />} />
 
-			
 					<Route
 						path="stock-history-detail/:id"
-						element={<StockHistoryDetail state={{ profile }} />}/>
-					<Route path="product-management"
-						element={<BranchAdminProductList />}/>
+						element={<StockHistoryDetail state={{ profile }} />}
+					/>
+					<Route
+						path="product-management"
+						element={<BranchAdminProductList />}
+					/>
 					<Route path="discount-management" element={<DiscountManagement />} />
 					<Route path="transaction" element={<TransactionAdmin />} />
 				</Route>

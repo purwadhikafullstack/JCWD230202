@@ -6,7 +6,7 @@ import REST_API from "../support/services/RESTApiService";
 import { toast, Toaster } from "react-hot-toast";
 import { useNavigate } from "react-router-dom";
 
-export default function Cart() {
+export default function Cart(props) {
 	const [data, setdata] = useState([]);
 	const [sum, setsum] = useState(0);
 	const [disc, setdisc] = useState(0);
@@ -91,7 +91,9 @@ export default function Cart() {
 	return (
 		<div className=" mb-24">
 			<div className=" pt-[64px] max-w-[1120px] mx-auto ">
-				<div className=" pl-5 flex items-end h-[66px] border-b-4 font-bold ">Cart</div>
+				<div className=" pl-5 flex items-end h-[66px] border-b-4 font-bold ">
+					Cart
+				</div>
 
 				<div className="flex px-5">
 					{data.length > 0 ? (
@@ -123,7 +125,10 @@ export default function Cart() {
 																	{value.product.name}
 																</p>
 																<p className=" flex gap-1 pl-[15px] font-tokpedFont text-[12px]">
-																	per <p className=" font-semibold">{value.product.unit.name}</p>
+																	per{" "}
+																	<p className=" font-semibold">
+																		{value.product.unit.name}
+																	</p>
 																</p>
 																<p className=" pl-[15px] font-semibold font-tokpedFont text-[14px]">
 																	Rp. {value.product.price.toLocaleString()}
@@ -150,7 +155,9 @@ export default function Cart() {
 															<div className=" flex items-center pt-4 gap-1">
 																<button
 																	className=" disabled:text-slate-500 enabled:text-green-500"
-																	disabled={disable || value.qty <= 1 ? true : false}
+																	disabled={
+																		disable || value.qty <= 1 ? true : false
+																	}
 																	onClick={() =>
 																		setTimeout(() => {
 																			updateQuantity(value.id, "-", value.qty);
@@ -166,7 +173,9 @@ export default function Cart() {
 																<button
 																	className=" disabled:text-slate-500 enabled:text-green-500"
 																	disabled={
-																		disable || value.qty >= value.product.branch_products[0].stock
+																		disable ||
+																		value.qty >=
+																			value.product.branch_products[0].stock
 																			? true
 																			: false
 																	}
@@ -200,20 +209,34 @@ export default function Cart() {
 									<p className=" mt-2 text-[14px] ">Discount Product </p>
 								</div>
 								<div>
-									<p className=" flex gap-1 text-[14px]">Rp. {sum.toLocaleString()} </p>
-									<p className=" mt-2 text-[14px]">Rp. {disc.toLocaleString()}</p>
+									<p className=" flex gap-1 text-[14px]">
+										Rp. {sum.toLocaleString()}{" "}
+									</p>
+									<p className=" mt-2 text-[14px]">
+										Rp. {disc.toLocaleString()}
+									</p>
 								</div>
 							</div>
 							<div className=" border-t flex justify-between h-[37px] items-end ">
 								<p className=" font-semibold text-[16px] ">Total Bill</p>
-								<p className=" font-semibold text-[16px] ">Rp. {(sum - disc).toLocaleString()} </p>
+								<p className=" font-semibold text-[16px] ">
+									Rp. {(sum - disc).toLocaleString()}{" "}
+								</p>
 							</div>
 							<p className=" mt-4 text-slate-500 text-[11px]">
 								Dengan mengaktifkan asuransi, Saya menyetujui{" "}
-								<p className=" text-red-700">syarat dan ketentuan yang berlaku.</p>
+								<p className=" text-red-700">
+									syarat dan ketentuan yang berlaku.
+								</p>
 							</p>
 							<button
-								onClick={() => Navigate("/checkout")}
+								onClick={
+									props.state.profile.status === "verified"
+										? () => Navigate("/checkout")
+										: () => {
+												toast.error("Please Verify Your Account First");
+										  }
+								}
 								className=" mt-6 h-12 w-full text-white bg-[#0095DA] rounded-lg "
 							>
 								Checkout

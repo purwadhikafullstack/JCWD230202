@@ -1,16 +1,27 @@
 import axios from "axios";
 import { useEffect, useState } from "react";
 import { Outlet } from "react-router-dom";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
+import {
+	BsCart,
+	BsPeople,
+	BsPieChart,
+	BsClipboardCheck,
+	BsHandbag,
+} from "react-icons/bs";
+import { TbReportMoney, TbDiscount } from "react-icons/tb";
+import { VscSignOut } from "react-icons/vsc";
 
 export default function Dashboard(props) {
 	const [admin, setAdmin] = useState(true);
 	const [navmenu, setNavmenu] = useState(true);
 	const [data, setData] = useState();
+	const [showSidebar, setShowSidebar] = useState(false);
 
 	let Navigate = useNavigate();
+	let Location = useLocation();
 
-	let onGetRole = async () => {
+	let onGetRole = async (role) => {
 		try {
 			let token = localStorage.getItem("token");
 			let response = await axios.get("http://localhost:8000/admin/checkRole", {
@@ -23,21 +34,13 @@ export default function Dashboard(props) {
 				setAdmin(false);
 			}
 		} catch (error) {
-			console.log(error);
+			return Navigate("/home");
 		}
 	};
 
-	function toggle(params) {
-		if (navmenu === false) {
-			setNavmenu(true);
-		} else if (navmenu === true) {
-			setNavmenu(false);
-		}
-	}
-
 	useEffect(() => {
-		onGetRole();
-		// console.log(props.state.profile);
+		onGetRole(props.state.profile.role);
+		if (Location.pathname === "/admin") Navigate("/admin/overview");
 	}, []);
 
 	if (admin === false) {
@@ -47,7 +50,10 @@ export default function Dashboard(props) {
 	return (
 		<div>
 			<nav className="bg-white flex justify-between px-4 fixed top-0 z-40 w-full h-14 min-[640px]:hidden ">
-				<button onClick={() => toggle()} className=" min-[640px]:hidden">
+				<button
+					onClick={() => setShowSidebar(!showSidebar)}
+					className=" min-[640px]:hidden"
+				>
 					<svg
 						className="w-6 h-6"
 						fill="currentColor"
@@ -62,176 +68,26 @@ export default function Dashboard(props) {
 					</svg>
 				</button>
 				<a className="flex items-center font-mandalaFont ml-2 min-[640px]:hidden md:mr-24">
-					<img
-						src="https://play-lh.googleusercontent.com/boZIokjjWqcraRXdblgqxqCquWz-zk626VsNYSgyLn9ltvjoW59uU5nlY9l-qnA1wlQ"
-						className="h-6 w-6 mr-3 sm:h-6"
-						alt="FlowBite Logo"
-					/>
-					<span className="self-center font-mandalaFont text-md  sm:text-xl whitespace-nowrap text-red-700 dark:text-white">
+					<span className="self-center font-mandalaFont text-md font-bold  sm:text-xl whitespace-nowrap text-[#0095DA]  dark:text-white">
 						tokonglomerat
 					</span>
 				</a>
 			</nav>
 
-			{admin === "super admin" ? (
-				<div
-					id="dropdown"
-					className=" z-30 mt-6 ml-4  bg-white divide-y divide-gray-100 rounded-lg shadow w-44 dark:bg-gray-700 absolute left-0"
-					hidden={navmenu}
-				>
-					<ul
-						className="py-2 text-sm text-gray-700 dark:text-gray-200"
-						aria-labelledby="dropdownDefaultButton"
-					>
-						<li>
-							<a
-								href="#"
-								className="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white"
-							>
-								Overview
-							</a>
-						</li>
-						<li>
-							<a
-								href="/branch-admin-register"
-								className="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white"
-							>
-								Branch Admin Register
-							</a>
-						</li>
-						<li>
-							<a
-								href="#"
-								className="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white"
-							>
-								Transaction
-							</a>
-						</li>
-						<li>
-							<a
-								href="/sales-report"
-								className="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white"
-							>
-								Sales Report
-							</a>
-						</li>
-						<li>
-							<a
-								href="#"
-								className="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white"
-							>
-								Discount Management
-							</a>
-						</li>
-						<li>
-							<a
-								href="#"
-								className="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white"
-							>
-								Stock History
-							</a>
-						</li>
-						<li>
-							<a
-								href="#"
-								className="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white"
-							>
-								Sign out
-							</a>
-						</li>
-					</ul>
-				</div>
-			) : (
-				<div
-					id="dropdown"
-					className=" z-30 mt-6 ml-4  bg-white divide-y divide-gray-100 rounded-lg shadow w-44 dark:bg-gray-700 absolute left-0"
-					hidden={navmenu}
-				>
-					<ul
-						className="py-2 text-sm text-gray-700 dark:text-gray-200"
-						aria-labelledby="dropdownDefaultButton"
-					>
-						<li>
-							<a
-								href="#"
-								className="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white"
-							>
-								Overview
-							</a>
-						</li>
-						<li>
-							<a
-								href="#"
-								className="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white"
-							>
-								Product Management
-							</a>
-						</li>
-						<li>
-							<a
-								href="#"
-								className="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white"
-							>
-								Transaction
-							</a>
-						</li>
-						<li>
-							<a
-								href="/admin/sales-reports"
-								className="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white"
-							>
-								Sales Report
-							</a>
-						</li>
-						<li>
-							<a
-								href="#"
-								className="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white"
-							>
-								Discount Management
-							</a>
-						</li>
-						<li>
-							<a
-								href="#"
-								className="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white"
-							>
-								Stock History
-							</a>
-						</li>
-						<li>
-							<a
-								href="#"
-								className="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white"
-							>
-								Sign out
-							</a>
-						</li>
-					</ul>
-				</div>
-			)}
-
 			{props.state.profile.role === "super admin" ? (
-				<aside
-					id="logo-sidebar"
-					className="fixed top-0 left-0 z-50 w-64 h-screen pt-10 max-[640px]:hidden bg-slate-200  border-r border-gray-200  dark:bg-gray-800 dark:border-gray-700"
-					aria-label="Sidebar"
+				<div
+					className={`min-[640px]:hidden top-0 left-0 w-full bg-white pt-10 pl-10  fixed h-full z-40  ease-in-out duration-300 ${
+						showSidebar ? "translate-x-0" : "-translate-x-full"
+					}`}
 				>
-					<a href="https://flowbite.com" className="flex  w-full md:mr-24">
-						<span className=" font-mandalaFont mx-auto text-3xl w-full text-center  font-semibold sm:text-2xl whitespace-nowrap text-[#0095DA] dark:text-white">
-							tokonglomerat
-						</span>
-					</a>
-					<div className="h-full pt-10 px-3 pb-4 overflow-y-auto dark:bg-gray-800">
-						<div className="w-full flex-row items-center ">
-							<h1 className="pt-6 text-md text-center mb-6">
-								Hi {props.state.profile ? props.state.profile.name : null}
-							</h1>
-						</div>
+					<div className=" w-full flex justify-end pr-10">
+						<button onClick={() => setShowSidebar(!showSidebar)}>X</button>
+					</div>
+					<div>
 						<ul className="space-y-2">
 							<li>
 								<a
-									href="#"
+									href="/admin/overview"
 									className="flex items-center p-2 text-base font-normal text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700"
 								>
 									<svg
@@ -390,28 +246,21 @@ export default function Dashboard(props) {
 							</li>
 						</ul>
 					</div>
-				</aside>
+				</div>
 			) : (
-				<aside
-					id="logo-sidebar"
-					className="fixed top-0 left-0 z-50 w-64 h-screen pt-10 max-[640px]:hidden bg-slate-200  border-r border-gray-200  dark:bg-gray-800 dark:border-gray-700"
-					aria-label="Sidebar"
+				<div
+					className={`min-[640px]:hidden top-0 left-0 w-full bg-white pt-10 pl-10  fixed h-full z-40  ease-in-out duration-300 ${
+						showSidebar ? "translate-x-0" : "-translate-x-full"
+					}`}
 				>
-					<a href="https://flowbite.com" className="flex  w-full md:mr-24">
-						<span className=" font-mandalaFont mx-auto text-4xl w-full text-center  font-semibold sm:text-2xl whitespace-nowrap text-blue-700 dark:text-white">
-							Tokonglomerat
-						</span>
-					</a>
-					<div className="h-full pt-10 px-3 pb-4 overflow-y-auto dark:bg-gray-800">
-						<div className="w-full flex-row items-center ">
-							<h1 className="pt-6 text-center text-md mb-6">
-								Hi {props.state.profile ? props.state.profile.name : null}
-							</h1>
-						</div>
+					<div className=" w-full flex justify-end pr-10">
+						<button onClick={() => setShowSidebar(!showSidebar)}>X</button>
+					</div>
+					<div>
 						<ul className="space-y-2">
 							<li>
 								<a
-									href="#"
+									href="/admin/overview"
 									className="flex items-center p-2 text-base font-normal text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700"
 								>
 									<svg
@@ -564,6 +413,202 @@ export default function Dashboard(props) {
 												clip-rule="evenodd"
 											></path>
 										</svg>
+										<span class="flex-1 ml-3 whitespace-nowrap">Sign Out</span>
+									</a>
+								</button>
+							</li>
+						</ul>
+					</div>
+				</div>
+			)}
+
+			{props.state.profile.role === "super admin" ? (
+				<aside
+					id="logo-sidebar"
+					className="fixed top-0 left-0 z-50 w-64 h-screen pt-10 max-[640px]:hidden bg-[#0095DA] text-white  border-r border-gray-200  dark:bg-gray-800 dark:border-gray-700"
+					aria-label="Sidebar"
+				>
+					<a href="/home" className="flex  w-full md:mr-24">
+						<span className=" font-mandalaFont mx-auto text-3xl w-full text-center font-extrabold  sm:text-2xl whitespace-nowrap ] dark:text-white">
+							tokonglomerat
+						</span>
+					</a>
+					<div className="h-full pt-10 px-3 pb-4 overflow-y-auto dark:bg-gray-800">
+						<div className="w-full flex-row items-center ">
+							<h1 className="pt-6 text-md text-center mb-6">
+								Hi {props.state.profile ? props.state.profile.name : null}
+							</h1>
+						</div>
+						<ul className="space-y-2">
+							<li>
+								<a
+									href="/admin/overview"
+									className="flex items-center p-2 text-base font-normal hover:text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700"
+								>
+									<BsPieChart />
+									<span className="ml-3">Overview</span>
+								</a>
+							</li>
+							<li>
+								<a
+									href="/admin/branch-admin-register"
+									className="flex items-center p-2 text-base font-normal hover:text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700"
+								>
+									<BsPeople />
+									<span className="flex-1 ml-3 whitespace-nowrap">
+										Branch Admin Register
+									</span>
+								</a>
+							</li>
+							<li>
+								<a
+									href="/admin/transaction"
+									className="flex items-center p-2 text-base font-normal hover:text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700"
+								>
+									<BsCart />
+									<span className="flex-1 ml-3 whitespace-nowrap">
+										Transaction
+									</span>
+								</a>
+							</li>
+							<li>
+								<a
+									href="/admin/sales-report"
+									className="flex items-center p-2 text-base font-normal hover:text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700"
+								>
+									<TbReportMoney />
+									<span className="flex-1 ml-3 whitespace-nowrap">
+										Sales Report
+									</span>
+								</a>
+							</li>
+
+							<li>
+								<a
+									href="/admin/discount-management"
+									className="flex items-center p-2 text-base font-normal hover:text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700"
+								>
+									<TbDiscount />
+									<span className="flex-1 ml-3 whitespace-nowrap">
+										Discount Management
+									</span>
+								</a>
+							</li>
+							<li>
+								<a
+									href="/admin/stock-history"
+									className="flex items-center p-2 text-base font-normal hover:text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700"
+								>
+									<BsClipboardCheck />
+									<span className="flex-1 ml-3 whitespace-nowrap">
+										Stock History
+									</span>
+								</a>
+							</li>
+							<li>
+								<button onClick={() => props.Func.onLogout()}>
+									<a
+										href="/loginAdmin"
+										class="flex items-center p-2 text-base font-normal hover:text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700"
+									>
+										<VscSignOut />
+										<span class="flex-1 ml-3 whitespace-nowrap">Sign Out</span>
+									</a>
+								</button>
+							</li>
+						</ul>
+					</div>
+				</aside>
+			) : (
+				<aside
+					id="logo-sidebar"
+					className="fixed top-0 left-0 z-50 w-64 h-screen pt-10 max-[640px]:hidden border-r bg-[#0095DA] text-white  border-gray-200  dark:bg-gray-800 dark:border-gray-700"
+					aria-label="Sidebar"
+				>
+					<a href="/home" className="flex  w-full md:mr-24">
+						<span className=" font-mandalaFont mx-auto text-4xl w-full text-center font-extrabold  sm:text-2xl whitespace-nowrap  dark:text-white">
+							tokonglomerat
+						</span>
+					</a>
+					<div className="h-full pt-10 px-3 pb-4 overflow-y-auto dark:bg-gray-800">
+						<div className="w-full flex-row items-center ">
+							<h1 className="pt-6 text-center text-md mb-6">
+								Hi {props.state.profile ? props.state.profile.name : null}
+							</h1>
+						</div>
+						<ul className="space-y-2">
+							<li>
+								<a
+									href="/admin/overview"
+									className="flex items-center p-2 text-base font-normal hover:text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700"
+								>
+									<BsPieChart />
+									<span className="ml-3">Overview</span>
+								</a>
+							</li>
+							<li>
+								<a
+									href="/admin/admin-product"
+									className="flex items-center p-2 text-base font-normal hover:text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700"
+								>
+									<BsHandbag />
+									<span className="flex-1 ml-3 whitespace-nowrap">
+										Product Management
+									</span>
+								</a>
+							</li>
+							<li>
+								<a
+									href="/admin/transaction"
+									className="flex items-center p-2 text-base font-normal hover:text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700"
+								>
+									<BsCart />
+									<span className="flex-1 ml-3 whitespace-nowrap">
+										Transaction
+									</span>
+								</a>
+							</li>
+							<li>
+								<a
+									href="/admin/sales-report"
+									className="flex items-center p-2 text-base font-normal hover:text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700"
+								>
+									<TbReportMoney />
+									<span className="flex-1 ml-3 whitespace-nowrap">
+										Sales Report
+									</span>
+								</a>
+							</li>
+
+							<li>
+								<a
+									href="/admin/discount-management"
+									className="flex items-center p-2 text-base font-normal hover:text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700"
+								>
+									<TbDiscount />
+									<span className="flex-1 ml-3 whitespace-nowrap">
+										Discount Management
+									</span>
+								</a>
+							</li>
+							<li>
+								<a
+									href="/admin/stock-history"
+									className="flex items-center p-2 text-base font-normal hover:text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700"
+								>
+									<BsClipboardCheck />
+									<span className="flex-1 ml-3 whitespace-nowrap">
+										Stock History
+									</span>
+								</a>
+							</li>
+							<li>
+								<button onClick={() => props.Func.onLogout()}>
+									<a
+										href="/loginAdmin"
+										class="flex items-center p-2 text-base font-normal hover:text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700"
+									>
+										<VscSignOut />
 										<span class="flex-1 ml-3 whitespace-nowrap">Sign Out</span>
 									</a>
 								</button>
