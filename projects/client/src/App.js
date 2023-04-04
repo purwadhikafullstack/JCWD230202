@@ -27,10 +27,14 @@ import StockHistoryDetail from "./components/stockHistoryDetail";
 import PaymentProof from "./pages/paymentProof";
 import TransactionAdmin from "./components/transaction";
 import Overview from "./components/overview";
+import ProfileSideBar from "./components/profileSideBar";
+import SuperAdminDiscountManagement from "./pages/superAdminDiscountManagement";
+
 
 function App() {
 	const navigate = useNavigate();
 	const [disable, setdisable] = useState();
+	const [selected, setselected] = useState();
 	const [profile, setprofile] = useState({
 		id: null,
 		name: null,
@@ -144,14 +148,32 @@ function App() {
 				>
 					<Route path="home" element={<LandingPage />} />
 					<Route
-						path="profile"
+						path="user"
 						element={
-							<Profile func={{ getProfile }} state={{ profile, setprofile }} />
+							<ProfileSideBar
+								state={{ profile, selected, setselected }}
+								func={{ getProfile }}
+							/>
 						}
-					/>
+					>
+						<Route
+							path="profile"
+							element={
+								<Profile
+									func={{ getProfile }}
+									state={{ profile, setprofile, setselected }}
+								/>
+							}
+						/>
+						<Route
+							path="transaction"
+							element={<Transaction state={{ setselected }} />}
+						/>
+					</Route>
 					<Route path="category/:product" element={<ProductCategory />} />
 					<Route path="cart" element={<Cart state={{ profile }} />} />
-					<Route path="transaction" element={<Transaction />} />
+					<Route path="uploadpayment" element={<PaymentProof />} />
+
 				</Route>
 				<Route path="checkout" element={<Checkout state={{ profile }} />} />
 				<Route
@@ -162,7 +184,6 @@ function App() {
 				<Route path="/register" element={<Register />} />
 				<Route path="/activation/:uid" element={<Activation />} />
 				<Route path="/forgotpassword" element={<ForgotPass />} />
-				<Route path="/uploadpayment" element={<PaymentProof />} />
 				{/* Admin */}
 				<Route
 					path="/admin"
@@ -185,7 +206,20 @@ function App() {
 						path="product-management"
 						element={<BranchAdminProductList />}
 					/>
-					<Route path="discount-management" element={<DiscountManagement />} />
+
+					<Route
+						path="discount-management"
+						element={
+							profile ? (
+								profile.role === "Branch Admin" ? (
+									<DiscountManagement />
+								) : profile.role === "Super Admin" ? (
+									<SuperAdminDiscountManagement />
+								) : null
+							) : null
+						}
+					/>
+
 					<Route path="transaction" element={<TransactionAdmin />} />
 				</Route>
 				<Route

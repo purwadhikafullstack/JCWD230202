@@ -5,12 +5,16 @@ import { useEffect, useState } from "react";
 import REST_API from "../support/services/RESTApiService";
 import { toast, Toaster } from "react-hot-toast";
 import { useNavigate } from "react-router-dom";
+import keranjang_empty from "../support/assets/KeranjangKosong.jpg";
+import FooterBar from "../components/footer";
+import LoadingSpin from "react-loading-spin";
 
 export default function Cart(props) {
 	const [data, setdata] = useState([]);
 	const [sum, setsum] = useState(0);
 	const [disc, setdisc] = useState(0);
 	const [disable, setdisable] = useState(false);
+	const [disableCheckout, setdisableCheckout] = useState();
 	const Navigate = useNavigate();
 
 	let onGetCart = async () => {
@@ -85,6 +89,24 @@ export default function Cart(props) {
 			}, 1500);
 		}
 	};
+
+	let checkStatus = async () => {
+		try {
+			setdisableCheckout(true);
+			if (props.state.profile.status === "Verified") {
+				toast.success("Redirect To Checkout page...");
+				setTimeout(() => {
+					Navigate("/checkout");
+				}, 1500);
+			} else {
+				toast.error("Please Check Your Email and Activate Your Account");
+			}
+		} catch (error) {
+			console.log(error);
+		} finally {
+			setdisableCheckout(false);
+		}
+	};
 	useEffect(() => {
 		onGetCart();
 	}, []);
@@ -127,6 +149,7 @@ export default function Cart(props) {
 																<p className=" flex gap-1 pl-[15px] font-tokpedFont text-[12px]">
 																	per{" "}
 																	<p className=" font-semibold">
+																		{value.product.unit.price_at}{" "}
 																		{value.product.unit.name}
 																	</p>
 																</p>
@@ -206,7 +229,6 @@ export default function Cart(props) {
 									<p className=" text-[14px] ">
 										Total price ({data ? data.length : null} Products)
 									</p>
-									<p className=" mt-2 text-[14px] ">Discount Product </p>
 								</div>
 								<div>
 									<p className=" flex gap-1 text-[14px]">
@@ -237,9 +259,28 @@ export default function Cart(props) {
 												toast.error("Please Verify Your Account First");
 										  }
 								}
+								// =======
+								// 									<p className=" flex gap-1 text-[14px]">Rp. {sum.toLocaleString()} </p>
+								// 								</div>
+								// 							</div>
+								// 							<div className=" border-t flex justify-between h-[37px] items-end ">
+								// 								<p className=" font-semibold text-[16px] ">Total Price</p>
+								// 								<p className=" font-semibold text-[16px] ">Rp. {sum.toLocaleString()} </p>
+								// 							</div>
+								// 							<button
+								// 								onClick={() => checkStatus()}
+								// >>>>>>> 84c94ffe68a1deb3af9624e949729136e4517b1f
 								className=" mt-6 h-12 w-full text-white bg-[#0095DA] rounded-lg "
 							>
-								Checkout
+								{disableCheckout ? (
+									<LoadingSpin
+										size={"30px"}
+										primaryColor={"#38ADE3"}
+										secondaryColor={"gray"}
+									/>
+								) : (
+									"Checkout"
+								)}
 							</button>
 						</div>
 					) : null}
@@ -248,7 +289,7 @@ export default function Cart(props) {
 							<img
 								alt="Keranjang Kosong"
 								className=" h-[141px] w-[200px]"
-								src="https://assets.tokopedia.net/assets-tokopedia-lite/v2/zeus/kratos/60adc47d.jpg"
+								src={keranjang_empty}
 							/>
 							<h1 className=" font-tokpedFont font-semibold text-[24px] mt-5  ">
 								Wow, your shopping cart is empty
@@ -267,6 +308,7 @@ export default function Cart(props) {
 				</div>
 				<Toaster />
 			</div>
+			<FooterBar />
 		</div>
 	);
 }

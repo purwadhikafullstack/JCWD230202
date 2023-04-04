@@ -48,6 +48,16 @@ Router.get(
 	tokenVerify,
 	productController.getCategoryEdit
 );
+Router.patch(
+	"/approve-discount",
+	tokenVerify,
+	discountController.approveDiscount
+);
+Router.patch(
+	"/decline-discount",
+	tokenVerify,
+	discountController.declineDiscount
+);
 Router.post("/create-discount", tokenVerify, discountController.createDiscount);
 Router.get("/discount-list", tokenVerify, discountController.discountList);
 Router.get(
@@ -82,11 +92,20 @@ Router.delete(
 	productController.deleteCategory
 );
 Router.get("/get-product-edit", tokenVerify, adminController.getProductEdit);
-Router.patch("/edit-product", tokenVerify, productController.editProduct);
+
+// Router.patch("/edit-product", tokenVerify, productController.editProduct);
 Router.get(
 	"/get-transaction-month",
 	tokenVerify,
 	adminController.getTransactionPerMonth
 );
+
+Router.patch(
+	"/edit-product",
+	tokenVerify,
+	upload,
+	productController.editProduct
+);
+Router.get("/unit", productController.getUnit);
 
 module.exports = Router;
