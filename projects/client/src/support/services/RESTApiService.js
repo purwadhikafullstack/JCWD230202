@@ -1,7 +1,7 @@
 import axios from "axios";
 
 const REST_API = axios.create({
-	baseURL: "https://jcwd230202.purwadhikabootcamp.com/api",
+	baseURL: "https://jcwd230202.purwadhikabootcamp.com",
 	headers: { token: localStorage.getItem("token") },
 });
 export default REST_API;
