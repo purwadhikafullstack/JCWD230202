@@ -113,7 +113,9 @@ export default function Cart(props) {
 	return (
 		<div className=" mb-24">
 			<div className=" pt-[64px] max-w-[1120px] mx-auto ">
-				<div className=" pl-5 flex items-end h-[66px] border-b-4 font-bold ">Cart</div>
+				<div className=" pl-5 flex items-end h-[66px] border-b-4 font-bold ">
+					Cart
+				</div>
 
 				<div className="flex px-5">
 					{data.length > 0 ? (
@@ -147,7 +149,8 @@ export default function Cart(props) {
 																<p className=" flex gap-1 pl-[15px] font-tokpedFont text-[12px]">
 																	per{" "}
 																	<p className=" font-semibold">
-																		{value.product.unit.price_at} {value.product.unit.name}
+																		{value.product.unit.price_at}{" "}
+																		{value.product.unit.name}
 																	</p>
 																</p>
 																<p className=" pl-[15px] font-semibold font-tokpedFont text-[14px]">
@@ -175,7 +178,9 @@ export default function Cart(props) {
 															<div className=" flex items-center pt-4 gap-1">
 																<button
 																	className=" disabled:text-slate-500 enabled:text-green-500"
-																	disabled={disable || value.qty <= 1 ? true : false}
+																	disabled={
+																		disable || value.qty <= 1 ? true : false
+																	}
 																	onClick={() =>
 																		setTimeout(() => {
 																			updateQuantity(value.id, "-", value.qty);
@@ -191,7 +196,9 @@ export default function Cart(props) {
 																<button
 																	className=" disabled:text-slate-500 enabled:text-green-500"
 																	disabled={
-																		disable || value.qty >= value.product.branch_products[0].stock
+																		disable ||
+																		value.qty >=
+																			value.product.branch_products[0].stock
 																			? true
 																			: false
 																	}
@@ -224,19 +231,53 @@ export default function Cart(props) {
 									</p>
 								</div>
 								<div>
-									<p className=" flex gap-1 text-[14px]">Rp. {sum.toLocaleString()} </p>
+									<p className=" flex gap-1 text-[14px]">
+										Rp. {sum.toLocaleString()}{" "}
+									</p>
+									<p className=" mt-2 text-[14px]">
+										Rp. {disc.toLocaleString()}
+									</p>
 								</div>
 							</div>
 							<div className=" border-t flex justify-between h-[37px] items-end ">
-								<p className=" font-semibold text-[16px] ">Total Price</p>
-								<p className=" font-semibold text-[16px] ">Rp. {sum.toLocaleString()} </p>
+								<p className=" font-semibold text-[16px] ">Total Bill</p>
+								<p className=" font-semibold text-[16px] ">
+									Rp. {(sum - disc).toLocaleString()}{" "}
+								</p>
 							</div>
+							<p className=" mt-4 text-slate-500 text-[11px]">
+								Dengan mengaktifkan asuransi, Saya menyetujui{" "}
+								<p className=" text-red-700">
+									syarat dan ketentuan yang berlaku.
+								</p>
+							</p>
 							<button
-								onClick={() => checkStatus()}
+								onClick={
+									props.state.profile.status === "verified"
+										? () => Navigate("/checkout")
+										: () => {
+												toast.error("Please Verify Your Account First");
+										  }
+								}
+								// =======
+								// 									<p className=" flex gap-1 text-[14px]">Rp. {sum.toLocaleString()} </p>
+								// 								</div>
+								// 							</div>
+								// 							<div className=" border-t flex justify-between h-[37px] items-end ">
+								// 								<p className=" font-semibold text-[16px] ">Total Price</p>
+								// 								<p className=" font-semibold text-[16px] ">Rp. {sum.toLocaleString()} </p>
+								// 							</div>
+								// 							<button
+								// 								onClick={() => checkStatus()}
+								// >>>>>>> 84c94ffe68a1deb3af9624e949729136e4517b1f
 								className=" mt-6 h-12 w-full text-white bg-[#0095DA] rounded-lg "
 							>
 								{disableCheckout ? (
-									<LoadingSpin size={"30px"} primaryColor={"#38ADE3"} secondaryColor={"gray"} />
+									<LoadingSpin
+										size={"30px"}
+										primaryColor={"#38ADE3"}
+										secondaryColor={"gray"}
+									/>
 								) : (
 									"Checkout"
 								)}
@@ -245,7 +286,11 @@ export default function Cart(props) {
 					) : null}
 					{data.length > 0 ? null : (
 						<div className="mt-[71px] h-fit flex flex-col justify-center items-center w-full">
-							<img alt="Keranjang Kosong" className=" h-[141px] w-[200px]" src={keranjang_empty} />
+							<img
+								alt="Keranjang Kosong"
+								className=" h-[141px] w-[200px]"
+								src={keranjang_empty}
+							/>
 							<h1 className=" font-tokpedFont font-semibold text-[24px] mt-5  ">
 								Wow, your shopping cart is empty
 							</h1>

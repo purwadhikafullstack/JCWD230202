@@ -23,7 +23,9 @@ module.exports = {
 				img,
 				user_addresses,
 				role,
-				status
+				status,
+
+
 			} = await db.user.findOne({
 				where: { uid },
 				include: { model: db.user_address },

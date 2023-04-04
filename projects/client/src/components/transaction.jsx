@@ -2,6 +2,8 @@ import { Card, Modal, Table } from "flowbite-react";
 import { TabList, TabPanel, TabPanels, Tabs, Tab, Avatar } from "@chakra-ui/react";
 import { useState } from "react";
 import PaymentProof from "../support/assets/buktitf.png";
+import swal from "sweetalert";
+
 
 export default function TransactionAdmin() {
 	const [show, setShow] = useState(false);
@@ -9,7 +11,9 @@ export default function TransactionAdmin() {
 		<div className=" py-10 h-fit px-8 mr-8">
 			<div>
 				<div className="mb-4 flex items-center justify-between">
-					<h5 className="text-xl font-semibold font-tokpedFont">Transaction List</h5>
+					<h5 className="text-xl font-semibold font-tokpedFont">
+						Transaction List
+					</h5>
 				</div>
 				<Tabs>
 					<TabList
@@ -24,6 +28,7 @@ export default function TransactionAdmin() {
 					</TabList>
 					<TabPanels>
 						<TabPanel>
+
 							{/* WAITING TAB START HERE */}
 							<Tabs>
 								<TabList fontWeight="semibold" color={"#38ADE3"} gap={5}>
@@ -146,6 +151,7 @@ export default function TransactionAdmin() {
 													</div>
 												</div>
 											</Card>
+
 										</div>
 									</TabPanel>
 									{/* WAITING PAYMENT END HERE */}
@@ -268,6 +274,7 @@ export default function TransactionAdmin() {
 							{/* WAITING TAB END HERE */}
 						</TabPanel>
 						<TabPanel>
+
 							{/* PROCESS TAB START HERE */}
 							<Tabs>
 								<TabList fontWeight="semibold" color={"#38ADE3"} gap={5}>
@@ -395,6 +402,7 @@ export default function TransactionAdmin() {
 													</div>
 												</div>
 											</Card>
+
 										</div>
 									</TabPanel>
 									{/* PACKING ORDER END HERE */}
@@ -509,6 +517,7 @@ export default function TransactionAdmin() {
 							{/* PROCESS TAB END HERE */}
 						</TabPanel>
 						<TabPanel>
+
 							{/* DONE TAB START HERE */}
 							<Tabs>
 								<TabList fontWeight="semibold" color={"#38ADE3"} gap={5}>
@@ -743,12 +752,19 @@ export default function TransactionAdmin() {
 								</TabPanels>
 							</Tabs>
 							{/* DONE TAB END HERE */}
+
 						</TabPanel>
 					</TabPanels>
 				</Tabs>
-				<Modal show={show} size="md" popup={true} onClose={() => setShow(false)}>
+				<Modal
+					show={show}
+					size="md"
+					popup={true}
+					onClose={() => setShow(false)}
+				>
+					<Modal.Header />
 					<div className=" flex justify-center items-center p-5">
-						<img alt="Payment Proof" src={PaymentProof} />
+						<img className="h-[600px]" alt="Payment Proof" src={PaymentProof} />
 					</div>
 					<div className=" flex justify-center pb-5 gap-4">
 						<button

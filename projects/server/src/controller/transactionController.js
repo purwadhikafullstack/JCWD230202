@@ -75,6 +75,18 @@ module.exports = {
 			const result = await db.transaction.findAll({
 				where: { invoice },
 			});
+
+			await db.transaction.update(
+				{
+					status: "Canceled",
+				},
+				{
+					where: {
+						invoice,
+					},
+				}
+			);
+
 			result.map(async (value) => {
 				const t = await sequelize.transaction();
 				try {
@@ -155,6 +167,35 @@ module.exports = {
 				.send();
 		}
 	},
+
+	sent: async (req, res) => {
+		const { uid } = req.uid;
+		const { invoice } = req.body;
+		const t = await sequelize.transaction();
+		try {
+			const { id } = await db.user.findOne({ where: { uid } });
+
+			await db.transaction_history.create(
+				{ status: "sent", invoice },
+				{ transaction: t }
+			);
+			await db.transaction.update(
+				{ status: "sent" },
+				{ where: { invoice } },
+				{ transaction: t }
+			);
+			t.commit();
+			const httpStatus = new HTTPStatus(res)
+				.success("Status changed to received")
+				.send();
+		} catch (error) {
+			t.rollback();
+			const httpStatus = new HTTPStatus(res, error)
+				.error(error.message, 400)
+				.send();
+		}
+	},
+
 	addTransaction: async (req, res) => {
 		const { uid } = req.uid;
 		const {

@@ -29,7 +29,6 @@ module.exports = (sequelize, DataTypes) => {
 			},
 			payment_proof: DataTypes.STRING,
 			invoice: DataTypes.STRING,
-			expired: DataTypes.DATE
 		},
 		{
 			sequelize,
