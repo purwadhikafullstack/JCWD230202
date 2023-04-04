@@ -5,6 +5,80 @@ const { sequelize } = require("../sequelize/models");
 const moment = require("moment");
 
 module.exports = {
+	tryEventScheduler: async (req, res) => {
+		const { uid } = req.uid;
+		let query = "";
+		try {
+			const transaction = await db.transaction.bulkCreate([
+				{
+					product_name: "Pakcoy",
+					qty: 200,
+					total_price: 8000,
+					shipping_cost: 1000,
+					user_address: "Jl. Jalan",
+					courier: "JNE",
+					invoice: `INV/${uid.slice(-12)}/${Date.now()}`,
+					status: "Waiting Payment",
+					branch_id: 1,
+					user_id: 21,
+					product_id: 1,
+				},
+				{
+					product_name: "Labu Siam Besar",
+					qty: 300,
+					total_price: 13500,
+					shipping_cost: 1000,
+					user_address: "Jl. Jalan",
+					courier: "JNE",
+					invoice: `INV/${uid.slice(-12)}/${Date.now()}`,
+					status: "Waiting Payment",
+					branch_id: 1,
+					user_id: 21,
+					product_id: 1,
+				},
+			]);
+
+			transaction.forEach(async (element) => {
+				const { stock } = await db.branch_product.findOne({
+					where: {
+						[Op.and]: [
+							{ branch_id: element.branch_id },
+							{ product_id: element.product_id },
+						],
+					},
+				});
+				console.log(stock);
+
+				// query.push("12");
+				query += "test";
+				console.log(query);
+
+				// query += `INSERT INTO toko.stock_history(stock,createdAt,branch_id,product_id) VALUES(${
+				// 	element.invoice
+				// },NOW(),${element.branch_id},${element.product_id});
+				// 	UPDATE toko.branch_product SET stock = ${
+				// 		stock + element.qty
+				// 	} WHERE branch_id = ${element.branch_id} AND product_id = ${
+				// 	element.product_id
+				// };`;
+			});
+
+			// sequelize.query(`DELIMITER |
+			// CREATE EVENT ${transaction[0].invoice}
+			// 	ON SCHEDULE AT ${transaction[0].createdAt} + INTERVAL 1 MINUTE
+			// 	DO
+			// BEGIN
+			// 	UPDATE toko.transaction SET status = "Expired" WHERE invoice = ${transaction[0].invoice};
+			// 	INSERT INTO toko.transaction_history(status,invoice,createdAt) VALUES("Expired",${transaction[0].invoice},NOW());
+			// 	${query}
+			// END |
+			// DELIMITER ;`);
+			res.status(200).send("test");
+			// new HTTPStatus(res, query).success("Event Created").send();
+		} catch (error) {
+			new HTTPStatus(res, error).error(error.message).send();
+		}
+	},
 	getTransaction: async (req, res) => {
 		const { uid } = req.uid;
 		const { status } = req.query;

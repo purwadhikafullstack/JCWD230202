@@ -13,7 +13,9 @@ const user = async () => {
 			email: "aswin05.aw@gmail.com",
 			password: await hashPassword(pass_1),
 			phone_number: "087805667895",
-			role: "super admin",
+			gender: "Male",
+			birthdate: "1999-01-01",
+			role: "Super Admin",
 			status: "Verified",
 		},
 		{
@@ -21,7 +23,9 @@ const user = async () => {
 			email: "ashfimzk@gmail.com",
 			password: await hashPassword(pass_2),
 			phone_number: "085156004326",
-			role: "super admin",
+			gender: "Male",
+			birthdate: "1999-01-01",
+			role: "Branch Admin",
 			status: "Verified",
 		},
 		{
@@ -29,7 +33,29 @@ const user = async () => {
 			email: "veanusnathan.work@gmail.com",
 			password: await hashPassword(pass_3),
 			phone_number: "082246704951",
-			role: "super admin",
+			gender: "Male",
+			birthdate: "1999-01-01",
+			role: "Branch Admin",
+			status: "Verified",
+		},
+		{
+			name: "nathan1",
+			email: "vn6299@gmail.com",
+			password: await hashPassword(pass_3),
+			phone_number: "082246704951",
+			gender: "Male",
+			birthdate: "1999-01-01",
+			role: "user",
+			status: "Verified",
+		},
+		{
+			name: "nathan2",
+			email: "veanusnathan68@gmail.com",
+			password: await hashPassword(pass_3),
+			phone_number: "082246704951",
+			gender: "Male",
+			birthdate: "1999-01-01",
+			role: "user",
 			status: "Verified",
 		},
 	]);
@@ -122,11 +148,11 @@ const category = async () => {
 
 const unit = async () => {
 	await db.unit.bulkCreate([
-		{ name: "Kg" },
-		{ name: "Gram" },
-		{ name: "Dozen" },
-		{ name: "Liter" },
-		{ name: "Pcs" },
+		{ name: "Kg", price_at: 1 },
+		{ name: "Gram", price_at: 100 },
+		{ name: "Dozen", price_at: 1 },
+		{ name: "Liter", price_at: 1 },
+		{ name: "Pcs", price_at: 1 },
 	]);
 };
 
@@ -156,7 +182,8 @@ const branch = async () => {
 	);
 	await db.branch.create({
 		location: "Bandung",
-		address: "Jl. Braga No.99-101, Braga, Kec. Sumur Bandung, Kota Bandung, Jawa Barat",
+		address:
+			"Jl. Braga No.99-101, Braga, Kec. Sumur Bandung, Kota Bandung, Jawa Barat",
 		lat: branch2.data.results[0].geometry.lat,
 		lng: branch2.data.results[0].geometry.lng,
 		city_code: "23.Bandung",
@@ -179,7 +206,8 @@ const branch = async () => {
 	);
 	await db.branch.create({
 		location: "Semarang",
-		address: "Jl. Pemuda No.118, Sekayu, Kec. Semarang Tengah, Kota Semarang, Jawa Tengah",
+		address:
+			"Jl. Pemuda No.118, Sekayu, Kec. Semarang Tengah, Kota Semarang, Jawa Tengah",
 		lat: branch4.data.results[0].geometry.lat,
 		lng: branch4.data.results[0].geometry.lng,
 		city_code: "399.Semarang",
@@ -202,7 +230,8 @@ const branch = async () => {
 	);
 	await db.branch.create({
 		location: "Sulawesi",
-		address: "Jl. Metro Tj. Bunga No.2, Panambungan, Kec. Mariso, Kota Makassar, Sulawesi Selatan",
+		address:
+			"Jl. Metro Tj. Bunga No.2, Panambungan, Kec. Mariso, Kota Makassar, Sulawesi Selatan",
 		lat: branch6.data.results[0].geometry.lat,
 		lng: branch6.data.results[0].geometry.lng,
 		city_code: "254.Makassar",

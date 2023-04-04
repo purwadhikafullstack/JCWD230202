@@ -3,8 +3,8 @@ import { AiFillEye, AiFillEyeInvisible } from "react-icons/ai";
 import Tokonglomerat from "../support/assets/new_login.png";
 import { toast, Toaster } from "react-hot-toast";
 import LoadingSpin from "react-loading-spin";
-// import { useNavigate } from "react-router-dom";
-// import axios from "axios";
+import { useNavigate } from "react-router-dom";
+import axios from "axios";
 
 function LoginAdmin(props) {
 	const [showPassword, setshowPassword] = useState(false);
@@ -15,30 +15,30 @@ function LoginAdmin(props) {
 	const email = useRef();
 	const password = useRef();
 
-	// const Navigate = useNavigate();
+	const Navigate = useNavigate();
 
-	// let onLogin = async () => {
-	// 	try {
-	// 		setdisable(true);
+	let onLogin = async () => {
+		try {
+			setdisable(true);
 
-	// 		let { data } = await axios.post("http://localhost:8000/admin/login", {
-	// 			email: email.current.value,
-	// 			password: password.current.value,
-	// 		});
+			let { data } = await axios.post("http://localhost:8000/admin/login", {
+				email: email.current.value,
+				password: password.current.value,
+			});
 
-	// 		localStorage.setItem("token", `${data.data.token}`);
-	// 		toast.success(data.message);
-	// 		email.current.value = "";
-	// 		password.current.value = "";
-	// 		setTimeout(() => {
-	// 			Navigate("/admin");
-	// 		}, 1000);
-	// 	} catch (error) {
-	// 		toast.error(error.response.data.message);
-	// 	} finally {
-	// 		setdisable(false);
-	// 	}
-	// };
+			localStorage.setItem("token", `${data.data.token}`);
+			toast.success(data.message);
+			email.current.value = "";
+			password.current.value = "";
+			setTimeout(() => {
+				Navigate("/admin");
+			}, 1000);
+		} catch (error) {
+			toast.error(error.response.data.message);
+		} finally {
+			setdisable(false);
+		}
+	};
 
 	let onValidateEmail = (value) => {
 		if (value === "") {
