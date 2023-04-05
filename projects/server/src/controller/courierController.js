@@ -6,7 +6,7 @@ module.exports = {
 	getJNE: async (req, res) => {
 		let { origin, destination, weight } = req.body;
 		let { uid } = req.uid;
-		let key = "fea367e998c52f08d1281e2cd99f145e";
+		let key = "537ce8cebdded54aa4c17d563f8a5ea2";
 		try {
 			if (destination === 0) {
 				let { user_addresses } = await db.user.findOne({
@@ -47,7 +47,7 @@ module.exports = {
 	getPOS: async (req, res) => {
 		let { origin, destination, weight } = req.body;
 		const { uid } = req.uid;
-		let key = "fea367e998c52f08d1281e2cd99f145e";
+		let key = "537ce8cebdded54aa4c17d563f8a5ea2";
 		try {
 			if (destination === 0) {
 				let { user_addresses } = await db.user.findOne({
@@ -88,7 +88,7 @@ module.exports = {
 	getTIKI: async (req, res) => {
 		let { origin, destination, weight } = req.body;
 		const { uid } = req.uid;
-		let key = "fea367e998c52f08d1281e2cd99f145e";
+		let key = "537ce8cebdded54aa4c17d563f8a5ea2";
 		try {
 			if (destination === 0) {
 				let { user_addresses } = await db.user.findOne({

@@ -1,5 +1,6 @@
 const db = require("../sequelize/models");
 const { Op } = require("sequelize");
+const { sequelize } = require("../sequelize/models");
 
 module.exports = {
 	addToCart: async (req, res) => {
@@ -8,9 +9,9 @@ module.exports = {
 		try {
 			const { id } = await db.user.findOne({ where: { uid } });
 
-			const findCart = await db.cart.findAll({ where: {user_id : id}})
+			const findCart = await db.cart.findAll({ where: { user_id: id } });
 
-			if(findCart.length > 0){
+			if (findCart.length > 0) {
 				const findBranch = await db.cart.findAll({
 					where: { user_id: id },
 				});
@@ -20,10 +21,9 @@ module.exports = {
 						message: "Cannot Add Product With Diffrent Branch, Please Remove Product in Cart",
 					};
 				}
-			}else{
+			} else {
 				var data = await db.cart.create({ qty, branch_id, user_id: id, product_id });
 			}
-
 
 			const branch_product = await db.branch_product.findOne({
 				where: {
@@ -87,7 +87,7 @@ module.exports = {
 			const cart = await db.cart.findAll({
 				where: { user_id: id },
 			});
-
+		
 			if (cart.length === 0) {
 				return res.status(201).send({
 					isError: false,
@@ -97,23 +97,44 @@ module.exports = {
 			}
 
 			const data = await db.cart.findAll({
+				attributes: [
+					"id",
+					"product_id",
+					"branch_id",
+					"qty",
+					[sequelize.literal("price * qty"), "total_price"],
+				],
 				where: { user_id: id },
 				include: [
 					{
 						model: db.product,
+						attributes: ["name", "img", "price"],
 						include: [
-							{ model: db.branch_product, where: { branch_id: cart[0].branch_id } },
-							{ model: db.unit },
+							{
+								model: db.branch_product,
+								attributes: ["stock"],
+								where: { branch_id: cart[0].branch_id },
+							},
+							{ model: db.unit, attributes: ["name", "price_at"] },
+							{
+								model: db.discount_history,
+								attributes: ["min_purchase", "percent", "discount_id", "branch_id","id"],
+								where: {[Op.and]: [{
+									branch_id: cart[0].branch_id
+								},{status : "Active"}]},
+								required : false,
+								include: [{model: db.discount}]
+							},
 						],
 					},
-					{ model: db.branch },
+					{ model: db.branch, attributes: ["location","city_code"] },
 				],
 			});
 
 			res.status(201).send({
 				isError: false,
 				message: "Get Cart Success",
-				data,
+				data
 			});
 		} catch (error) {
 			res.status(404).send({

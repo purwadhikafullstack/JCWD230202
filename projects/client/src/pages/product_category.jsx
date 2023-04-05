@@ -40,7 +40,6 @@ export default function ProductCategory() {
 				}`,
 				method: "GET",
 			});
-			console.log(data.data);
 			setproduct(data.data);
 			setselectedpage(page);
 		} catch (error) {
@@ -59,7 +58,6 @@ export default function ProductCategory() {
 				}`,
 				method: "GET",
 			});
-			console.log(data.data);
 			setproduct(data.data);
 			setselectedpage(page);
 		} catch (error) {
@@ -89,9 +87,6 @@ export default function ProductCategory() {
 				url: `product/detail?branch=${branch}&product=${products}`,
 				method: "GET",
 			});
-			console.log(data.data[0].product);
-			// console.log(data.data[0].branch);
-			// console.log(data.data[0]);
 			setdetail(data.data[0]);
 			setunit(data.data[0].product)
 			setquantity(1);
