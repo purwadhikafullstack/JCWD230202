@@ -175,7 +175,7 @@ function App() {
 					<Route path="uploadpayment" element={<PaymentProof />} />
 
 				</Route>
-				<Route path="checkout" element={<Checkout state={{ profile }} />} />
+				<Route path="checkout" element={<Checkout func={{getProfile}} state={{ profile }} />} />
 				<Route
 					path="/login"
 					element={<Login MyFunc={{ onLogin }} isDisable={{ disable }} />}
@@ -220,7 +220,7 @@ function App() {
 						}
 					/>
 
-					<Route path="transaction" element={<TransactionAdmin />} />
+					<Route path="transaction" element={<TransactionAdmin state={{profile}} />} />
 				</Route>
 				<Route
 					path="/loginAdmin"

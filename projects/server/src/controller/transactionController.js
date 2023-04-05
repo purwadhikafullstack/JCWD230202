@@ -206,6 +206,8 @@ module.exports = {
 			courier,
 			branch_id,
 			product_id,
+			shipping_cost,
+			discount_history_id,
 		} = req.body;
 		const t = await sequelize.transaction();
 		try {
@@ -262,7 +264,9 @@ module.exports = {
 					invoice: invoice,
 					user_id: id,
 					status: status,
-					expired: moment().add(2, "hour").toDate(),
+					shipping_cost: shipping_cost,
+					discount_history_id: discount_history_id[i],
+					expired: moment().add(1, "hour").toDate(),
 				});
 			}
 
@@ -273,9 +277,9 @@ module.exports = {
 				{ status: status, invoice: invoice },
 				{ transaction: t }
 			);
-			// await db.cart.destroy({
-			// 	where: { user_id: id },
-			// });
+			await db.cart.destroy({
+				where: { user_id: id },
+			});
 
 			let Loader = "";
 			for (let i = 0; i < qty.length; i++) {
@@ -285,27 +289,22 @@ module.exports = {
 					},
 				});
 
-				Loader += `INSERT INTO stock_history (stock, branch_id, product_id) VALUES(${
+				Loader += `INSERT INTO stock_history (stock, createdAt, branch_id, product_id) VALUES(${
 					stock + qty[i]
-				}, ${branch_id}, ${product_id[i]}); UPDATE branch_product SET stock = ${
+				},NOW(),${branch_id},${product_id[i]}); 
+				UPDATE branch_product SET stock = ${
 					stock + qty[i]
 				} WHERE branch_id = ${branch_id} AND product_id = ${product_id[i]};`;
 			}
 
-			await sequelize.query(
-				`DELIMETER |
-				CREATE EVENT expired_${
-					invoice.split("/")[2]
-				} ON SCHEDULE AT NOW() + INTERVAL 1 MINUTE 
-				DO 
-				BEGIN
-				UPDATE transaction SET status = "Canceled" WHERE invoice = ${invoice} AND payment_proof IS NULL;
-				INSERT INTO transaction_history (status, invoice) VALUES ("Canceled", ${invoice}); 
-				${Loader} 
-				END |
-				DELIMETER ;
-				`
-			);
+			await sequelize.query(`CREATE EVENT expired_${
+				invoice.split("/")[2]
+			} ON SCHEDULE AT NOW() + INTERVAL 60 MINUTE 
+			DO BEGIN
+			UPDATE transaction SET status = "Canceled" WHERE invoice = '${invoice}' AND payment_proof IS NULL;
+			INSERT INTO transaction_history (status,invoice,createdAt) VALUES ("Canceled",${invoice},NOW());
+			${Loader}
+			END;`);
 
 			t.commit();
 			res.status(201).send({
@@ -322,6 +321,112 @@ module.exports = {
 			});
 		}
 	},
+	getInvoice: async (req, res) => {
+		const { uid } = req.uid;
+		try {
+			const { id } = await db.user.findOne({ where: { uid } });
+
+			const data = await db.transaction.findAll({
+				attributes: [
+					"invoice",
+					"status",
+					"expired",
+					"shipping_cost",
+					"createdAt",
+					[sequelize.fn("SUM", sequelize.col("total_price")), "total_price"],
+					[sequelize.fn("COUNT", sequelize.col("product_name")), "total_item"],
+				],
+				where: { user_id: id },
+				group: ["invoice", "status", "expired", "createdAt","shipping_cost"],
+				order: [["createdAt", "DESC"]],
+			});
+			res.status(201).send({
+				isError: false,
+				message: "Get Transaction Succes",
+				data,
+			});
+		} catch (error) {
+			res.status(500).send({
+				isError: true,
+				message: error.message,
+				data: error,
+			});
+		}
+	},
+
+	getDetails: async (req, res) => {
+		const { uid } = req.uid;
+		const { invoice } = req.body;
+		try {
+			const { id } = await db.user.findOne({
+				where: { uid },
+			});
+			const data = await db.transaction.findAll({
+				attributes: [
+					"product_name",
+					"qty",
+					"total_price",
+					"courier",
+					"status",
+					"invoice",
+					"expired",
+				],
+				where: {
+					[Op.and]: [
+						{
+							invoice,
+						},
+						{ user_id: id },
+					],
+				},
+			});
+			res.status(201).send({
+				isError: false,
+				message: "Get Detail Transaction Success",
+				data,
+			});
+		} catch (error) {
+			res.status(500).send({
+				isError: true,
+				message: error.message,
+				data: error,
+			});
+		}
+	},
+
+	uploadPayment: async (req, res) => {
+		// const t = await sequelize.transaction();
+		try {
+
+			// let {invoice} = JSON.parse(req.body.data)
+
+			await db.transaction.update(
+				{
+					payment_proof: req.files.images[0].path,
+				},
+				// {
+				// 	where: {
+				// 		invoice: invoice,
+				// 	},
+				// },
+				// { transaction: t }
+			);
+			// t.commit()
+			req.status(201).send({
+				isError: false,
+				message: "Upload Payment Proof Success",
+				data: getInvoice,
+			});
+		} catch (error) {
+			// t.rollback()
+			res.status(500).send({
+				isError: true,
+				message: error.message,
+				data: error,
+			});
+		}
+	},
+
 	// getTransactionAdmin:(req,res)=>{
 	// 	const transaction = await db.transaction.findAll({group:"invoice"})
 	// 	transaction.forEach(async(value,index)=>{
