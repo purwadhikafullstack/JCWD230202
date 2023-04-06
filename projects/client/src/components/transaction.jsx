@@ -15,10 +15,10 @@ import {
 } from "@chakra-ui/react";
 import { SlClose } from "react-icons/sl";
 import { useEffect, useState } from "react";
-import PaymentProof from "../support/assets/buktitf.png";
 import REST_API from "../support/services/RESTApiService";
 import keranjang_empty from "../support/assets/KeranjangKosong.jpg";
 import { Toaster, toast } from "react-hot-toast";
+import NoImage from "../support/assets/no_image.png";
 
 export default function TransactionAdmin(props) {
 	const [show, setShow] = useState(false);
@@ -27,6 +27,7 @@ export default function TransactionAdmin(props) {
 	const [showAlert, setshowAlert] = useState(false);
 	const [cancelAlert, setcancelAlert] = useState(false);
 	const [sentAlert, setsentAlert] = useState(false);
+	const [paymentProof, setpaymentProof] = useState();
 	const [inv, setinv] = useState();
 
 	const getTransaction = async () => {
@@ -39,6 +40,7 @@ export default function TransactionAdmin(props) {
 			data.data.forEach((value, index) => {
 				invoice.push(value.invoice);
 			});
+			console.log(data.data);
 			setdata(data.data);
 			getDetail(invoice);
 		} catch (error) {
@@ -46,9 +48,10 @@ export default function TransactionAdmin(props) {
 		}
 	};
 
-	const onProcess = async (invoice) => {
+	const onProcess = async (invoice, payment_proof) => {
 		setShow(true);
 		setinv(invoice);
+		setpaymentProof(payment_proof);
 	};
 
 	const onSent = async (invoice) => {
@@ -288,7 +291,7 @@ export default function TransactionAdmin(props) {
 																<div className=" border-b-8 pb-5 mb-5">
 																	<Card>
 																		<div className=" font-tokpedFont gap-10 flex justify-between pb-8 border-b">
-																			<div className=" h-[375px] w-full">
+																			<div className=" h-[375px] w-full overflow-y-auto">
 																				<Table className="text-center w-full">
 																					<Table.Head>
 																						<Table.HeadCell>Product Name</Table.HeadCell>
@@ -382,7 +385,9 @@ export default function TransactionAdmin(props) {
 																							{props.state.profile?.role ===
 																							"super admin" ? null : (
 																								<button
-																									onClick={() => onProcess(value.invoice)}
+																									onClick={() =>
+																										onProcess(value.invoice, value.payment_proof)
+																									}
 																									className=" hover:bg-gray-300 text-center w-full bg-yellow-400 rounded-full text-white font-tokpedFont font-semibold p-3"
 																								>
 																									Check Payment
@@ -436,7 +441,7 @@ export default function TransactionAdmin(props) {
 																<div className=" border-b-8 pb-5 mb-5">
 																	<Card>
 																		<div className=" font-tokpedFont gap-10 flex justify-between pb-8 border-b">
-																			<div className=" h-[375px] w-full flex">
+																			<div className=" h-[375px] w-full overflow-y-auto">
 																				<Table className="text-center">
 																					<Table.Head>
 																						<Table.HeadCell>Product Name</Table.HeadCell>
@@ -536,12 +541,6 @@ export default function TransactionAdmin(props) {
 																									Send Order
 																								</button>
 																							)}
-																							<button
-																								onClick={() => onSent(value.invoice)}
-																								className=" hover:bg-gray-300 text-center w-full bg-blue-400 rounded-full text-white font-tokpedFont font-semibold p-3"
-																							>
-																								Send Order
-																							</button>
 																						</div>
 																					</div>
 																				</div>
@@ -938,7 +937,11 @@ export default function TransactionAdmin(props) {
 				)}
 				<Modal show={show} size="md" popup={true} onClose={() => setShow(false)}>
 					<div className=" flex justify-center items-center p-5">
-						<img alt="Payment Proof" src={PaymentProof} />
+						{paymentProof === null ? (
+							<img alt="NoImage" src={NoImage} />
+						) : (
+							<img alt="Payment Proof" src={`http://localhost:8000/${paymentProof}`} />
+						)}
 					</div>
 					<div className=" flex justify-center pb-5 gap-4">
 						<button

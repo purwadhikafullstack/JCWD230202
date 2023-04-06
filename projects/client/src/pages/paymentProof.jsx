@@ -36,13 +36,13 @@ export default function PaymentProof() {
 	const [invoice, setinvoice] = useState();
 	const { isOpen, onOpen, onClose } = useDisclosure();
 	const cancelRef = React.useRef();
+
 	const getTransaction = async () => {
 		try {
 			const { data } = await REST_API({
 				url: "/transaction/invoice",
 				method: "GET",
 			});
-			console.log(data.data)
 			setinvoice(data.data[0].invoice);
 			setdata(data.data[0]);
 		} catch (error) {}
@@ -57,6 +57,7 @@ export default function PaymentProof() {
 			});
 			setdetails(data.data);
 		} catch (error) {
+			toast.error(error);
 		} finally {
 			setshowDetail(true);
 		}
@@ -82,13 +83,16 @@ export default function PaymentProof() {
 		setdisable(true);
 		try {
 			fd.append("images", img);
-			fd.append("data", JSON.stringify({ invoice: invoice }));
-			await REST_API({
+			fd.append("data", JSON.stringify(invoice));
+			const { data } = await REST_API({
 				url: "/transaction/uploadPayment",
 				method: "PATCH",
 				data: fd,
 			});
-			toast("Upload Payment Success");
+			toast.success(data.message);
+			setTimeout(() => {
+				Navigate("/home");
+			},3000);
 		} catch (error) {
 			toast.error("Upload Payment Failed");
 		} finally {
