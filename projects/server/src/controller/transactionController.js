@@ -40,7 +40,7 @@ module.exports = {
 				],
 				where,
 				include: [{ model: db.branch }, { model: db.product }],
-				group: "invoice",
+				group: ["invoice","createdAt","status", "product_name","branch_id","product_id"],
 				order: [["createdAt", "ASC"]],
 			});
 			new HTTPStatus(res, data).success("Get all transaction").send();
