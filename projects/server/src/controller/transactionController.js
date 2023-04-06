@@ -135,14 +135,14 @@ module.exports = {
 		try {
 			const { id } = await db.user.findOne({ where: { uid } });
 
-			await db.transaction_history.create({ status: "Received", invoice }, { transaction: t });
+			await db.transaction_history.create({ status: "Delivered", invoice }, { transaction: t });
 			await db.transaction.update(
-				{ status: "Received" },
+				{ status: "Delivered" },
 				{ where: { [Op.and]: [{ user_id: id }, { invoice }] } },
 				{ transaction: t }
 			);
 			t.commit();
-			const httpStatus = new HTTPStatus(res).success("Status changed to received").send();
+			const httpStatus = new HTTPStatus(res).success("Status changed to delivered").send();
 		} catch (error) {
 			t.rollback();
 			const httpStatus = new HTTPStatus(res, error).error(error.message, 400).send();
