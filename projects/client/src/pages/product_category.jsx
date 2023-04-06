@@ -43,7 +43,7 @@ export default function ProductCategory() {
 			setproduct(data.data);
 			setselectedpage(page);
 		} catch (error) {
-			console.log(error);
+			error.response.data.message ? toast.error(error.response.data.message) : toast.error(error)		;
 		}
 	};
 
@@ -61,7 +61,7 @@ export default function ProductCategory() {
 			setproduct(data.data);
 			setselectedpage(page);
 		} catch (error) {
-			console.log(error);
+			error.response.data.message ? toast.error(error.response.data.message) : toast.error(error)		;
 		}
 	};
 
@@ -78,7 +78,9 @@ export default function ProductCategory() {
 				totalPage.push(i);
 			}
 			setpage(totalPage);
-		} catch (error) {}
+		} catch (error) {
+			error.response.data.message ? toast.error(error.response.data.message) : toast.error(error)		
+		}
 	};
 
 	let onGetDetail = async (branch, products) => {
@@ -92,7 +94,7 @@ export default function ProductCategory() {
 			setquantity(1);
 			setshow(true);
 		} catch (error) {
-			console.log(error);
+			error.response.data.message ? toast.error(error.response.data.message) : toast.error(error)		;
 		}
 	};
 

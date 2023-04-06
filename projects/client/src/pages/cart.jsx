@@ -29,7 +29,7 @@ export default function Cart(props) {
 			setsum(total);
 			setdata(data.data);
 		} catch (error) {
-			console.log(error);
+			error.response.data.message ? toast.error(error.response.data.message) : toast.error(error)		;
 		}
 	};
 
@@ -45,7 +45,7 @@ export default function Cart(props) {
 			toast.success(data.message);
 			onGetCart();
 		} catch (error) {
-			console.log(error);
+			error.response.data.message ? toast.error(error.response.data.message) : toast.error(error)		;
 		}
 	};
 
@@ -76,7 +76,7 @@ export default function Cart(props) {
 				onGetCart();
 			}
 		} catch (error) {
-			console.log(error);
+			error.response.data.message ? toast.error(error.response.data.message) : toast.error(error)		;
 		} finally {
 			setTimeout(() => {
 				setdisable(false);
@@ -101,7 +101,7 @@ export default function Cart(props) {
 				toast.error("Please Check Your Email and Activate Your Account");
 			}
 		} catch (error) {
-			console.log(error);
+			error.response.data.message ? toast.error(error.response.data.message) : toast.error(error)		;
 		} finally {
 			setdisableCheckout(false);
 		}
