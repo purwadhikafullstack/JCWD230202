@@ -9,7 +9,11 @@ module.exports = {
 		try {
 			const { id } = await db.user.findOne({ where: { uid } });
 
-			const findCart = await db.cart.findAll({ where: { user_id: id } });
+			const findCart = await db.cart.findAll({
+				where: {
+					[Op.and]: [{ user_id: id }, { product_id: product_id }],
+				},
+			});
 
 			if (findCart.length > 0) {
 				const findBranch = await db.cart.findAll({
@@ -21,8 +25,6 @@ module.exports = {
 						message: "Cannot Add Product With Diffrent Branch, Please Remove Product in Cart",
 					};
 				}
-			} else {
-				var data = await db.cart.create({ qty, branch_id, user_id: id, product_id });
 			}
 
 			const branch_product = await db.branch_product.findOne({
@@ -87,7 +89,7 @@ module.exports = {
 			const cart = await db.cart.findAll({
 				where: { user_id: id },
 			});
-		
+
 			if (cart.length === 0) {
 				return res.status(201).send({
 					isError: false,
@@ -118,23 +120,28 @@ module.exports = {
 							{ model: db.unit, attributes: ["name", "price_at"] },
 							{
 								model: db.discount_history,
-								attributes: ["min_purchase", "percent", "discount_id", "branch_id","id"],
-								where: {[Op.and]: [{
-									branch_id: cart[0].branch_id
-								},{status : "Active"}]},
-								required : false,
-								include: [{model: db.discount}]
+								attributes: ["min_purchase", "percent", "discount_id", "branch_id", "id"],
+								where: {
+									[Op.and]: [
+										{
+											branch_id: cart[0].branch_id,
+										},
+										{ status: "Active" },
+									],
+								},
+								required: false,
+								include: [{ model: db.discount }],
 							},
 						],
 					},
-					{ model: db.branch, attributes: ["location","city_code"] },
+					{ model: db.branch, attributes: ["location", "city_code"] },
 				],
 			});
 
 			res.status(201).send({
 				isError: false,
 				message: "Get Cart Success",
-				data
+				data,
 			});
 		} catch (error) {
 			res.status(404).send({

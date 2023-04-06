@@ -12,8 +12,7 @@ module.exports = {
 			const { id } = await db.user.findOne({ where: { uid } });
 			let where;
 			if (status == 0) where = { user_id: id };
-			if (status == 1)
-				where = { [Op.and]: [{ user_id: id }, { status: "Waiting Payment" }] };
+			if (status == 1) where = { [Op.and]: [{ user_id: id }, { status: "Waiting Payment" }] };
 			if (status == 2)
 				where = {
 					[Op.and]: [
@@ -27,10 +26,8 @@ module.exports = {
 						},
 					],
 				};
-			if (status == 3)
-				where = { [Op.and]: [{ user_id: id }, { status: "Delivered" }] };
-			if (status == 4)
-				where = { [Op.and]: [{ user_id: id }, { status: "Canceled" }] };
+			if (status == 3) where = { [Op.and]: [{ user_id: id }, { status: "Delivered" }] };
+			if (status == 4) where = { [Op.and]: [{ user_id: id }, { status: "Canceled" }] };
 
 			const data = await db.transaction.findAll({
 				attributes: [
@@ -92,10 +89,7 @@ module.exports = {
 				try {
 					const { stock } = await db.branch_product.findOne({
 						where: {
-							[Op.and]: [
-								{ branch_id: value.branch_id },
-								{ product_id: value.product_id },
-							],
+							[Op.and]: [{ branch_id: value.branch_id }, { product_id: value.product_id }],
 						},
 					});
 
@@ -103,10 +97,7 @@ module.exports = {
 						{ stock: stock + value.qty },
 						{
 							where: {
-								[Op.and]: [
-									{ branch_id: value.branch_id },
-									{ product_id: value.product_id },
-								],
+								[Op.and]: [{ branch_id: value.branch_id }, { product_id: value.product_id }],
 							},
 						},
 						{ transaction: t }
@@ -124,10 +115,7 @@ module.exports = {
 					t.rollback();
 				}
 			});
-			await db.transaction_history.create(
-				{ status: "Canceled", invoice },
-				{ transaction: t1 }
-			);
+			await db.transaction_history.create({ status: "Canceled", invoice }, { transaction: t1 });
 			await db.transaction.update(
 				{ status: "Canceled" },
 				{ where: { [Op.and]: [{ user_id: id }, { invoice }] } },
@@ -147,24 +135,17 @@ module.exports = {
 		try {
 			const { id } = await db.user.findOne({ where: { uid } });
 
-			await db.transaction_history.create(
-				{ status: "Received", invoice },
-				{ transaction: t }
-			);
+			await db.transaction_history.create({ status: "Received", invoice }, { transaction: t });
 			await db.transaction.update(
 				{ status: "Received" },
 				{ where: { [Op.and]: [{ user_id: id }, { invoice }] } },
 				{ transaction: t }
 			);
 			t.commit();
-			const httpStatus = new HTTPStatus(res)
-				.success("Status changed to received")
-				.send();
+			const httpStatus = new HTTPStatus(res).success("Status changed to received").send();
 		} catch (error) {
 			t.rollback();
-			const httpStatus = new HTTPStatus(res, error)
-				.error(error.message, 400)
-				.send();
+			const httpStatus = new HTTPStatus(res, error).error(error.message, 400).send();
 		}
 	},
 
@@ -175,24 +156,13 @@ module.exports = {
 		try {
 			const { id } = await db.user.findOne({ where: { uid } });
 
-			await db.transaction_history.create(
-				{ status: "sent", invoice },
-				{ transaction: t }
-			);
-			await db.transaction.update(
-				{ status: "sent" },
-				{ where: { invoice } },
-				{ transaction: t }
-			);
+			await db.transaction_history.create({ status: "sent", invoice }, { transaction: t });
+			await db.transaction.update({ status: "sent" }, { where: { invoice } }, { transaction: t });
 			t.commit();
-			const httpStatus = new HTTPStatus(res)
-				.success("Status changed to received")
-				.send();
+			const httpStatus = new HTTPStatus(res).success("Status changed to received").send();
 		} catch (error) {
 			t.rollback();
-			const httpStatus = new HTTPStatus(res, error)
-				.error(error.message, 400)
-				.send();
+			const httpStatus = new HTTPStatus(res, error).error(error.message, 400).send();
 		}
 	},
 
@@ -217,20 +187,14 @@ module.exports = {
 					const t1 = await sequelize.transaction();
 					const { stock } = await db.branch_product.findOne({
 						where: {
-							[Op.and]: [
-								{ branch_id: branch_id },
-								{ product_id: product_id[i] },
-							],
+							[Op.and]: [{ branch_id: branch_id }, { product_id: product_id[i] }],
 						},
 					});
 					await db.branch_product.update(
 						{ stock: stock - qty[i] },
 						{
 							where: {
-								[Op.and]: [
-									{ branch_id: branch_id },
-									{ product_id: product_id[i] },
-								],
+								[Op.and]: [{ branch_id: branch_id }, { product_id: product_id[i] }],
 							},
 						},
 						{ transaction: t1 }
@@ -273,10 +237,7 @@ module.exports = {
 			let data = await db.transaction.bulkCreate(dataToSend, {
 				transaction: t,
 			});
-			await db.transaction_history.create(
-				{ status: status, invoice: invoice },
-				{ transaction: t }
-			);
+			await db.transaction_history.create({ status: status, invoice: invoice }, { transaction: t });
 			await db.cart.destroy({
 				where: { user_id: id },
 			});
@@ -337,7 +298,7 @@ module.exports = {
 					[sequelize.fn("COUNT", sequelize.col("product_name")), "total_item"],
 				],
 				where: { user_id: id },
-				group: ["invoice", "status", "expired", "createdAt","shipping_cost"],
+				group: ["invoice", "status", "expired", "createdAt", "shipping_cost"],
 				order: [["createdAt", "DESC"]],
 			});
 			res.status(201).send({
@@ -395,30 +356,30 @@ module.exports = {
 	},
 
 	uploadPayment: async (req, res) => {
-		// const t = await sequelize.transaction();
+		const t = await sequelize.transaction();
 		try {
-
-			// let {invoice} = JSON.parse(req.body.data)
-
+			const invoice = req.body.data;
+			
 			await db.transaction.update(
 				{
 					payment_proof: req.files.images[0].path,
+					status: "Waiting Approval",
 				},
-				// {
-				// 	where: {
-				// 		invoice: invoice,
-				// 	},
-				// },
-				// { transaction: t }
+				{
+					where: {
+						invoice: invoice,
+					},
+				},
+				{ transaction: t }
 			);
-			// t.commit()
-			req.status(201).send({
+			await t.commit();
+			res.status(201).send({
 				isError: false,
 				message: "Upload Payment Proof Success",
-				data: getInvoice,
+				data: invoice,
 			});
 		} catch (error) {
-			// t.rollback()
+			await t.rollback();
 			res.status(500).send({
 				isError: true,
 				message: error.message,
