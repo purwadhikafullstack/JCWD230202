@@ -123,6 +123,7 @@ export default function TransactionAdmin(props) {
 
 	useEffect(() => {
 		getTransaction();
+		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, []);
 
 	return (

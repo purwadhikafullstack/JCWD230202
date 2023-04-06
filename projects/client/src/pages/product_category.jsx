@@ -134,6 +134,7 @@ export default function ProductCategory() {
 		getCategory();
 		onGetData(1)
 		onGetPage();
+		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, []);
 
 	return (
