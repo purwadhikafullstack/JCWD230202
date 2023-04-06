@@ -40,11 +40,10 @@ export default function TransactionAdmin(props) {
 			data.data.forEach((value, index) => {
 				invoice.push(value.invoice);
 			});
-			console.log(data.data);
 			setdata(data.data);
 			getDetail(invoice);
 		} catch (error) {
-			console.log(error);
+			error.response.data.message ? toast.error(error.response.data.message) : toast.error(error);
 		}
 	};
 
@@ -70,8 +69,7 @@ export default function TransactionAdmin(props) {
 			toast.success(data.message);
 			getTransaction();
 		} catch (error) {
-			console.log(error);
-			toast.error(error.response.data.message);
+			error.response.data.message ? toast.error(error.response.data.message) : toast.error(error);
 		}
 	};
 
@@ -88,8 +86,7 @@ export default function TransactionAdmin(props) {
 			toast.success(data.message);
 			getTransaction();
 		} catch (error) {
-			console.log(error);
-			toast.error(error.response.data.message);
+			error.response.data.message ? toast.error(error.response.data.message) : toast.error(error);
 		}
 	};
 
@@ -106,8 +103,7 @@ export default function TransactionAdmin(props) {
 			toast.success(data.message);
 			getTransaction();
 		} catch (error) {
-			console.log(error);
-			toast.error(error.response.data.message);
+			error.response.data.message ? toast.error(error.response.data.message) : toast.error(error);
 		}
 	};
 
@@ -121,7 +117,7 @@ export default function TransactionAdmin(props) {
 
 			setdetail(data.data);
 		} catch (error) {
-			console.log(error);
+			error.response.data.message ? toast.error(error.response.data.message) : toast.error(error);
 		}
 	};
 

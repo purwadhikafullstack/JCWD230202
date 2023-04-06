@@ -358,8 +358,7 @@ module.exports = {
 	uploadPayment: async (req, res) => {
 		const t = await sequelize.transaction();
 		try {
-			const invoice = req.body.data;
-			
+			const {invoice }= JSON.parse(req.body.data);
 			await db.transaction.update(
 				{
 					payment_proof: req.files.images[0].path,
@@ -372,11 +371,13 @@ module.exports = {
 				},
 				{ transaction: t }
 			);
+
+			await db.transaction_history.create({status: "Waiting Approval", invoice: invoice}), {transaction: t}
 			await t.commit();
 			res.status(201).send({
 				isError: false,
 				message: "Upload Payment Proof Success",
-				data: invoice,
+				data: null,
 			});
 		} catch (error) {
 			await t.rollback();

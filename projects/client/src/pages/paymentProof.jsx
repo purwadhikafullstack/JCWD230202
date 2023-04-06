@@ -83,7 +83,7 @@ export default function PaymentProof() {
 		setdisable(true);
 		try {
 			fd.append("images", img);
-			fd.append("data", JSON.stringify(invoice));
+			fd.append("data", JSON.stringify({invoice: invoice}));
 			const { data } = await REST_API({
 				url: "/transaction/uploadPayment",
 				method: "PATCH",

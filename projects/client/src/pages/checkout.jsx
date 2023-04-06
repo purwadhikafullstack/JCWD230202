@@ -105,8 +105,8 @@ export default function Checkout(props) {
 					}
 				} else {
 					discount_history.push(null);
-					total_price.push(value.total_price)
-					total += value.total_price
+					total_price.push(value.total_price);
+					total += value.total_price;
 				}
 			});
 			setdiscount_history_id(discount_history);
@@ -120,7 +120,7 @@ export default function Checkout(props) {
 			setdata(data.data);
 			setorigin(data.data[0].branch.city_code.split(".")[0]);
 		} catch (error) {
-			console.log(error);
+			error.response.data.message ? toast.error(error.response.data.message) : toast.error(error)		;
 		}
 	};
 
@@ -152,7 +152,7 @@ export default function Checkout(props) {
 				setdisable(false);
 			}, 1000);
 		} catch (error) {
-			console.log(error);
+			error.response.data.message ? toast.error(error.response.data.message) : toast.error(error)		;
 		}
 	};
 
@@ -170,7 +170,7 @@ export default function Checkout(props) {
 			props.func.getProfile();
 			toast.success("Address deleted");
 		} catch (error) {
-			console.log(error);
+			error.response.data.message ? toast.error(error.response.data.message) : toast.error(error)		;
 		}
 	};
 
@@ -184,10 +184,10 @@ export default function Checkout(props) {
 			toast.success("Main address updated");
 			setaddress("");
 			setdestination(0);
-			getCourier();
+			onGetCart()
 			setshow({ ...show, changeAddress: false });
 		} catch (error) {
-			console.log(error);
+			error.response.data.message ? toast.error(error.response.data.message) : toast.error(error)		;
 		}
 	};
 
@@ -203,7 +203,7 @@ export default function Checkout(props) {
 			});
 			setrakir({ ...rakir, province: data.data });
 		} catch (error) {
-			console.log(error);
+			error.response.data.message ? toast.error(error.response.data.message) : toast.error(error)		;
 		}
 	};
 	const rakirCity = async (province) => {
@@ -214,7 +214,7 @@ export default function Checkout(props) {
 			});
 			setrakir({ ...rakir, city: data.data });
 		} catch (error) {
-			console.log(error);
+			error.response.data.message ? toast.error(error.response.data.message) : toast.error(error)		;
 		}
 	};
 	const onSubmitAddAddress = async (data) => {
@@ -231,7 +231,7 @@ export default function Checkout(props) {
 			props.func.getProfile();
 			toast.success("Address added");
 		} catch (error) {
-			console.log(error);
+			error.response.data.message ? toast.error(error.response.data.message) : toast.error(error)		;
 		} finally {
 			setshow({ ...show, loading: false, addAddress: false });
 		}
@@ -241,14 +241,18 @@ export default function Checkout(props) {
 		setaddress(value);
 		let dest = value.city.split(".")[0];
 		setdestination(dest);
-		getCourier();
+		setcourier("")
+		setcosts(0)
+		onGetCart()
 		setshow({ ...show, changeAddress: false });
 	};
 
 	const selectedMainAddress = async () => {
 		setaddress("");
 		setdestination(0);
-		getCourier();
+		setcourier("")
+		setcosts(0)
+		onGetCart()
 		setshow({ ...show, changeAddress: false });
 	};
 
@@ -266,14 +270,14 @@ export default function Checkout(props) {
 				branch_id: branch_id,
 				product_id: product_id,
 				shipping_cost: costs,
-				discount_history_id: discount_history_id
+				discount_history_id: discount_history_id,
 			});
 			toast.success(data.message);
 			setTimeout(() => {
 				Navigate("/uploadpayment");
-			},3000);
+			}, 3000);
 		} catch (error) {
-			console.log(error);
+			error.response.data.message ? toast.error(error.response.data.message) : toast.error(error)		;
 			toast.error(error.response.data.message);
 		} finally {
 			setdisablePayment(false);
@@ -580,7 +584,7 @@ export default function Checkout(props) {
 						</div>
 						<div>
 							<p className=" flex gap-1 text-[14px]">Rp. {sum.toLocaleString()} </p>
-							{costs ? <p className=" mt-2 text-[14px]">Rp. {costs.toLocaleString()}</p> : null}
+							{costs  ? <p className=" mt-2 text-[14px]">Rp. {costs.toLocaleString()}</p> : null}
 						</div>
 					</div>
 					<div className=" border-t flex justify-between h-[37px] items-end ">
@@ -591,8 +595,13 @@ export default function Checkout(props) {
 						Dengan mengaktifkan asuransi, Saya menyetujui{" "}
 						<p className=" text-red-700">syarat dan ketentuan yang berlaku.</p>
 					</p>
+					{!courier ? (
+						<p className=" mt-2 text-red-700 text-[12px] font-tokpedFont font-semibold">
+							*Please Input Your Courier Methode {" "}
+						</p>
+					) : null}
 					<button
-						disabled={ !courier? true : false}
+						disabled={!courier ? true : false}
 						onClick={() => onSubmit()}
 						className=" mt-6 h-12 w-full text-white bg-[#0095DA] rounded-lg "
 					>
