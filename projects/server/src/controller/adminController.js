@@ -1477,7 +1477,7 @@ module.exports = {
 			});
 			await db.category.update(
 				{
-					img: req.files.images[0].path,
+					img: `Public/images/${req.files.images[0].filename}`,
 				},
 				{
 					where: {
