@@ -164,7 +164,7 @@ function SalesReport() {
 										<Table.HeadCell>Date</Table.HeadCell>
 									</Table.Head>
 
-									{dataTransaction !== 0 ? (
+									{dataTransaction.length !== 0 ? (
 										dataTransaction.map((value, index) => {
 											return (
 												<Table.Body className="divide-y">
@@ -256,7 +256,7 @@ function SalesReport() {
 										<Table.HeadCell>Location</Table.HeadCell>
 									</Table.Head>
 
-									{dataProduct !== 0 ? (
+									{dataProduct.length !== 0 ? (
 										dataProduct.map((value, index) => {
 											return (
 												<Table.Body className="divide-y">
