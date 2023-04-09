@@ -8,9 +8,7 @@ const { validateToken } = require("../lib/jwt");
 
 module.exports = {
 	editProduct: async (req, res) => {
-		const { branch_id, id, name, stock, price, description } = JSON.parse(
-			req.body.data
-		);
+		const { branch_id, id, name, stock, price, description } = JSON.parse(req.body.data);
 		const t = await sequelize.transaction();
 		try {
 			await db.product.update(
@@ -64,10 +62,7 @@ module.exports = {
 				where: { uid },
 				include: { model: db.user_address, where: { main_address: true } },
 			});
-			const proximity = await getProximity(
-				user.user_addresses[0].lat,
-				user.user_addresses[0].lng
-			);
+			const proximity = await getProximity(user.user_addresses[0].lat, user.user_addresses[0].lng);
 			new HTTPStatus(res, proximity).success("Get nearest branch").send();
 		} catch (error) {
 			new HTTPStatus(res, error).error(error.message).send();
@@ -118,8 +113,7 @@ module.exports = {
 	},
 	createProduct: async (req, res) => {
 		const { uid } = req.uid;
-		const { name, price, category_id, stock, unit_id, description } =
-			JSON.parse(req.body.data);
+		const { name, price, category_id, stock, unit_id, description } = JSON.parse(req.body.data);
 		const t = await sequelize.transaction();
 		try {
 			const admin = await db.user.findOne({
@@ -168,12 +162,7 @@ module.exports = {
 		try {
 			if (user.token === undefined) {
 				data = await db.transaction.findAll({
-					attributes: [
-						[
-							sequelize.fn("COUNT", sequelize.col("product_name")),
-							"total_transaction",
-						],
-					],
+					attributes: [[sequelize.fn("COUNT", sequelize.col("product_name")), "total_transaction"]],
 					include: [
 						{
 							model: db.product,
@@ -194,9 +183,7 @@ module.exports = {
 						{ model: db.branch, attributes: ["id", "location"] },
 					],
 					group: ["product.id"],
-					order: [
-						[sequelize.fn("COUNT", sequelize.col("product_name")), "DESC"],
-					],
+					order: [[sequelize.fn("COUNT", sequelize.col("product_name")), "DESC"]],
 				});
 			} else {
 				const { uid } = validateToken(user.token);
@@ -212,12 +199,7 @@ module.exports = {
 
 				data = await db.transaction.findAll({
 					where: { branch_id: proximity[0].id },
-					attributes: [
-						[
-							sequelize.fn("COUNT", sequelize.col("product_name")),
-							"total_transaction",
-						],
-					],
+					attributes: [[sequelize.fn("COUNT", sequelize.col("product_name")), "total_transaction"]],
 					include: [
 						{
 							model: db.product,
@@ -238,9 +220,7 @@ module.exports = {
 						{ model: db.branch, attributes: ["id", "location"] },
 					],
 					group: ["product.id"],
-					order: [
-						[sequelize.fn("COUNT", sequelize.col("product_name")), "DESC"],
-					],
+					order: [[sequelize.fn("COUNT", sequelize.col("product_name")), "DESC"]],
 				});
 			}
 
@@ -315,16 +295,9 @@ module.exports = {
 		}
 	},
 	totalPage: async (req, res) => {
-		const { uid } = req.uid;
+		const user = req.headers;
 		try {
-			const user = await db.user.findOne({
-				where: {
-					uid,
-				},
-				include: { model: db.user_address, where: { main_address: true } },
-			});
-
-			if (!user) {
+			if (user.token === undefined || !address) {
 				const branch = 1;
 				const data = await db.branch_product.count({
 					where: { [Op.and]: [{ branch_id: branch }, { status: "Active" }] },
@@ -335,21 +308,14 @@ module.exports = {
 					data,
 				});
 			} else {
-				if (user.user_addresses[0].lat && user.user_addresses[0].lng) {
-					const proximity = await getProximity(
-						user.user_addresses[0].lat,
-						user.user_addresses[0].lng
-					);
-					const branch = proximity[0].id;
-					const data = await db.branch_product.count({
-						where: { [Op.and]: [{ branch_id: branch }, { status: "Active" }] },
-					});
-					res.status(200).send({
-						isError: false,
-						message: "Get Total Page",
-						data,
-					});
-				} else {
+				const { uid } = validateToken(user.token);
+				const address = await db.user.findOne({
+					where: {
+						uid,
+					},
+					include: { model: db.user_address, where: { main_address: true } },
+				});
+				if (!address) {
 					const branch = 1;
 					const data = await db.branch_product.count({
 						where: { [Op.and]: [{ branch_id: branch }, { status: "Active" }] },
@@ -359,6 +325,32 @@ module.exports = {
 						message: "Get Total Page",
 						data,
 					});
+				} else {
+					if (address.user_addresses[0].lat && address.user_addresses[0].lng) {
+						const proximity = await getProximity(
+							address.user_addresses[0].lat,
+							address.user_addresses[0].lng
+						);
+						const branch = proximity[0].id;
+						const data = await db.branch_product.count({
+							where: { [Op.and]: [{ branch_id: branch }, { status: "Active" }] },
+						});
+						res.status(200).send({
+							isError: false,
+							message: "Get Total Page",
+							data,
+						});
+					} else {
+						const branch = 1;
+						const data = await db.branch_product.count({
+							where: { [Op.and]: [{ branch_id: branch }, { status: "Active" }] },
+						});
+						res.status(200).send({
+							isError: false,
+							message: "Get Total Page",
+							data,
+						});
+					}
 				}
 			}
 		} catch (error) {
@@ -392,16 +384,9 @@ module.exports = {
 		try {
 			const data = await db.branch_product.findAll({
 				where: {
-					[Op.and]: [
-						{ branch_id: branch },
-						{ product_id: product },
-						{ status: "Active" },
-					],
+					[Op.and]: [{ branch_id: branch }, { product_id: product }, { status: "Active" }],
 				},
-				include: [
-					{ model: db.branch },
-					{ model: db.product, include: { model: db.unit } },
-				],
+				include: [{ model: db.branch }, { model: db.product, include: { model: db.unit } }],
 			});
 
 			res.status(201).send({
@@ -419,16 +404,9 @@ module.exports = {
 	},
 	totalPageCategory: async (req, res) => {
 		const { category } = req.query;
-		const { uid } = req.uid;
+		const user = req.headers;
 		try {
-			const user = await db.user.findOne({
-				where: {
-					uid,
-				},
-				include: { model: db.user_address, where: { main_address: true } },
-			});
-
-			if (!user) {
+			if (user.token === undefined) {
 				const branch = 1;
 				const data = await db.branch_product.count({
 					where: { [Op.and]: [{ branch_id: branch }, { status: "Active" }] },
@@ -446,28 +424,14 @@ module.exports = {
 					data,
 				});
 			} else {
-				if (user.user_addresses[0].lat && user.user_addresses[0].lng) {
-					const proximity = await getProximity(
-						user.user_addresses[0].lat,
-						user.user_addresses[0].lng
-					);
-					const branch = proximity[0].id;
-					const data = await db.branch_product.count({
-						where: { [Op.and]: [{ branch_id: branch }, { status: "Active" }] },
-						required: false,
-						include: {
-							model: db.product,
-							where: {
-								[Op.and]: [{ category_id: category }, { status: "Active" }],
-							},
-						},
-					});
-					res.status(201).send({
-						isError: false,
-						message: "Total Page Category",
-						data,
-					});
-				} else {
+				const { uid } = validateToken(user.token);
+				const address = await db.user.findOne({
+					where: {
+						uid,
+					},
+					include: { model: db.user_address, where: { main_address: true } },
+				});
+				if (!address) {
 					const branch = 1;
 					const data = await db.branch_product.count({
 						where: { [Op.and]: [{ branch_id: branch }, { status: "Active" }] },
@@ -484,6 +448,46 @@ module.exports = {
 						message: "Total Page Category",
 						data,
 					});
+				} else {
+					if (address.user_addresses[0].lat && address.user_addresses[0].lng) {
+						const proximity = await getProximity(
+							address.user_addresses[0].lat,
+							address.user_addresses[0].lng
+						);
+						const branch = proximity[0].id;
+						const data = await db.branch_product.count({
+							where: { [Op.and]: [{ branch_id: branch }, { status: "Active" }] },
+							required: false,
+							include: {
+								model: db.product,
+								where: {
+									[Op.and]: [{ category_id: category }, { status: "Active" }],
+								},
+							},
+						});
+						res.status(201).send({
+							isError: false,
+							message: "Total Page Category",
+							data,
+						});
+					} else {
+						const branch = 1;
+						const data = await db.branch_product.count({
+							where: { [Op.and]: [{ branch_id: branch }, { status: "Active" }] },
+							required: false,
+							include: {
+								model: db.product,
+								where: {
+									[Op.and]: [{ category_id: category }, { status: "Active" }],
+								},
+							},
+						});
+						res.status(201).send({
+							isError: false,
+							message: "Total Page Category",
+							data,
+						});
+					}
 				}
 			}
 		} catch (error) {
@@ -497,16 +501,9 @@ module.exports = {
 	sortby: async (req, res) => {
 		const { category, page, sortby } = req.query;
 		const sort = sortby ? sortby.split("-") : "";
-		const { uid } = req.uid;
+		const user = req.headers;
 		try {
-			const user = await db.user.findOne({
-				where: {
-					uid,
-				},
-				include: { model: db.user_address, where: { main_address: true } },
-			});
-
-			if (!user) {
+			if (user.token === undefined) {
 				const branch = 1;
 				if (sort[0] === "name") {
 					const data = await db.product.findAll({
@@ -597,106 +594,14 @@ module.exports = {
 					});
 				}
 			} else {
-				if (user.user_addresses[0].lat && user.user_addresses[0].lng) {
-					const proximity = await getProximity(
-						user.user_addresses[0].lat,
-						user.user_addresses[0].lng
-					);
-					const branch = proximity[0].id;
-					if (sort[0] === "name") {
-						const data = await db.product.findAll({
-							where: {
-								[Op.and]: [
-									{
-										category_id: category,
-									},
-									{ status: "Active" },
-								],
-							},
-							required: false,
-							include: [
-								{
-									model: db.branch_product,
-									where: {
-										[Op.and]: [{ branch_id: branch }, { status: "Active" }],
-									},
-									include: {
-										model: db.branch,
-									},
-								},
-							],
-							order: [["name", sort[1]]],
-							offset: page == 1 ? 0 : page * 10 - 10,
-							limit: 12,
-						});
-						res.status(201).send({
-							isError: false,
-							message: "Get Product by Sort Success",
-							data,
-						});
-					} else if (sort[0] === "price") {
-						const data = await db.product.findAll({
-							where: {
-								[Op.and]: [
-									{
-										category_id: category,
-									},
-									{ status: "Active" },
-								],
-							},
-							required: false,
-							include: [
-								{
-									model: db.branch_product,
-									where: {
-										[Op.and]: [{ branch_id: branch }, { status: "Active" }],
-									},
-									include: {
-										model: db.branch,
-									},
-								},
-							],
-							order: [["price", sort[1]]],
-							offset: page == 1 ? 0 : page * 10 - 10,
-							limit: 12,
-						});
-						res.status(201).send({
-							isError: false,
-							message: "Get Product by Sort Success",
-							data,
-						});
-					} else if (sort === "") {
-						const data = await db.product.findAll({
-							where: {
-								[Op.and]: [
-									{
-										category_id: category,
-									},
-									{ status: "Active" },
-								],
-							},
-							required: false,
-							include: [
-								{
-									model: db.branch_product,
-									where: {
-										[Op.and]: [{ branch_id: branch }, { status: "Active" }],
-									},
-									include: {
-										model: db.branch,
-									},
-								},
-							],
-							offset: page == 1 ? 0 : page * 10 - 10,
-							limit: 12,
-						});
-						res.status(201).send({
-							isError: false,
-							message: "Get Product by Sort Success",
-							data,
-						});
-					}
-				} else {
+				const { uid } = validateToken(user.token);
+				const address = await db.user.findOne({
+					where: {
+						uid,
+					},
+					include: { model: db.user_address, where: { main_address: true } },
+				});
+				if (!address) {
 					const branch = 1;
 					if (sort[0] === "name") {
 						const data = await db.product.findAll({
@@ -763,12 +668,7 @@ module.exports = {
 					} else if (sort === "") {
 						const data = await db.product.findAll({
 							where: {
-								[Op.and]: [
-									{
-										category_id: category,
-									},
-									{ status: "Active" },
-								],
+								category_id: category,
 							},
 							required: false,
 							include: [
@@ -790,6 +690,202 @@ module.exports = {
 							message: "Get Product by Sort Success",
 							data,
 						});
+					}
+				} else {
+					if (address.user_addresses[0].lat && address.user_addresses[0].lng) {
+						const proximity = await getProximity(
+							address.user_addresses[0].lat,
+							address.user_addresses[0].lng
+						);
+						const branch = proximity[0].id;
+						if (sort[0] === "name") {
+							const data = await db.product.findAll({
+								where: {
+									[Op.and]: [
+										{
+											category_id: category,
+										},
+										{ status: "Active" },
+									],
+								},
+								required: false,
+								include: [
+									{
+										model: db.branch_product,
+										where: {
+											[Op.and]: [{ branch_id: branch }, { status: "Active" }],
+										},
+										include: {
+											model: db.branch,
+										},
+									},
+								],
+								order: [["name", sort[1]]],
+								offset: page == 1 ? 0 : page * 10 - 10,
+								limit: 12,
+							});
+							res.status(201).send({
+								isError: false,
+								message: "Get Product by Sort Success",
+								data,
+							});
+						} else if (sort[0] === "price") {
+							const data = await db.product.findAll({
+								where: {
+									[Op.and]: [
+										{
+											category_id: category,
+										},
+										{ status: "Active" },
+									],
+								},
+								required: false,
+								include: [
+									{
+										model: db.branch_product,
+										where: {
+											[Op.and]: [{ branch_id: branch }, { status: "Active" }],
+										},
+										include: {
+											model: db.branch,
+										},
+									},
+								],
+								order: [["price", sort[1]]],
+								offset: page == 1 ? 0 : page * 10 - 10,
+								limit: 12,
+							});
+							res.status(201).send({
+								isError: false,
+								message: "Get Product by Sort Success",
+								data,
+							});
+						} else if (sort === "") {
+							const data = await db.product.findAll({
+								where: {
+									[Op.and]: [
+										{
+											category_id: category,
+										},
+										{ status: "Active" },
+									],
+								},
+								required: false,
+								include: [
+									{
+										model: db.branch_product,
+										where: {
+											[Op.and]: [{ branch_id: branch }, { status: "Active" }],
+										},
+										include: {
+											model: db.branch,
+										},
+									},
+								],
+								offset: page == 1 ? 0 : page * 10 - 10,
+								limit: 12,
+							});
+							res.status(201).send({
+								isError: false,
+								message: "Get Product by Sort Success",
+								data,
+							});
+						}
+					} else {
+						const branch = 1;
+						if (sort[0] === "name") {
+							const data = await db.product.findAll({
+								where: {
+									[Op.and]: [
+										{
+											category_id: category,
+										},
+										{ status: "Active" },
+									],
+								},
+								required: false,
+								include: [
+									{
+										model: db.branch_product,
+										where: {
+											[Op.and]: [{ branch_id: branch }, { status: "Active" }],
+										},
+										include: {
+											model: db.branch,
+										},
+									},
+								],
+								order: [["name", sort[1]]],
+								offset: page == 1 ? 0 : page * 10 - 10,
+								limit: 12,
+							});
+							res.status(201).send({
+								isError: false,
+								message: "Get Product by Sort Success",
+								data,
+							});
+						} else if (sort[0] === "price") {
+							const data = await db.product.findAll({
+								where: {
+									[Op.and]: [
+										{
+											category_id: category,
+										},
+										{ status: "Active" },
+									],
+								},
+								required: false,
+								include: [
+									{
+										model: db.branch_product,
+										where: {
+											[Op.and]: [{ branch_id: branch }, { status: "Active" }],
+										},
+										include: {
+											model: db.branch,
+										},
+									},
+								],
+								order: [["price", sort[1]]],
+								offset: page == 1 ? 0 : page * 10 - 10,
+								limit: 12,
+							});
+							res.status(201).send({
+								isError: false,
+								message: "Get Product by Sort Success",
+								data,
+							});
+						} else if (sort === "") {
+							const data = await db.product.findAll({
+								where: {
+									[Op.and]: [
+										{
+											category_id: category,
+										},
+										{ status: "Active" },
+									],
+								},
+								required: false,
+								include: [
+									{
+										model: db.branch_product,
+										where: {
+											[Op.and]: [{ branch_id: branch }, { status: "Active" }],
+										},
+										include: {
+											model: db.branch,
+										},
+									},
+								],
+								offset: page == 1 ? 0 : page * 10 - 10,
+								limit: 12,
+							});
+							res.status(201).send({
+								isError: false,
+								message: "Get Product by Sort Success",
+								data,
+							});
+						}
 					}
 				}
 			}

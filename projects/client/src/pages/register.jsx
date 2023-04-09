@@ -95,9 +95,11 @@ function Register() {
 	};
 
 	return (
-		<div className=" max-h-screen overflow-hidden ">
+		<div className=" max-h-screen xl:overflow-hidden md:overflow-auto h-screen">
 			<div className=" mt-[20px] mb-[25px] flex content-center justify-center">
-				<h1 className=" font-bold text-4xl font-mandalaFont text-[#0095DA] "><button onClick={() => Navigate("/home")}>tokonglomerat</button></h1>
+				<h1 className=" font-bold text-4xl font-mandalaFont text-[#0095DA] ">
+					<button onClick={() => Navigate("/home")}>tokonglomerat</button>
+				</h1>
 			</div>
 			<div className="  flex content-center justify-center max-w-sm h-screen xl:max-w-screen-2xl mx-auto">
 				<div className=" hidden xl:flex-row xl:block">
@@ -117,7 +119,7 @@ function Register() {
 
 				<form
 					autoComplete="off"
-					className="w-full max-w-[400px] xl:h-fit p-10 bg-white rounded-lg shadow-2xl"
+					className="w-full max-w-[400px] xl:h-fit p-10 bg-white rounded-lg shadow-2xl md:h-fit sm: h-max"
 					aria-label="register now"
 				>
 					<h1 className="text-[22px] text-[#40444e] font-extrabold text-center font-tokpedFont">
