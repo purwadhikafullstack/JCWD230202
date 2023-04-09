@@ -101,8 +101,7 @@ module.exports = {
 			const { id } = await db.user.findOne({ where: { uid } });
 			let where;
 			if (status == 0) where = { user_id: id };
-			if (status == 1)
-				where = { [Op.and]: [{ user_id: id }, { status: "Waiting Payment" }] };
+			if (status == 1) where = { [Op.and]: [{ user_id: id }, { status: "Waiting Payment" }] };
 			if (status == 2)
 				where = {
 					[Op.and]: [
@@ -116,10 +115,8 @@ module.exports = {
 						},
 					],
 				};
-			if (status == 3)
-				where = { [Op.and]: [{ user_id: id }, { status: "Delivered" }] };
-			if (status == 4)
-				where = { [Op.and]: [{ user_id: id }, { status: "Canceled" }] };
+			if (status == 3) where = { [Op.and]: [{ user_id: id }, { status: "Delivered" }] };
+			if (status == 4) where = { [Op.and]: [{ user_id: id }, { status: "Canceled" }] };
 
 			const data = await db.transaction.findAll({
 				attributes: [
@@ -132,7 +129,7 @@ module.exports = {
 				],
 				where,
 				include: [{ model: db.branch }, { model: db.product }],
-				group: "invoice",
+				group: ["invoice","createdAt","status", "product_name","branch_id","product_id"],
 				order: [["createdAt", "ASC"]],
 			});
 			new HTTPStatus(res, data).success("Get all transaction").send();
@@ -164,15 +161,24 @@ module.exports = {
 			const result = await db.transaction.findAll({
 				where: { invoice },
 			});
+
+			await db.transaction.update(
+				{
+					status: "Canceled",
+				},
+				{
+					where: {
+						invoice,
+					},
+				}
+			);
+
 			result.map(async (value) => {
 				const t = await sequelize.transaction();
 				try {
 					const { stock } = await db.branch_product.findOne({
 						where: {
-							[Op.and]: [
-								{ branch_id: value.branch_id },
-								{ product_id: value.product_id },
-							],
+							[Op.and]: [{ branch_id: value.branch_id }, { product_id: value.product_id }],
 						},
 					});
 
@@ -180,10 +186,7 @@ module.exports = {
 						{ stock: stock + value.qty },
 						{
 							where: {
-								[Op.and]: [
-									{ branch_id: value.branch_id },
-									{ product_id: value.product_id },
-								],
+								[Op.and]: [{ branch_id: value.branch_id }, { product_id: value.product_id }],
 							},
 						},
 						{ transaction: t }
@@ -201,10 +204,7 @@ module.exports = {
 					t.rollback();
 				}
 			});
-			await db.transaction_history.create(
-				{ status: "Canceled", invoice },
-				{ transaction: t1 }
-			);
+			await db.transaction_history.create({ status: "Canceled", invoice }, { transaction: t1 });
 			await db.transaction.update(
 				{ status: "Canceled" },
 				{ where: { [Op.and]: [{ user_id: id }, { invoice }] } },
@@ -224,26 +224,37 @@ module.exports = {
 		try {
 			const { id } = await db.user.findOne({ where: { uid } });
 
-			await db.transaction_history.create(
-				{ status: "Received", invoice },
-				{ transaction: t }
-			);
+			await db.transaction_history.create({ status: "Delivered", invoice }, { transaction: t });
 			await db.transaction.update(
-				{ status: "Received" },
+				{ status: "Delivered" },
 				{ where: { [Op.and]: [{ user_id: id }, { invoice }] } },
 				{ transaction: t }
 			);
 			t.commit();
-			const httpStatus = new HTTPStatus(res)
-				.success("Status changed to received")
-				.send();
+			const httpStatus = new HTTPStatus(res).success("Status changed to delivered").send();
 		} catch (error) {
 			t.rollback();
-			const httpStatus = new HTTPStatus(res, error)
-				.error(error.message, 400)
-				.send();
+			const httpStatus = new HTTPStatus(res, error).error(error.message, 400).send();
 		}
 	},
+
+	sent: async (req, res) => {
+		const { uid } = req.uid;
+		const { invoice } = req.body;
+		const t = await sequelize.transaction();
+		try {
+			const { id } = await db.user.findOne({ where: { uid } });
+
+			await db.transaction_history.create({ status: "sent", invoice }, { transaction: t });
+			await db.transaction.update({ status: "sent" }, { where: { invoice } }, { transaction: t });
+			t.commit();
+			const httpStatus = new HTTPStatus(res).success("Status changed to received").send();
+		} catch (error) {
+			t.rollback();
+			const httpStatus = new HTTPStatus(res, error).error(error.message, 400).send();
+		}
+	},
+
 	addTransaction: async (req, res) => {
 		const { uid } = req.uid;
 		const {
@@ -254,6 +265,8 @@ module.exports = {
 			courier,
 			branch_id,
 			product_id,
+			shipping_cost,
+			discount_history_id,
 		} = req.body;
 		const t = await sequelize.transaction();
 		try {
@@ -263,20 +276,14 @@ module.exports = {
 					const t1 = await sequelize.transaction();
 					const { stock } = await db.branch_product.findOne({
 						where: {
-							[Op.and]: [
-								{ branch_id: branch_id },
-								{ product_id: product_id[i] },
-							],
+							[Op.and]: [{ branch_id: branch_id }, { product_id: product_id[i] }],
 						},
 					});
 					await db.branch_product.update(
 						{ stock: stock - qty[i] },
 						{
 							where: {
-								[Op.and]: [
-									{ branch_id: branch_id },
-									{ product_id: product_id[i] },
-								],
+								[Op.and]: [{ branch_id: branch_id }, { product_id: product_id[i] }],
 							},
 						},
 						{ transaction: t1 }
@@ -310,20 +317,19 @@ module.exports = {
 					invoice: invoice,
 					user_id: id,
 					status: status,
-					expired: moment().add(2, "hour").toDate(),
+					shipping_cost: shipping_cost,
+					discount_history_id: discount_history_id[i],
+					expired: moment().add(1, "hour").toDate(),
 				});
 			}
 
 			let data = await db.transaction.bulkCreate(dataToSend, {
 				transaction: t,
 			});
-			await db.transaction_history.create(
-				{ status: status, invoice: invoice },
-				{ transaction: t }
-			);
-			// await db.cart.destroy({
-			// 	where: { user_id: id },
-			// });
+			await db.transaction_history.create({ status: status, invoice: invoice }, { transaction: t });
+			await db.cart.destroy({
+				where: { user_id: id },
+			});
 
 			let Loader = "";
 			for (let i = 0; i < qty.length; i++) {
@@ -333,27 +339,22 @@ module.exports = {
 					},
 				});
 
-				Loader += `INSERT INTO stock_history (stock, branch_id, product_id) VALUES(${
+				Loader += `INSERT INTO stock_history (stock, createdAt, branch_id, product_id) VALUES(${
 					stock + qty[i]
-				}, ${branch_id}, ${product_id[i]}); UPDATE branch_product SET stock = ${
+				},NOW(),${branch_id},${product_id[i]}); 
+				UPDATE branch_product SET stock = ${
 					stock + qty[i]
 				} WHERE branch_id = ${branch_id} AND product_id = ${product_id[i]};`;
 			}
 
-			await sequelize.query(
-				`DELIMETER |
-				CREATE EVENT expired_${
-					invoice.split("/")[2]
-				} ON SCHEDULE AT NOW() + INTERVAL 1 MINUTE 
-				DO 
-				BEGIN
-				UPDATE transaction SET status = "Canceled" WHERE invoice = ${invoice} AND payment_proof IS NULL;
-				INSERT INTO transaction_history (status, invoice) VALUES ("Canceled", ${invoice}); 
-				${Loader} 
-				END |
-				DELIMETER ;
-				`
-			);
+			await sequelize.query(`CREATE EVENT expired_${
+				invoice.split("/")[2]
+			} ON SCHEDULE AT NOW() + INTERVAL 60 MINUTE 
+			DO BEGIN
+			UPDATE transaction SET status = "Canceled" WHERE invoice = '${invoice}' AND payment_proof IS NULL;
+			INSERT INTO transaction_history (status,invoice,createdAt) VALUES ("Canceled",${invoice},NOW());
+			${Loader}
+			END;`);
 
 			t.commit();
 			res.status(201).send({
@@ -370,6 +371,113 @@ module.exports = {
 			});
 		}
 	},
+	getInvoice: async (req, res) => {
+		const { uid } = req.uid;
+		try {
+			const { id } = await db.user.findOne({ where: { uid } });
+
+			const data = await db.transaction.findAll({
+				attributes: [
+					"invoice",
+					"status",
+					"expired",
+					"shipping_cost",
+					"createdAt",
+					[sequelize.fn("SUM", sequelize.col("total_price")), "total_price"],
+					[sequelize.fn("COUNT", sequelize.col("product_name")), "total_item"],
+				],
+				where: { user_id: id },
+				group: ["invoice", "status", "expired", "createdAt", "shipping_cost"],
+				order: [["createdAt", "DESC"]],
+			});
+			res.status(201).send({
+				isError: false,
+				message: "Get Transaction Succes",
+				data,
+			});
+		} catch (error) {
+			res.status(500).send({
+				isError: true,
+				message: error.message,
+				data: error,
+			});
+		}
+	},
+
+	getDetails: async (req, res) => {
+		const { uid } = req.uid;
+		const { invoice } = req.body;
+		try {
+			const { id } = await db.user.findOne({
+				where: { uid },
+			});
+			const data = await db.transaction.findAll({
+				attributes: [
+					"product_name",
+					"qty",
+					"total_price",
+					"courier",
+					"status",
+					"invoice",
+					"expired",
+				],
+				where: {
+					[Op.and]: [
+						{
+							invoice,
+						},
+						{ user_id: id },
+					],
+				},
+			});
+			res.status(201).send({
+				isError: false,
+				message: "Get Detail Transaction Success",
+				data,
+			});
+		} catch (error) {
+			res.status(500).send({
+				isError: true,
+				message: error.message,
+				data: error,
+			});
+		}
+	},
+
+	uploadPayment: async (req, res) => {
+		const t = await sequelize.transaction();
+		try {
+			const {invoice }= JSON.parse(req.body.data);
+			await db.transaction.update(
+				{
+					payment_proof: req.files.images[0].path,
+					status: "Waiting Approval",
+				},
+				{
+					where: {
+						invoice: invoice,
+					},
+				},
+				{ transaction: t }
+			);
+
+			await db.transaction_history.create({status: "Waiting Approval", invoice: invoice}), {transaction: t}
+			await t.commit();
+			res.status(201).send({
+				isError: false,
+				message: "Upload Payment Proof Success",
+				data: null,
+			});
+		} catch (error) {
+			await t.rollback();
+			res.status(500).send({
+				isError: true,
+				message: error.message,
+				data: error,
+			});
+		}
+	},
+
 	// getTransactionAdmin:(req,res)=>{
 	// 	const transaction = await db.transaction.findAll({group:"invoice"})
 	// 	transaction.forEach(async(value,index)=>{

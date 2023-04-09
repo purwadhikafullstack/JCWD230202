@@ -141,6 +141,113 @@ const string = [
 // 		},
 // 	]);
 // })();
+(async () => {
+	await db.branch_product.update(
+		{
+			status: "active",
+		},
+		{
+			where: {
+				status: null,
+			},
+		}
+		// {
+		// 	product_name: "Minyak Sunflower Golden Bridge",
+		// 	qty: 2,
+		// 	total_price: 2 * 79500,
+		// 	branch_id: 1,
+		// 	user_id: 12,
+		// 	invoice: `INV/097b46c2001z/${Date.now()}`,
+		// 	product_id: 150,
+		// 	status: "delivered",
+		// 	createdAt: "2023-02-26 09:11:09",
+		// },
+		// {
+		// 	product_name: "Minyak Sunflower Golden Bridge",
+		// 	qty: 2,
+		// 	total_price: 2 * 79500,
+		// 	branch_id: 1,
+		// 	user_id: 12,
+		// 	invoice: `INV/097b46c2001z/${Date.now()}`,
+		// 	product_id: 150,
+		// 	status: "delivered",
+		// 	createdAt: "2023-02-26 09:11:09",
+		// },
+		// {
+		// 	product_name: "Minyak Sunflower Golden Bridge",
+		// 	qty: 2,
+		// 	total_price: 2 * 79500,
+		// 	branch_id: 1,
+		// 	user_id: 12,
+		// 	invoice: `INV/097b46c2001z/${Date.now()}`,
+		// 	product_id: 150,
+		// 	status: "delivered",
+		// 	createdAt: "2023-02-26 09:11:09",
+		// },
+		// {
+		// 	product_name: "Minyak Sunflower Golden Bridge",
+		// 	qty: 2,
+		// 	total_price: 2 * 79500,
+		// 	branch_id: 1,
+		// 	user_id: 12,
+		// 	invoice: `INV/097b46c2001z/${Date.now()}`,
+		// 	product_id: 150,
+		// 	status: "delivered",
+		// 	createdAt: "2023-02-26 09:11:09",
+		// },
+		// {
+		// 	product_name: "Minyak Sunflower Golden Bridge",
+		// 	qty: 2,
+		// 	total_price: 2 * 79500,
+		// 	branch_id: 1,
+		// 	user_id: 12,
+		// 	invoice: `INV/097b46c2001z/${Date.now()}`,
+		// 	product_id: 150,
+		// 	status: "delivered",
+		// 	createdAt: "2023-02-26 09:11:09",
+		// },
+		// {
+		// 	product_name: "Minyak Canola Golden Bridge",
+		// 	qty: 1,
+		// 	total_price: 62300,
+		// 	branch_id: 1,
+		// 	user_id: 11,
+		// 	invoice: `INV/097b46c2001c/${Date.now()}`,
+		// 	product_id: 149,
+		// 	status: "delivered",
+		// },
+		// {
+		// 	product_name: "Minyak Wijen Lee Kum Kee",
+		// 	qty: 2,
+		// 	total_price: 2 * 64900,
+		// 	branch_id: 1,
+		// 	user_id: 11,
+		// 	invoice: `INV/097b46c2001c/${Date.now()}`,
+		// 	product_id: 138,
+		// 	status: "delivered",
+		// },
+		// {
+		// 	product_name: "Buncis Organik",
+		// 	qty: 50,
+		// 	total_price: 50 * 14700,
+		// 	branch_id: 2,
+		// 	user_id: 9,
+		// 	invoice: `INV/097b46c2001b/${Date.now()}`,
+		// 	product_id: 7,
+		// 	status: "delivered",
+		// },
+		// {
+		// 	product_name: "Wortel Organik",
+		// 	qty: 50,
+		// 	total_price: 50 * 20500,
+		// 	branch_id: 2,
+		// 	user_id: 9,
+		// 	invoice: `INV/097b46c2001b/${Date.now()}`,
+		// 	product_id: 8,
+		// 	status: "delivered",
+		// },
+	);
+})();
 // (async () => {
 // 	await db.transaction.bulkCreate([
 // 		{

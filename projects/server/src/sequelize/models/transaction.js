@@ -29,6 +29,8 @@ module.exports = (sequelize, DataTypes) => {
 				defaultValue: "Waiting Payment",
 			},
 			payment_proof: DataTypes.STRING,
+			invoice: DataTypes.STRING,
+			expired: DataTypes.DATE,
 		},
 		{
 			sequelize,

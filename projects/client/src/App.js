@@ -26,6 +26,7 @@ import NotFoundPage from "./pages/404";
 import StockHistoryDetail from "./components/stockHistoryDetail";
 import PaymentProof from "./pages/paymentProof";
 import TransactionAdmin from "./components/transaction";
+import Overview from "./components/overview";
 import ProfileSideBar from "./components/profileSideBar";
 import SuperAdminDiscountManagement from "./pages/superAdminDiscountManagement";
 
@@ -43,6 +44,7 @@ function App() {
 		profile_picture: null,
 		role: null,
 		address: null,
+		status: null,
 	});
 	const getProfile = async () => {
 		try {
@@ -50,6 +52,8 @@ function App() {
 				url: "/user/profile",
 				method: "GET",
 			});
+
+			console.log(data, "ini get profile");
 			setprofile({
 				...profile,
 				id: data.data.id,
@@ -61,6 +65,7 @@ function App() {
 				profile_picture: data.data.img,
 				role: data.data.role,
 				address: data.data.user_addresses,
+				status: data.data.status,
 			});
 		} catch (error) {
 			console.log(error);
@@ -117,7 +122,7 @@ function App() {
 				window.location.href = "http://localhost:3000/admin";
 			}, 1000);
 		} catch (error) {
-			toast.error(error.response.data.message);
+			toast.error(error.response.message);
 		} finally {
 			setdisable(false);
 		}
@@ -168,7 +173,7 @@ function App() {
 					<Route path="cart" element={<Cart state={{ profile }} />} />
 					<Route path="uploadpayment" element={<PaymentProof />} />
 				</Route>
-				<Route path="checkout" element={<Checkout state={{ profile }} />} />
+				<Route path="checkout" element={<Checkout func={{getProfile}} state={{ profile }} />} />
 				<Route
 					path="/login"
 					element={<Login MyFunc={{ onLogin }} isDisable={{ disable }} />}
@@ -182,7 +187,7 @@ function App() {
 					path="/admin"
 					element={<Dashboard state={{ profile }} Func={{ onLogout }} />}
 				>
-					{/* <Route path="/admin" element={<Overview />} /> */}
+					<Route path="overview" element={<Overview />} />
 					<Route path="sales-report" element={<SalesReport />} />
 					<Route
 						path="branch-admin-register"
@@ -199,6 +204,7 @@ function App() {
 						path="product-management"
 						element={<BranchAdminProductList />}
 					/>
+
 					<Route
 						path="discount-management"
 						element={
@@ -211,7 +217,8 @@ function App() {
 							) : null
 						}
 					/>
-					<Route path="transaction" element={<TransactionAdmin />} />
+
+					<Route path="transaction" element={<TransactionAdmin state={{profile}} />} />
 				</Route>
 				<Route
 					path="/loginAdmin"

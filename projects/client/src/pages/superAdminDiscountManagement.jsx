@@ -65,7 +65,7 @@ export default function SuperAdminDiscountManagement() {
 				>
 					<Tabs.Item active={true} title="All Discount">
 						<div className="rounded-lg max-w-screen-xl relative">
-							<div className="sticky w-full max-w-screen-xl grid grid-cols-6 bg-[#0095da] text-white px-3 rounded-md text-lg py-2 z-50">
+							<div className="sticky w-full max-w-screen-xl grid grid-cols-6 bg-[#0095da] text-white px-3 rounded-md text-lg py-2 z-40">
 								<Dropdown label="Type" inline={true}>
 									<Dropdown.Item onClick={() => sortBy("type-asc")}>
 										Ascending
@@ -135,7 +135,7 @@ export default function SuperAdminDiscountManagement() {
 					</Tabs.Item>
 					<Tabs.Item title="Waiting Approval">
 						<div className="rounded-lg max-w-screen-xl relative">
-							<div className="sticky w-full max-w-screen-xl grid grid-cols-6 bg-[#0095da] text-white px-3 rounded-md text-lg py-2 z-50">
+							<div className="sticky w-full max-w-screen-xl grid grid-cols-6 bg-[#0095da] text-white px-3 rounded-md text-lg py-2 z-40">
 								<Dropdown label="Type" inline={true}>
 									<Dropdown.Item onClick={() => sortBy("type-asc")}>
 										Ascending
@@ -218,7 +218,7 @@ export default function SuperAdminDiscountManagement() {
 					</Tabs.Item>
 					<Tabs.Item title="Active">
 						<div className="rounded-lg max-w-screen-xl relative">
-							<div className="sticky w-full max-w-screen-xl grid grid-cols-5 bg-[#0095da] text-white px-3 rounded-md text-lg py-2 z-50">
+							<div className="sticky w-full max-w-screen-xl grid grid-cols-5 bg-[#0095da] text-white px-3 rounded-md text-lg py-2 z-40">
 								<Dropdown label="Type" inline={true}>
 									<Dropdown.Item onClick={() => sortBy("type-asc")}>
 										Ascending
@@ -286,7 +286,7 @@ export default function SuperAdminDiscountManagement() {
 					</Tabs.Item>
 					<Tabs.Item title="Declined">
 						<div className="rounded-lg max-w-screen-xl relative">
-							<div className="sticky w-full max-w-screen-xl grid grid-cols-5 bg-[#0095da] text-white px-3 rounded-md text-lg py-2 z-50">
+							<div className="sticky w-full max-w-screen-xl grid grid-cols-5 bg-[#0095da] text-white px-3 rounded-md text-lg py-2 z-40">
 								<Dropdown label="Type" inline={true}>
 									<Dropdown.Item onClick={() => sortBy("type-asc")}>
 										Ascending

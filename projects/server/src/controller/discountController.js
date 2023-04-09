@@ -61,6 +61,8 @@ module.exports = {
 				where: { uid },
 				include: { model: db.branch, required: false },
 			});
+
+			console.log(admin.branch.id, "test");
 			if (status == 0) where = { branch_id: admin.branch.id };
 			if (status == 1)
 				where = {
@@ -126,6 +128,7 @@ module.exports = {
 				where: { uid },
 				include: { model: db.branch },
 			});
+
 			if (discount_id == 1) {
 				product_id.map(async (value) => {
 					await db.discount_history.create({

@@ -38,11 +38,10 @@ export default function ProductCategory() {
 				}&page=${page}&sortby=${sortby ? sortby : ""}`,
 				method: "GET",
 			});
-			console.log(data.data);
 			setproduct(data.data);
 			setselectedpage(page);
 		} catch (error) {
-			console.log(error);
+			error.response.data.message ? toast.error(error.response.data.message) : toast.error(error)		;
 		}
 	};
 
@@ -55,11 +54,10 @@ export default function ProductCategory() {
 				}&page=${page}&sortby=${sortby ? sortby : ""}`,
 				method: "GET",
 			});
-			console.log(data.data);
 			setproduct(data.data);
 			setselectedpage(page);
 		} catch (error) {
-			console.log(error);
+			error.response.data.message ? toast.error(error.response.data.message) : toast.error(error)		;
 		}
 	};
 
@@ -78,7 +76,9 @@ export default function ProductCategory() {
 				totalPage.push(i);
 			}
 			setpage(totalPage);
-		} catch (error) {}
+		} catch (error) {
+			error.response.data.message ? toast.error(error.response.data.message) : toast.error(error)		
+		}
 	};
 
 	let onGetDetail = async (branch, products) => {
@@ -87,15 +87,12 @@ export default function ProductCategory() {
 				url: `product/detail?branch=${branch}&product=${products}`,
 				method: "GET",
 			});
-			console.log(data.data[0].product);
-			// console.log(data.data[0].branch);
-			// console.log(data.data[0]);
 			setdetail(data.data[0]);
 			setunit(data.data[0].product);
 			setquantity(1);
 			setshow(true);
 		} catch (error) {
-			console.log(error);
+			error.response.data.message ? toast.error(error.response.data.message) : toast.error(error)		;
 		}
 	};
 

@@ -12,7 +12,6 @@ import LoadingSpin from "react-loading-spin";
 export default function Cart(props) {
 	const [data, setdata] = useState([]);
 	const [sum, setsum] = useState(0);
-	const [disc, setdisc] = useState(0);
 	const [disable, setdisable] = useState(false);
 	const [disableCheckout, setdisableCheckout] = useState();
 	const Navigate = useNavigate();
@@ -24,16 +23,13 @@ export default function Cart(props) {
 				method: "GET",
 			});
 			let total = 0;
-			console.log(data.data);
 			data.data.forEach((value, index) => {
-				total += value.qty * value.product.price;
+				total += value.total_price;
 			});
-			console.log(total);
 			setsum(total);
-			setdisc(5000);
 			setdata(data.data);
 		} catch (error) {
-			console.log(error);
+			error.response.data.message ? toast.error(error.response.data.message) : toast.error(error)		;
 		}
 	};
 
@@ -47,10 +43,9 @@ export default function Cart(props) {
 				},
 			});
 			toast.success(data.message);
-			console.log(data);
 			onGetCart();
 		} catch (error) {
-			console.log(error);
+			error.response.data.message ? toast.error(error.response.data.message) : toast.error(error)		;
 		}
 	};
 
@@ -66,8 +61,7 @@ export default function Cart(props) {
 						quantity: quantity,
 					},
 				});
-
-				console.log(data);
+				toast.success(data.message);
 				onGetCart();
 			} else if (operation === "-") {
 				const { data } = await REST_API({
@@ -78,11 +72,11 @@ export default function Cart(props) {
 						quantity: quantity,
 					},
 				});
-				console.log(data);
+				toast.success(data.message);
 				onGetCart();
 			}
 		} catch (error) {
-			console.log(error);
+			error.response.data.message ? toast.error(error.response.data.message) : toast.error(error)		;
 		} finally {
 			setTimeout(() => {
 				setdisable(false);
@@ -98,11 +92,16 @@ export default function Cart(props) {
 				setTimeout(() => {
 					Navigate("/checkout");
 				}, 1500);
+			} else if(props.state.profile.address === null){
+				toast.error("Please Add Main Address First")
+				setTimeout(() => {
+					Navigate("/profile")
+				})
 			} else {
 				toast.error("Please Check Your Email and Activate Your Account");
 			}
 		} catch (error) {
-			console.log(error);
+			error.response.data.message ? toast.error(error.response.data.message) : toast.error(error)		;
 		} finally {
 			setdisableCheckout(false);
 		}
@@ -114,7 +113,6 @@ export default function Cart(props) {
 		<div className=" mb-24">
 			<div className=" pt-[64px] max-w-[1120px] mx-auto ">
 				<div className=" pl-5 flex items-end h-[66px] border-b-4 font-bold ">Cart</div>
-
 				<div className="flex px-5">
 					{data.length > 0 ? (
 						<div className=" w-[685px]">
@@ -145,7 +143,7 @@ export default function Cart(props) {
 																	{value.product.name}
 																</p>
 																<p className=" flex gap-1 pl-[15px] font-tokpedFont text-[12px]">
-																	per{" "}
+																	per
 																	<p className=" font-semibold">
 																		{value.product.unit.price_at} {value.product.unit.name}
 																	</p>
@@ -167,7 +165,7 @@ export default function Cart(props) {
 																	className=" text-slate-500 hover:text-red-500"
 																/>
 															</button>
-															{value.product.branch_products[0].stock === 0 ? (
+															{value.product.branch_products.stock === 0 ? (
 																<p className="pt-4 text-red-700 font-tokpedFont font-semibold ">
 																	Stock Habis
 																</p>
@@ -191,7 +189,7 @@ export default function Cart(props) {
 																<button
 																	className=" disabled:text-slate-500 enabled:text-green-500"
 																	disabled={
-																		disable || value.qty >= value.product.branch_products[0].stock
+																		disable || value.qty >= value.product.branch_products.stock
 																			? true
 																			: false
 																	}
