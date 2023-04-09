@@ -12,6 +12,7 @@ const branch_product = async () => {
 				stock: 100,
 				branch_id: 1,
 				product_id: element.id,
+				status: "Active",
 			});
 			await db.stock_history.create({
 				stock: 100,
@@ -23,6 +24,7 @@ const branch_product = async () => {
 				stock: 100000,
 				branch_id: 1,
 				product_id: element.id,
+				status: "Active",
 			});
 			await db.stock_history.create({
 				stock: 100000,
@@ -42,6 +44,7 @@ const branch_product = async () => {
 				stock: 100,
 				branch_id: 2,
 				product_id: element.id,
+				status: "Active",
 			});
 			await db.stock_history.create({
 				stock: 100,
@@ -53,6 +56,7 @@ const branch_product = async () => {
 				stock: 100000,
 				branch_id: 2,
 				product_id: element.id,
+				status: "Active",
 			});
 			await db.stock_history.create({
 				stock: 100000,
@@ -71,6 +75,7 @@ const branch_product = async () => {
 				stock: 100,
 				branch_id: 3,
 				product_id: element.id,
+				status: "Active",
 			});
 			await db.stock_history.create({
 				stock: 100,
@@ -82,6 +87,7 @@ const branch_product = async () => {
 				stock: 100000,
 				branch_id: 3,
 				product_id: element.id,
+				status: "Active",
 			});
 			await db.stock_history.create({
 				stock: 100000,
@@ -100,6 +106,7 @@ const branch_product = async () => {
 				stock: 100,
 				branch_id: 4,
 				product_id: element.id,
+				status: "Active",
 			});
 			await db.stock_history.create({
 				stock: 100,
@@ -111,6 +118,7 @@ const branch_product = async () => {
 				stock: 100000,
 				branch_id: 4,
 				product_id: element.id,
+				status: "Active",
 			});
 			await db.stock_history.create({
 				stock: 100000,
@@ -129,6 +137,7 @@ const branch_product = async () => {
 				stock: 100,
 				branch_id: 5,
 				product_id: element.id,
+				status: "Active",
 			});
 			await db.stock_history.create({
 				stock: 100,
@@ -140,6 +149,7 @@ const branch_product = async () => {
 				stock: 100000,
 				branch_id: 5,
 				product_id: element.id,
+				status: "Active",
 			});
 			await db.stock_history.create({
 				stock: 100000,
@@ -158,6 +168,7 @@ const branch_product = async () => {
 				stock: 100,
 				branch_id: 6,
 				product_id: element.id,
+				status: "Active",
 			});
 			await db.stock_history.create({
 				stock: 100,
@@ -169,6 +180,7 @@ const branch_product = async () => {
 				stock: 100000,
 				branch_id: 6,
 				product_id: element.id,
+				status: "Active",
 			});
 			await db.stock_history.create({
 				stock: 100000,

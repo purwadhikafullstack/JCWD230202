@@ -49,7 +49,7 @@ export default function Dashboard(props) {
 
 	return (
 		<div>
-			<nav className="bg-white flex justify-between px-4 fixed top-0 z-40 w-full h-14 min-[640px]:hidden ">
+			<nav className="bg-white flex justify-between px-4 fixed top-0 z-50 w-full h-14 min-[640px]:hidden ">
 				<button
 					onClick={() => setShowSidebar(!showSidebar)}
 					className=" min-[640px]:hidden"
@@ -76,11 +76,11 @@ export default function Dashboard(props) {
 
 			{props.state.profile.role === "super admin" ? (
 				<div
-					className={`min-[640px]:hidden top-0 left-0 w-full bg-white pt-10 pl-10  fixed h-full z-40  ease-in-out duration-300 ${
+					className={`min-[640px]:hidden top-0 left-0 w-full bg-white pt-10 pl-10  fixed h-full z-50  ease-in-out duration-300 ${
 						showSidebar ? "translate-x-0" : "-translate-x-full"
 					}`}
 				>
-					<div className=" w-full flex justify-end pr-10">
+					<div className=" w-full flex justify-end pr-10 z-50">
 						<button onClick={() => setShowSidebar(!showSidebar)}>X</button>
 					</div>
 					<div>
@@ -249,11 +249,11 @@ export default function Dashboard(props) {
 				</div>
 			) : (
 				<div
-					className={`min-[640px]:hidden top-0 left-0 w-full bg-white pt-10 pl-10  fixed h-full z-40  ease-in-out duration-300 ${
+					className={`min-[640px]:hidden top-0 left-0 w-full bg-white pt-10 pl-10 fixed h-full z-50  ease-in-out duration-300 ${
 						showSidebar ? "translate-x-0" : "-translate-x-full"
 					}`}
 				>
-					<div className=" w-full flex justify-end pr-10">
+					<div className=" w-full flex justify-end pr-10 z-50">
 						<button onClick={() => setShowSidebar(!showSidebar)}>X</button>
 					</div>
 					<div>
@@ -428,11 +428,11 @@ export default function Dashboard(props) {
 					className="fixed top-0 left-0 z-50 w-64 h-screen pt-10 max-[640px]:hidden bg-[#0095DA] text-white  border-r border-gray-200  dark:bg-gray-800 dark:border-gray-700"
 					aria-label="Sidebar"
 				>
-					<a href="/home" className="flex  w-full md:mr-24">
+					<button href="/home" className="flex  w-full md:mr-24">
 						<span className=" font-mandalaFont mx-auto text-3xl w-full text-center font-extrabold  sm:text-2xl whitespace-nowrap ] dark:text-white">
 							tokonglomerat
 						</span>
-					</a>
+					</button>
 					<div className="h-full pt-10 px-3 pb-4 overflow-y-auto dark:bg-gray-800">
 						<div className="w-full flex-row items-center ">
 							<h1 className="pt-6 text-md text-center mb-6">
@@ -441,79 +441,79 @@ export default function Dashboard(props) {
 						</div>
 						<ul className="space-y-2">
 							<li>
-								<a
-									href="/admin/overview"
+								<button
+									onClick={() => Navigate("/admin/overview")}
 									className="flex items-center p-2 text-base font-normal hover:text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700"
 								>
 									<BsPieChart />
 									<span className="ml-3">Overview</span>
-								</a>
+								</button>
 							</li>
 							<li>
-								<a
-									href="/admin/branch-admin-register"
+								<button
+									onClick={() => Navigate("/admin/branch-admin-register")}
 									className="flex items-center p-2 text-base font-normal hover:text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700"
 								>
 									<BsPeople />
 									<span className="flex-1 ml-3 whitespace-nowrap">
 										Branch Admin Register
 									</span>
-								</a>
+								</button>
 							</li>
 							<li>
-								<a
-									href="/admin/transaction"
+								<button
+									onClick={() => Navigate("/admin/transaction")}
 									className="flex items-center p-2 text-base font-normal hover:text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700"
 								>
 									<BsCart />
 									<span className="flex-1 ml-3 whitespace-nowrap">
 										Transaction
 									</span>
-								</a>
+								</button>
 							</li>
 							<li>
-								<a
-									href="/admin/sales-report"
+								<button
+									onClick={() => Navigate("/admin/sales-report")}
 									className="flex items-center p-2 text-base font-normal hover:text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700"
 								>
 									<TbReportMoney />
 									<span className="flex-1 ml-3 whitespace-nowrap">
 										Sales Report
 									</span>
-								</a>
+								</button>
 							</li>
 
 							<li>
-								<a
-									href="/admin/discount-management"
+								<button
+									onClick={() => Navigate("/admin/discount-management")}
 									className="flex items-center p-2 text-base font-normal hover:text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700"
 								>
 									<TbDiscount />
 									<span className="flex-1 ml-3 whitespace-nowrap">
 										Discount Management
 									</span>
-								</a>
+								</button>
 							</li>
 							<li>
-								<a
-									href="/admin/stock-history"
+								<button
+									onClick={() => Navigate("/admin/stock-history")}
 									className="flex items-center p-2 text-base font-normal hover:text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700"
 								>
 									<BsClipboardCheck />
 									<span className="flex-1 ml-3 whitespace-nowrap">
 										Stock History
 									</span>
-								</a>
+								</button>
 							</li>
 							<li>
 								<button onClick={() => props.Func.onLogout()}>
-									<a
-										href="/loginAdmin"
+									<button
+										onClick={() => Navigate("/loginAdmin")}
 										class="flex items-center p-2 text-base font-normal hover:text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700"
 									>
 										<VscSignOut />
 										<span class="flex-1 ml-3 whitespace-nowrap">Sign Out</span>
-									</a>
+									</button>
 								</button>
 							</li>
 						</ul>
@@ -525,11 +525,11 @@ export default function Dashboard(props) {
 					className="fixed top-0 left-0 z-50 w-64 h-screen pt-10 max-[640px]:hidden border-r bg-[#0095DA] text-white  border-gray-200  dark:bg-gray-800 dark:border-gray-700"
 					aria-label="Sidebar"
 				>
-					<a href="/home" className="flex  w-full md:mr-24">
+					<button href="/home" className="flex  w-full md:mr-24">
 						<span className=" font-mandalaFont mx-auto text-4xl w-full text-center font-extrabold  sm:text-2xl whitespace-nowrap  dark:text-white">
 							tokonglomerat
 						</span>
-					</a>
+					</button>
 					<div className="h-full pt-10 px-3 pb-4 overflow-y-auto dark:bg-gray-800">
 						<div className="w-full flex-row items-center ">
 							<h1 className="pt-6 text-center text-md mb-6">
@@ -538,79 +538,79 @@ export default function Dashboard(props) {
 						</div>
 						<ul className="space-y-2">
 							<li>
-								<a
-									href="/admin/overview"
+								<button
+									onClick={() => Navigate("/admin/overview")}
 									className="flex items-center p-2 text-base font-normal hover:text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700"
 								>
 									<BsPieChart />
 									<span className="ml-3">Overview</span>
-								</a>
+								</button>
 							</li>
 							<li>
-								<a
-									href="/admin/admin-product"
+								<button
+									onClick={() => Navigate("/admin/admin-product")}
 									className="flex items-center p-2 text-base font-normal hover:text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700"
 								>
 									<BsHandbag />
 									<span className="flex-1 ml-3 whitespace-nowrap">
 										Product Management
 									</span>
-								</a>
+								</button>
 							</li>
 							<li>
-								<a
-									href="/admin/transaction"
+								<button
+									onClick={() => Navigate("/admin/transaction")}
 									className="flex items-center p-2 text-base font-normal hover:text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700"
 								>
 									<BsCart />
 									<span className="flex-1 ml-3 whitespace-nowrap">
 										Transaction
 									</span>
-								</a>
+								</button>
 							</li>
 							<li>
-								<a
-									href="/admin/sales-report"
+								<button
+									onClick={() => Navigate("/admin/sales-report")}
 									className="flex items-center p-2 text-base font-normal hover:text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700"
 								>
 									<TbReportMoney />
 									<span className="flex-1 ml-3 whitespace-nowrap">
 										Sales Report
 									</span>
-								</a>
+								</button>
 							</li>
 
 							<li>
-								<a
-									href="/admin/discount-management"
+								<button
+									onClick={() => Navigate("/admin/discount-management")}
 									className="flex items-center p-2 text-base font-normal hover:text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700"
 								>
 									<TbDiscount />
 									<span className="flex-1 ml-3 whitespace-nowrap">
 										Discount Management
 									</span>
-								</a>
+								</button>
 							</li>
 							<li>
-								<a
-									href="/admin/stock-history"
+								<button
+									onClick={() => Navigate("/admin/stock-history")}
 									className="flex items-center p-2 text-base font-normal hover:text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700"
 								>
 									<BsClipboardCheck />
 									<span className="flex-1 ml-3 whitespace-nowrap">
 										Stock History
 									</span>
-								</a>
+								</button>
 							</li>
 							<li>
 								<button onClick={() => props.Func.onLogout()}>
-									<a
-										href="/loginAdmin"
+									<button
+										onClick={() => Navigate("/admin/loginAdmin")}
 										class="flex items-center p-2 text-base font-normal hover:text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700"
 									>
 										<VscSignOut />
 										<span class="flex-1 ml-3 whitespace-nowrap">Sign Out</span>
-									</a>
+									</button>
 								</button>
 							</li>
 						</ul>

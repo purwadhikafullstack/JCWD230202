@@ -42,7 +42,7 @@ function StockHistory() {
 				},
 			}
 		);
-		console.log(response.data.data);
+		// console.log(response.data.data);
 		setData(response.data.data);
 	};
 

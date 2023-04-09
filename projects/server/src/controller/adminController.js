@@ -860,7 +860,7 @@ module.exports = {
 
 				include: [
 					{ model: db.branch },
-					{ model: db.product },
+					{ model: db.product, where: { status: "Active" } },
 					{ model: db.user },
 				],
 			});
@@ -1058,10 +1058,11 @@ module.exports = {
 
 			if (sort !== "") {
 				data = await db.branch_product.findAll({
-					where: { branch_id: admin_branch_id, status: "active" },
+					where: { branch_id: admin_branch_id, status: "Active" },
 					include: [
 						{
 							model: db.product,
+							where: { status: "Active" },
 							order: ["name", "ASC"],
 						},
 						{ model: db.branch },
@@ -1078,10 +1079,11 @@ module.exports = {
 				});
 			} else {
 				data = await db.branch_product.findAll({
-					where: { branch_id: admin_branch_id, status: "active" },
+					where: { branch_id: admin_branch_id, status: "Active" },
 					include: [
 						{
 							model: db.product,
+							where: { status: "Active" },
 						},
 						{ model: db.branch },
 					],
@@ -1180,8 +1182,7 @@ module.exports = {
 						{
 							model: db.product,
 							where: {
-								category_id: category,
-								status: "active",
+								[Op.and]: [{ category_id: category }, { status: "Active" }],
 							},
 						},
 						{ model: db.branch },
@@ -1201,8 +1202,7 @@ module.exports = {
 						{
 							model: db.product,
 							where: {
-								category_id: category,
-								status: "active",
+								[Op.and]: [{ category_id: category }, { status: "Active" }],
 							},
 						},
 						{ model: db.branch },
@@ -1465,6 +1465,7 @@ module.exports = {
 			});
 		}
 	},
+
 	updateCategoryImage: async (req, res) => {
 		const { id } = req.params;
 
@@ -1513,7 +1514,7 @@ module.exports = {
 				where: {
 					[Op.and]: [{ branch_id: admin.branch.id }, { product_id: id }],
 				},
-				include: { model: db.product },
+				include: { model: db.product, where: { status: "Active" } },
 			});
 			new HTTPStatus(res, data).success("Get product details for edit").send();
 		} catch (error) {

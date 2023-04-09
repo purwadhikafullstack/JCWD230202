@@ -5,6 +5,95 @@ const { sequelize } = require("../sequelize/models");
 const moment = require("moment");
 
 module.exports = {
+	tryEventScheduler: async (req, res) => {
+		const { uid } = req.uid;
+		let query = "";
+
+		try {
+			const transaction = await db.transaction.bulkCreate([
+				{
+					product_name: "Pakcoy",
+					qty: 200,
+					total_price: 8000,
+					shipping_cost: 1000,
+					user_address: "Jl. Jalan",
+					courier: "JNE",
+					invoice: `INV/${uid.slice(-12)}/${Date.now()}`,
+					status: "Waiting Payment",
+					branch_id: 1,
+					user_id: 21,
+					product_id: 1,
+				},
+				{
+					product_name: "Labu Siam Besar",
+					qty: 300,
+					total_price: 13500,
+					shipping_cost: 1000,
+					user_address: "Jl. Jalan",
+					courier: "JNE",
+					invoice: `INV/${uid.slice(-12)}/${Date.now()}`,
+					status: "Waiting Payment",
+					branch_id: 1,
+					user_id: 21,
+					product_id: 1,
+				},
+			]);
+
+			for (let i = 0; i < transaction.length; i++) {
+				const { stock } = await db.branch_product.findOne({
+					where: {
+						[Op.and]: [
+							{ branch_id: transaction[i].branch_id },
+							{ product_id: transaction[i].product_id },
+						],
+					},
+				});
+				query += `INSERT INTO toko.stock_history(stock,createdAt,branch_id,product_id) VALUES(${
+					stock + transaction[i].qty
+				},NOW(),${transaction[i].branch_id},${transaction[i].product_id});
+				UPDATE toko.branch_product SET stock = ${
+					stock + transaction[i].qty
+				} WHERE branch_id = ${transaction[i].branch_id} AND product_id = ${
+					transaction[i].product_id
+				};`;
+			}
+
+			// await sequelize.query(`
+			// CREATE EVENT trx_${
+			// 				transaction[transaction.length - 1].id
+			// 			} ON SCHEDULE AT NOW() + INTERVAL 2 HOUR
+			// DO BEGIN
+			// UPDATE toko.transaction SET status = "Expired" WHERE invoice = ${
+			// 				transaction[0].invoice
+			// 			};
+			// INSERT INTO toko.transaction_history(status,invoice,createdAt)
+			// SELECT "Expired", "${transaction[0].invoice}",NOW() FROM DUAL
+			// WHERE EXISTS(SELECT 1 FROM toko.transactions WHERE invoice="${
+			// 				transaction[0].invoice
+			// 			}" AND payment_proof IS NULL);
+			// ${query}
+
+			// END;`);
+
+			sequelize.query(
+				`CREATE EVENT trx_${
+					transaction[transaction.length - 1].id
+				} ON SCHEDULE AT NOW() + INTERVAL 2 HOUR
+				DO BEGIN
+				UPDATE toko.transaction SET status = "Expired" WHERE invoice = ${
+					transaction[0].invoice
+				};
+				INSERT INTO toko.transaction_history(status,invoice,createdAt) VALUES("Expired",${
+					transaction[0].invoice
+				},NOW());
+				${query}
+				END;`
+			);
+			new HTTPStatus(res).success("Event Created").send();
+		} catch (error) {
+			new HTTPStatus(res, error).error(error.message).send();
+		}
+	},
 	getTransaction: async (req, res) => {
 		const { uid } = req.uid;
 		const { status } = req.query;

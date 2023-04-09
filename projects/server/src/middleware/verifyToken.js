@@ -14,7 +14,7 @@ module.exports = {
 		try {
 			req.uid = validateToken(token);
 
-			next()
+			next();
 		} catch (error) {
 			res.status(401).send({
 				isError: true,

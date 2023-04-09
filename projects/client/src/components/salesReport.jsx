@@ -43,33 +43,20 @@ function SalesReport() {
 
 	let onGetData = async (page, filter, sort) => {
 		try {
-			// let localStorage.getItem("token") = localStorage.getItem("token");
-			let responseTransaction = await axios.get(
-				`http://localhost:8000/admin/sales-report?report=transaction&page=${page}&filter=${filter}&sort=${sort}`,
-				{
-					headers: {
-						token: localStorage.getItem("token"),
-					},
-				}
-			);
+			let responseTransaction = await REST_API({
+				url: `/admin/sales-report?report=transaction&page=${page}&filter=${filter}&sort=${sort}`,
+				method: "GET",
+			});
 
-			let responseProduct = await axios.get(
-				`http://localhost:8000/admin/sales-report?report=product&page=${page}&filter=${filter}&sort=${sort}`,
-				{
-					headers: {
-						token: localStorage.getItem("token"),
-					},
-				}
-			);
+			let responseProduct = await REST_API({
+				url: `/admin/sales-report?report=product&page=${page}&filter=${filter}&sort=${sort}`,
+				method: "GET",
+			});
 
-			let responseUser = await axios.get(
-				`http://localhost:8000/admin/sales-report?report=user&page=${page}&filter=${filter}&sort=${sort}`,
-				{
-					headers: {
-						token: localStorage.getItem("token"),
-					},
-				}
-			);
+			let responseUser = await REST_API({
+				url: `/admin/sales-report?report=user&page=${page}&filter=${filter}&sort=${sort}`,
+				method: "GET",
+			});
 
 			setDataTransaction(responseTransaction.data.data);
 			setDataProduct(responseProduct.data.data);
@@ -77,7 +64,7 @@ function SalesReport() {
 			setselectedpage(page);
 
 			console.log(responseTransaction.data.data, "trans");
-			console.log(responseProduct.data.data);
+			console.log(responseProduct.data.data, "");
 			console.log(responseUser.data.data);
 		} catch (error) {
 			console.log(error);
@@ -273,8 +260,8 @@ function SalesReport() {
 										})
 									) : (
 										<Table.Body className="divide-y">
-											<Table.Row className="bg-white dark:border-gray-700 dark:bg-gray-800">
-												<Table.Cell className="text-center">
+											<Table.Row className=" dark:border-gray-700 dark:bg-gray-800 col-span-full w-full">
+												<Table.Cell className="text-center  " colSpan="full">
 													<Empty image={Empty.PRESENTED_IMAGE_SIMPLE} />
 												</Table.Cell>
 											</Table.Row>

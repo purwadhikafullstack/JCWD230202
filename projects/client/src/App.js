@@ -30,7 +30,6 @@ import Overview from "./components/overview";
 import ProfileSideBar from "./components/profileSideBar";
 import SuperAdminDiscountManagement from "./pages/superAdminDiscountManagement";
 
-
 function App() {
 	const navigate = useNavigate();
 	const [disable, setdisable] = useState();
@@ -173,9 +172,11 @@ function App() {
 					<Route path="category/:product" element={<ProductCategory />} />
 					<Route path="cart" element={<Cart state={{ profile }} />} />
 					<Route path="uploadpayment" element={<PaymentProof />} />
-
 				</Route>
-				<Route path="checkout" element={<Checkout func={{getProfile}} state={{ profile }} />} />
+				<Route
+					path="checkout"
+					element={<Checkout func={{ getProfile }} state={{ profile }} />}
+				/>
 				<Route
 					path="/login"
 					element={<Login MyFunc={{ onLogin }} isDisable={{ disable }} />}
@@ -211,16 +212,19 @@ function App() {
 						path="discount-management"
 						element={
 							profile ? (
-								profile.role === "Branch Admin" ? (
+								profile.role === "branch admin" ? (
 									<DiscountManagement />
-								) : profile.role === "Super Admin" ? (
+								) : profile.role === "super admin" ? (
 									<SuperAdminDiscountManagement />
 								) : null
 							) : null
 						}
 					/>
 
-					<Route path="transaction" element={<TransactionAdmin state={{profile}} />} />
+					<Route
+						path="transaction"
+						element={<TransactionAdmin state={{ profile }} />}
+					/>
 				</Route>
 				<Route
 					path="/loginAdmin"
