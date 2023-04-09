@@ -29,7 +29,6 @@ module.exports = {
 
 			let role = admin.role;
 
-			
 			if (role === "branch admin") {
 				admin_branch_id = admin.branch.id;
 			}
@@ -836,10 +835,8 @@ module.exports = {
 				{ transaction: t }
 			);
 
-
 			let role = admin.role;
 			// console.log(role, "role");
-
 
 			if (role === "super admin") {
 				if (!email.length || !password.length) {
@@ -1003,6 +1000,7 @@ module.exports = {
 					include: [
 						{
 							model: db.product,
+							where: { status: "Active" },
 							order: ["name", "ASC"],
 						},
 						{ model: db.branch },
@@ -1023,6 +1021,7 @@ module.exports = {
 					include: [
 						{
 							model: db.product,
+							where: { status: "Active" },
 						},
 						{ model: db.branch },
 					],
@@ -1121,7 +1120,7 @@ module.exports = {
 						{
 							model: db.product,
 							where: {
-								category_id: category,
+								[Op.and]: [{ category_id: category }, { status: "Active" }],
 							},
 						},
 						{ model: db.branch },
@@ -1141,7 +1140,7 @@ module.exports = {
 						{
 							model: db.product,
 							where: {
-								category_id: category,
+								[Op.and]: [{ category_id: category }, { status: "Active" }],
 							},
 						},
 						{ model: db.branch },
@@ -1378,8 +1377,8 @@ module.exports = {
 				message: error.message,
 				data: error.data,
 			});
-		}},
-
+		}
+	},
 
 	updateCategoryImage: async (req, res) => {
 		const { id } = req.params;
@@ -1429,12 +1428,11 @@ module.exports = {
 				where: {
 					[Op.and]: [{ branch_id: admin.branch.id }, { product_id: id }],
 				},
-				include: { model: db.product },
+				include: { model: db.product, where: { status: "Active" } },
 			});
 			new HTTPStatus(res, data).success("Get product details for edit").send();
 		} catch (error) {
 			new HTTPStatus(res, error).error(error.message).send();
-
 		}
 	},
 };

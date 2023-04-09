@@ -203,9 +203,9 @@ function App() {
 						path="discount-management"
 						element={
 							profile ? (
-								profile.role === "Branch Admin" ? (
+								profile.role === "branch admin" ? (
 									<DiscountManagement />
-								) : profile.role === "Super Admin" ? (
+								) : profile.role === "super admin" ? (
 									<SuperAdminDiscountManagement />
 								) : null
 							) : null

@@ -8,6 +8,7 @@ module.exports = {
 	tryEventScheduler: async (req, res) => {
 		const { uid } = req.uid;
 		let query = "";
+
 		try {
 			const transaction = await db.transaction.bulkCreate([
 				{
@@ -38,43 +39,57 @@ module.exports = {
 				},
 			]);
 
-			transaction.forEach(async (element) => {
+			for (let i = 0; i < transaction.length; i++) {
 				const { stock } = await db.branch_product.findOne({
 					where: {
 						[Op.and]: [
-							{ branch_id: element.branch_id },
-							{ product_id: element.product_id },
+							{ branch_id: transaction[i].branch_id },
+							{ product_id: transaction[i].product_id },
 						],
 					},
 				});
-				console.log(stock);
+				query += `INSERT INTO toko.stock_history(stock,createdAt,branch_id,product_id) VALUES(${
+					stock + transaction[i].qty
+				},NOW(),${transaction[i].branch_id},${transaction[i].product_id});
+				UPDATE toko.branch_product SET stock = ${
+					stock + transaction[i].qty
+				} WHERE branch_id = ${transaction[i].branch_id} AND product_id = ${
+					transaction[i].product_id
+				};`;
+			}
 
-				// query.push("12");
-				query += "test";
-				console.log(query);
+			// await sequelize.query(`
+			// CREATE EVENT trx_${
+			// 				transaction[transaction.length - 1].id
+			// 			} ON SCHEDULE AT NOW() + INTERVAL 2 HOUR
+			// DO BEGIN
+			// UPDATE toko.transaction SET status = "Expired" WHERE invoice = ${
+			// 				transaction[0].invoice
+			// 			};
+			// INSERT INTO toko.transaction_history(status,invoice,createdAt)
+			// SELECT "Expired", "${transaction[0].invoice}",NOW() FROM DUAL
+			// WHERE EXISTS(SELECT 1 FROM toko.transactions WHERE invoice="${
+			// 				transaction[0].invoice
+			// 			}" AND payment_proof IS NULL);
+			// ${query}
 
-				// query += `INSERT INTO toko.stock_history(stock,createdAt,branch_id,product_id) VALUES(${
-				// 	element.invoice
-				// },NOW(),${element.branch_id},${element.product_id});
-				// 	UPDATE toko.branch_product SET stock = ${
-				// 		stock + element.qty
-				// 	} WHERE branch_id = ${element.branch_id} AND product_id = ${
-				// 	element.product_id
-				// };`;
-			});
+			// END;`);
 
-			// sequelize.query(`DELIMITER |
-			// CREATE EVENT ${transaction[0].invoice}
-			// 	ON SCHEDULE AT ${transaction[0].createdAt} + INTERVAL 1 MINUTE
-			// 	DO
-			// BEGIN
-			// 	UPDATE toko.transaction SET status = "Expired" WHERE invoice = ${transaction[0].invoice};
-			// 	INSERT INTO toko.transaction_history(status,invoice,createdAt) VALUES("Expired",${transaction[0].invoice},NOW());
-			// 	${query}
-			// END |
-			// DELIMITER ;`);
-			res.status(200).send("test");
-			// new HTTPStatus(res, query).success("Event Created").send();
+			sequelize.query(
+				`CREATE EVENT trx_${
+					transaction[transaction.length - 1].id
+				} ON SCHEDULE AT NOW() + INTERVAL 2 HOUR
+				DO BEGIN
+				UPDATE toko.transaction SET status = "Expired" WHERE invoice = ${
+					transaction[0].invoice
+				};
+				INSERT INTO toko.transaction_history(status,invoice,createdAt) VALUES("Expired",${
+					transaction[0].invoice
+				},NOW());
+				${query}
+				END;`
+			);
+			new HTTPStatus(res).success("Event Created").send();
 		} catch (error) {
 			new HTTPStatus(res, error).error(error.message).send();
 		}

@@ -59,7 +59,7 @@ module.exports = {
 			let where;
 			const admin = await db.user.findOne({
 				where: { uid },
-				include: { model: db.branch },
+				include: { model: db.branch, required: false },
 			});
 			if (status == 0) where = { branch_id: admin.branch.id };
 			if (status == 1)
@@ -99,10 +99,14 @@ module.exports = {
 		const { page } = req.query;
 		try {
 			const totalPage = await db.product.count({
-				where: { name: { [Op.substring]: name } },
+				where: {
+					[Op.and]: [{ name: { [Op.substring]: name } }, { status: "Active" }],
+				},
 			});
 			const data = await db.product.findAll({
-				where: { name: { [Op.substring]: name } },
+				where: {
+					[Op.and]: [{ name: { [Op.substring]: name } }, { status: "Active" }],
+				},
 				offset: page == 1 ? 0 : (page - 1) * 12,
 				limit: 12,
 			});

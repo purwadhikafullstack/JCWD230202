@@ -4,6 +4,7 @@ const HTTPStatus = require("../helper/HTTPStatus");
 const { sequelize } = require("../sequelize/models");
 const deleteFiles = require("../helper/deleteFiles");
 const getProximity = require("../lib/proximity");
+const { validateToken } = require("../lib/jwt");
 
 module.exports = {
 	editProduct: async (req, res) => {
@@ -64,9 +65,9 @@ module.exports = {
 				include: { model: db.user_address, where: { main_address: true } },
 			});
 			const proximity = await getProximity(
-				user.user_addresses[0].lat, 
+				user.user_addresses[0].lat,
 				user.user_addresses[0].lng
-				);
+			);
 			new HTTPStatus(res, proximity).success("Get nearest branch").send();
 		} catch (error) {
 			new HTTPStatus(res, error).error(error.message).send();
@@ -117,7 +118,7 @@ module.exports = {
 	},
 	createProduct: async (req, res) => {
 		const { uid } = req.uid;
-		const { name, price, category_id, stock, unit_id, description } = 
+		const { name, price, category_id, stock, unit_id, description } =
 			JSON.parse(req.body.data);
 		const t = await sequelize.transaction();
 		try {
@@ -162,38 +163,45 @@ module.exports = {
 		}
 	},
 	getSuggested: async (req, res) => {
-		const user = req.uid;
+		const user = req.headers;
 		let data;
 		try {
-			if (user === undefined) {
+			if (user.token === undefined) {
 				data = await db.transaction.findAll({
 					attributes: [
 						[
-						sequelize.fn("COUNT", sequelize.col("product_name")), 
-						"total_transaction"
-						]
+							sequelize.fn("COUNT", sequelize.col("product_name")),
+							"total_transaction",
+						],
 					],
-					limit: 10,
 					include: [
 						{
 							model: db.product,
-							attributes: ["id", "name", "img", "price", "description"],
 							include: [
-								{ model: db.unit },
+								{
+									model: db.unit,
+								},
 								{
 									model: db.discount_history,
+									where: {
+										status: "Active",
+									},
+									required: false,
 								},
 							],
 						},
 						{ model: db.branch, attributes: ["id", "location"] },
 					],
-					group: ["product_name"],
-					// order: [["total_transaction", "DESC"]],
+					group: ["product.id"],
+					order: [
+						[sequelize.fn("COUNT", sequelize.col("product_name")), "DESC"],
+					],
 				});
 			} else {
+				const { uid } = validateToken(user.token);
 				const address = await db.user.findOne({
-					where: { uid: user.uid },
-					include: { model: db.user_address },
+					where: { uid },
+					include: { model: db.user_address, where: { main_address: true } },
 				});
 
 				const proximity = await getProximity(
@@ -205,26 +213,32 @@ module.exports = {
 					where: { branch_id: proximity[0].id },
 					attributes: [
 						[
-							sequelize.fn("COUNT", sequelize.col("product_name")), 
-							"total_transaction"
-						]
+							sequelize.fn("COUNT", sequelize.col("product_name")),
+							"total_transaction",
+						],
 					],
-					limit: 10,
 					include: [
 						{
 							model: db.product,
-							attributes: ["id", "name", "img", "price", "description"],
 							include: [
-								{ model: db.unit },
+								{
+									model: db.unit,
+								},
 								{
 									model: db.discount_history,
+									where: {
+										status: "Active",
+									},
+									required: false,
 								},
 							],
 						},
 						{ model: db.branch, attributes: ["id", "location"] },
 					],
-					group: ["product_name"],
-					// order: [["total_transaction", "DESC"]],
+					group: ["product.id"],
+					order: [
+						[sequelize.fn("COUNT", sequelize.col("product_name")), "DESC"],
+					],
 				});
 			}
 
@@ -234,15 +248,20 @@ module.exports = {
 		}
 	},
 	getRandom: async (req, res) => {
-		const user = req.uid;
+		const user = req.headers;
 		let data;
 		try {
-			if (user === undefined) {
+			if (user.token === undefined) {
 				data = await db.branch_product.findAll({
 					where: { branch_id: 1 },
 					include: [
 						{
 							model: db.product,
+							include: {
+								model: db.discount_history,
+								where: { status: "Active" },
+								required: false,
+							},
 						},
 						{ model: db.branch },
 					],
@@ -250,9 +269,10 @@ module.exports = {
 					limit: 10,
 				});
 			} else {
+				const { uid } = validateToken(user.token);
 				const address = await db.user.findOne({
-					where: { uid: user.uid },
-					include: { model: db.user_address },
+					where: { uid },
+					include: { model: db.user_address, where: { main_address: true } },
 				});
 
 				const proximity = await getProximity(
@@ -272,7 +292,7 @@ module.exports = {
 						},
 						{ model: db.branch },
 					],
-					offset: 3,
+					offset: Math.floor(Math.random() * 155),
 					limit: 10,
 				});
 			}
@@ -368,7 +388,10 @@ module.exports = {
 				where: {
 					[Op.and]: [{ branch_id: branch }, { product_id: product }],
 				},
-				include: [{ model: db.branch }, { model: db.product, include: { model: db.unit } }],
+				include: [
+					{ model: db.branch },
+					{ model: db.product, include: { model: db.unit } },
+				],
 			});
 
 			res.status(201).send({

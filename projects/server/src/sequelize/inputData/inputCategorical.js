@@ -1,7 +1,7 @@
 require("dotenv").config();
 const db = require("../models");
 const axios = require("axios");
-const { hashPassword } = require("../lib/hash");
+const { hashPassword } = require("../../lib/hash");
 
 const user = async () => {
 	let pass_1 = "Aswin123456";

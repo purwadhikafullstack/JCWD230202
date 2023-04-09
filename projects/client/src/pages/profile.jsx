@@ -525,6 +525,7 @@ export default function Profile(props) {
 									onChange={(e) => {
 										rakirCity(e.target.value.split(".")[0]);
 										setValue("province", e.target.value);
+										console.log(e.target.value);
 									}}
 								>
 									<option value="selected">Select province</option>
@@ -547,6 +548,7 @@ export default function Profile(props) {
 									className="border-gray-300 rounded-lg bg-gray-50 w-full"
 									onChange={(e) => {
 										setValue("city", e.target.value);
+										console.log(e.target.value);
 									}}
 								>
 									<option value="selected">Select city</option>
