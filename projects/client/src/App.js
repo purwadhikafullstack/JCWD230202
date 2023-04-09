@@ -53,7 +53,6 @@ function App() {
 				method: "GET",
 			});
 
-			console.log(data, "ini get profile");
 			setprofile({
 				...profile,
 				id: data.data.id,
