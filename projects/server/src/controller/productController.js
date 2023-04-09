@@ -193,7 +193,6 @@ module.exports = {
 						},
 						{ model: db.branch, attributes: ["id", "location"] },
 					],
-					limit: 10,
 					group: ["product.id"],
 					order: [
 						[sequelize.fn("COUNT", sequelize.col("product_name")), "DESC"],
@@ -238,7 +237,6 @@ module.exports = {
 						},
 						{ model: db.branch, attributes: ["id", "location"] },
 					],
-					limit: 10,
 					group: ["product.id"],
 					order: [
 						[sequelize.fn("COUNT", sequelize.col("product_name")), "DESC"],
