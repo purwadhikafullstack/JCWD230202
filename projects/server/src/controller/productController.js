@@ -177,6 +177,7 @@ module.exports = {
 					include: [
 						{
 							model: db.product,
+							where: { status: "Active" },
 							include: [
 								{
 									model: db.unit,
@@ -220,6 +221,7 @@ module.exports = {
 					include: [
 						{
 							model: db.product,
+							where: { status: "Active" },
 							include: [
 								{
 									model: db.unit,
@@ -257,6 +259,7 @@ module.exports = {
 					include: [
 						{
 							model: db.product,
+							where: { status: "Active" },
 							include: {
 								model: db.discount_history,
 								where: { status: "Active" },
@@ -284,6 +287,7 @@ module.exports = {
 					include: [
 						{
 							model: db.product,
+							where: { status: "Active" },
 							include: {
 								model: db.discount_history,
 								where: { status: "Active" },

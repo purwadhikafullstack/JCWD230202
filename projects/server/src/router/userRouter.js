@@ -17,6 +17,12 @@ Router.patch(
 	userController.editProfilePic
 );
 Router.patch(
+	"/transaction/payment-proof",
+	tokenVerify,
+	upload,
+	userController.editPaymentProof
+);
+Router.patch(
 	"/profile/change-password",
 	tokenVerify,
 	userController.changePassword

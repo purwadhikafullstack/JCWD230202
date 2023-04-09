@@ -220,7 +220,7 @@ module.exports = {
 						invoice,
 					},
 					include: [
-						{ model: db.product, attributes: ["img", "price"] },
+						{ model: db.product, attributes: ["img", "price"],where:{status:"Active"} },
 						{ model: db.user, attributes: ["name"] },
 						{
 							model: db.discount_history,
@@ -256,7 +256,7 @@ module.exports = {
 						],
 					},
 					include: [
-						{ model: db.product, attributes: ["img", "price"] },
+						{ model: db.product, attributes: ["img", "price"],where:{status:"Active"} },
 						{ model: db.user, attributes: ["name"] },
 						{
 							model: db.discount_history,

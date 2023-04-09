@@ -1,12 +1,14 @@
 import React, { useEffect, useState } from "react";
 import { toast, Toaster } from "react-hot-toast";
-import { Tabs, Badge, Modal } from "flowbite-react";
+import { Tabs, Badge, Modal, Label, Spinner, Button } from "flowbite-react";
 import REST_API from "../support/services/RESTApiService";
 
 export default function Transaction(props) {
 	const [transaction, settransaction] = useState(null);
 	const [selected, setselected] = useState();
 	const [show, setshow] = useState(false);
+	const [showupload, setshowupload] = useState(false);
+	const [img, setimg] = useState(false);
 
 	const getTransaction = async (status) => {
 		try {
@@ -62,6 +64,35 @@ export default function Transaction(props) {
 			console.log(error);
 		}
 	};
+	const onSubmitPP = async () => {
+		const fd = new FormData();
+		try {
+			fd.append("images", img);
+			await REST_API({
+				url: "/user/transaction/payment-proof",
+				method: "PATCH",
+				data: fd,
+			});
+			toast.success("Payment Proof Uploaded");
+			getTransaction(0);
+		} catch (error) {
+			toast.error("Upload image failed");
+		}
+	};
+	const validateImage = (e) => {
+		const err = {
+			msg1: "Select 1 Image only!",
+			msg2: `${e.target.files[0].name} more than 1MB`,
+		};
+		try {
+			if (e.target.files > 1) throw err.msg1;
+
+			if (e.target.files[0].size > 1000000) throw err.msg2;
+			setimg(e.target.files[0]);
+		} catch (error) {
+			toast.error(error);
+		}
+	};
 
 	useEffect(() => {
 		getTransaction(0);
@@ -70,7 +101,6 @@ export default function Transaction(props) {
 	}, []);
 	return (
 		<>
-			{console.log(selected)}
 			<div className="flex justify-center font-tokpedFont">
 				<div className="max-w-screen-xl w-full p-8">
 					<h1 className="pb-8 text-2xl font-semibold text-gray-500">
@@ -144,7 +174,10 @@ export default function Transaction(props) {
 												<div className="flex justify-end">
 													{value.status === "Waiting Payment" ? (
 														<div className="space-x-5">
-															<button className="inline-flex items-center mt-4 px-3 py-2 text-sm font-medium text-center text-white bg-[#0095da] rounded-lg hover:bg-blue-800">
+															<button
+																onClick={() => setshowupload(true)}
+																className="inline-flex items-center mt-4 px-3 py-2 text-sm font-medium text-center text-white bg-[#0095da] rounded-lg hover:bg-blue-800"
+															>
 																Upload payment proof
 															</button>
 															<button
@@ -241,7 +274,10 @@ export default function Transaction(props) {
 												<div className="flex justify-end">
 													{value.status === "Waiting Payment" ? (
 														<div className="space-x-5">
-															<button className="inline-flex items-center mt-4 px-3 py-2 text-sm font-medium text-center text-white bg-[#0095da] rounded-lg hover:bg-blue-800">
+															<button
+																onClick={() => setshowupload(true)}
+																className="inline-flex items-center mt-4 px-3 py-2 text-sm font-medium text-center text-white bg-[#0095da] rounded-lg hover:bg-blue-800"
+															>
 																Upload payment proof
 															</button>
 															<button
@@ -338,7 +374,10 @@ export default function Transaction(props) {
 												<div className="flex justify-end">
 													{value.status === "Waiting Payment" ? (
 														<div className="space-x-5">
-															<button className="inline-flex items-center mt-4 px-3 py-2 text-sm font-medium text-center text-white bg-[#0095da] rounded-lg hover:bg-blue-800">
+															<button
+																onClick={() => setshowupload(true)}
+																className="inline-flex items-center mt-4 px-3 py-2 text-sm font-medium text-center text-white bg-[#0095da] rounded-lg hover:bg-blue-800"
+															>
 																Upload payment proof
 															</button>
 															<button
@@ -435,7 +474,10 @@ export default function Transaction(props) {
 												<div className="flex justify-end">
 													{value.status === "Waiting Payment" ? (
 														<div className="space-x-5">
-															<button className="inline-flex items-center mt-4 px-3 py-2 text-sm font-medium text-center text-white bg-[#0095da] rounded-lg hover:bg-blue-800">
+															<button
+																onClick={() => setshowupload(true)}
+																className="inline-flex items-center mt-4 px-3 py-2 text-sm font-medium text-center text-white bg-[#0095da] rounded-lg hover:bg-blue-800"
+															>
 																Upload payment proof
 															</button>
 															<button
@@ -532,7 +574,10 @@ export default function Transaction(props) {
 												<div className="flex justify-end">
 													{value.status === "Waiting Payment" ? (
 														<div className="space-x-5">
-															<button className="inline-flex items-center mt-4 px-3 py-2 text-sm font-medium text-center text-white bg-[#0095da] rounded-lg hover:bg-blue-800">
+															<button
+																onClick={() => setshowupload(true)}
+																className="inline-flex items-center mt-4 px-3 py-2 text-sm font-medium text-center text-white bg-[#0095da] rounded-lg hover:bg-blue-800"
+															>
 																Upload payment proof
 															</button>
 															<button
@@ -649,6 +694,45 @@ export default function Transaction(props) {
 									</div>
 								);
 							})}
+						</div>
+					</div>
+				</Modal.Body>
+			</Modal>
+			<Modal
+				show={showupload}
+				size="md"
+				popup={true}
+				onClose={() => setshowupload(false)}
+				id="name modal"
+			>
+				<Modal.Header />
+				<Modal.Body>
+					<div className="space-y-6 px-6 pb-4 sm:pb-6 lg:px-8 xl:pb-8">
+						<h3 className="text-xl font-medium text-gray-900 dark:text-white">
+							Upload your payment proof
+						</h3>
+						<div className="space-y-2">
+							<div className="mb-2 block">
+								<Label htmlFor="password" value="Upload image" />
+							</div>
+							<input
+								type="file"
+								name="myImage"
+								accept="image/png, image/gif, image/jpeg, image/jpg"
+								onChange={(e) => validateImage(e)}
+								className="rounded-lg bg-slate-500 text-white"
+							/>
+							<p className="text-xs">Upload image with .jpg, .png, .jpeg</p>
+							<p className="text-xs">Max size 1MB</p>
+						</div>
+						<div className="w-full flex justify-end">
+							{show.loading ? (
+								<button>
+									<Spinner aria-label="Default status example" />
+								</button>
+							) : (
+								<Button onClick={() => onSubmitPP()}>Submit</Button>
+							)}
 						</div>
 					</div>
 				</Modal.Body>

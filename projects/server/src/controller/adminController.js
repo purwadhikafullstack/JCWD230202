@@ -860,7 +860,7 @@ module.exports = {
 
 				include: [
 					{ model: db.branch },
-					{ model: db.product },
+					{ model: db.product,where:{status:"Active"} },
 					{ model: db.user },
 				],
 			});

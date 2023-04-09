@@ -7,6 +7,8 @@ import {
 	Spinner,
 	Textarea,
 	Checkbox,
+	Tabs,
+	Badge,
 } from "flowbite-react";
 import { AiFillEye, AiFillEyeInvisible } from "react-icons/ai";
 import { useForm } from "react-hook-form";
@@ -18,6 +20,7 @@ import REST_API from "../support/services/RESTApiService";
 
 export default function Profile(props) {
 	const [date, setdate] = useState();
+	const [img, setimg] = useState();
 	const [rakir, setrakir] = useState({
 		province: null,
 		city: null,
@@ -33,6 +36,8 @@ export default function Profile(props) {
 		oldPassword: false,
 		newPassword: false,
 		confirmPassword: false,
+		transactionDetail: false,
+		paymentProof: false,
 	});
 
 	const {
@@ -41,6 +46,79 @@ export default function Profile(props) {
 		formState: { errors },
 		setValue,
 	} = useForm();
+
+	const [transaction, settransaction] = useState(null);
+	const [selected, setselected] = useState();
+
+	const getTransaction = async (status) => {
+		try {
+			const { data } = await REST_API({
+				url: `/transaction?status=${status}`,
+				method: "GET",
+			});
+			settransaction(data.data);
+		} catch (error) {
+			console.log(error);
+		}
+	};
+
+	const cancel = async (invoice) => {
+		try {
+			await REST_API({
+				url: `/transaction/status/cancel`,
+				method: "PATCH",
+				data: { invoice },
+			});
+			toast.success("Transaction canceled");
+			getTransaction();
+		} catch (error) {
+			toast.error("Something went wrong");
+			console.log(error);
+		}
+	};
+	const received = async (invoice) => {
+		try {
+			await REST_API({
+				url: `/transaction/status/received`,
+				method: "PATCH",
+				data: { invoice },
+			});
+			toast.success("Pakage received");
+			getTransaction();
+		} catch (error) {
+			toast.error("Something went wrong");
+			console.log(error);
+		}
+	};
+
+	const findTransaction = async (invoice) => {
+		try {
+			const { data } = await REST_API({
+				url: `/transaction/find?invoice=${invoice}`,
+				method: "GET",
+			});
+			// console.log(data.data);
+			setselected(data.data);
+			setshow(true);
+		} catch (error) {
+			console.log(error);
+		}
+	};
+	const onSubmitPaymentProof = async () => {
+		const fd = new FormData();
+		try {
+			fd.append("images", img);
+			await REST_API({
+				url: "/user/transaction/payment-proof",
+				method: "PATCH",
+				data: fd,
+			});
+			toast.success("Payment Proof Uploaded");
+			getTransaction(0);
+		} catch (error) {
+			toast.error("Upload image failed");
+		}
+	};
 
 	const onSubmit = async (data) => {
 		setshow({ ...show, loading: true });
@@ -86,6 +164,22 @@ export default function Profile(props) {
 			toast.error(error.message);
 		} finally {
 			setshow({ ...show, loading: false, changePassword: false });
+		}
+	};
+	const onSubmitPP = async () => {
+		const fd = new FormData();
+		try {
+			fd.append("images", img);
+			await REST_API({
+				url: "/user/profile/picture",
+				method: "PATCH",
+				data: fd,
+			});
+			toast("Profile picture updated");
+			props.func.getProfile();
+			setshow({ ...show, changeProfilePic: false });
+		} catch (error) {
+			toast.error("Upload image failed");
 		}
 	};
 
@@ -136,6 +230,22 @@ export default function Profile(props) {
 			console.log(error);
 		}
 	};
+
+	const validateImage = (e) => {
+		const err = {
+			msg1: "Select 1 Image only!",
+			msg2: `${e.target.files[0].name} more than 1MB`,
+		};
+		try {
+			if (e.target.files > 1) throw err.msg1;
+
+			if (e.target.files[0].size > 1000000) throw err.msg2;
+			setimg(e.target.files[0]);
+		} catch (error) {
+			toast.error(error);
+		}
+	};
+
 	const onSubmitAddAddress = async (data) => {
 		setshow({ ...show, loading: true });
 		try {
@@ -161,13 +271,706 @@ export default function Profile(props) {
 		setValue("phone_number", props.state.profile.phone_number);
 		rakirProvince();
 		props.state.setselected("profile");
+		getTransaction(0);
 		// eslint-disable-next-line
 	}, []);
 	return (
 		<>
 			<div className="pt-10 flex flex-col justify-start font-tokpedFont items-start pl-10">
 				<div className=" max-w-screen-sm w-full space-y-5">
-					<div className="relative">
+					<img
+						src={
+							props.state.profile.profile_picture
+								? `http://localhost:8000/${props.state.profile.profile_picture}`
+								: ""
+						}
+						alt="Profile"
+						className="lg:hidden h-64 w-80 shadow-md object-cover rounded-full"
+					/>
+					<div className="lg:hidden">
+						<Tabs.Group aria-label="Default tabs">
+							<Tabs.Item active={true} title="Profile">
+								<div className="space-y-2">
+									<div className="relative">
+										<p className="absolute z-10 left-3 top-2 text-xs text-[#0095da] font-semibold tracking-wider">
+											Full name
+										</p>
+										<input
+											type="text"
+											disabled={true}
+											className="bg-gray-50 w-full border pt-6 border-gray-300 text-gray-900 text-sm rounded-lg"
+											placeholder={props.state.profile.name}
+										/>
+									</div>
+									<div className="relative">
+										<p className="absolute z-10 left-3 top-2 text-xs text-[#0095da] font-semibold tracking-wider">
+											Email
+										</p>
+										<input
+											type="text"
+											disabled={true}
+											className="bg-gray-50 w-full border pt-6 border-gray-300 text-gray-900 text-sm rounded-lg"
+											placeholder={props.state.profile.email}
+										/>
+									</div>
+									<div className="relative">
+										<p className="absolute z-10 left-3 top-2 text-xs text-[#0095da] font-semibold tracking-wider">
+											Phone number
+										</p>
+										<input
+											type="text"
+											className="bg-gray-50 w-full border pt-6 border-gray-300 text-gray-900 text-sm rounded-lg"
+											placeholder={props.state.profile.phone_number}
+											disabled={true}
+										/>
+									</div>
+									<div className="relative">
+										<button
+											onClick={() => setshow({ ...show, changePassword: true })}
+											className="absolute z-10 right-3 top-5 text-xs text-[#0095da] font-semibold tracking-wider"
+										>
+											Change
+										</button>
+										<input
+											type="text"
+											disabled={true}
+											className="bg-gray-50 w-full border py-4 border-gray-300 text-gray-900 text-sm rounded-lg"
+											placeholder="Password"
+										/>
+									</div>
+									<div className="relative">
+										<p className="absolute z-10 left-3 top-2 text-xs text-[#0095da] font-semibold tracking-wider">
+											Gender
+										</p>
+										<input
+											type="text"
+											disabled={true}
+											className="bg-gray-50 w-full border pt-7 border-gray-300 text-gray-900 text-sm rounded-lg"
+											placeholder={props.state.profile.gender}
+										/>
+									</div>
+									<div className="relative">
+										<p className="absolute z-10 left-3 top-2 text-xs text-[#0095da] font-semibold tracking-wider">
+											Birthdate
+										</p>
+										<input
+											type="text"
+											disabled={true}
+											className="bg-gray-50 w-full border pt-7 border-gray-300 text-gray-900 text-sm rounded-lg"
+											placeholder={props.state.profile.birthdate}
+										/>
+									</div>
+									<div className="flex justify-end max-w-screen-sm w-full mt-2">
+										<button
+											onClick={() => setshow({ ...show, changeAddress: true })}
+											className="text-[#0095da] rounded-lg text-sm font-semibold tracking-wider"
+										>
+											manage your address
+										</button>
+									</div>
+									<div className="flex justify-end max-w-screen-sm w-full mt-2">
+										<button
+											onClick={() =>
+												setshow({ ...show, changeProfilePic: true })
+											}
+											className="text-[#0095da] rounded-lg text-sm font-semibold tracking-wider"
+										>
+											Change profile picture
+										</button>
+									</div>
+									<div className="flex justify-start space-x-5">
+										<button
+											onClick={() => setshow({ ...show, edit: true })}
+											className="p-2 rounded-lg bg-[#0095da] text-white"
+										>
+											Edit profile
+										</button>
+									</div>
+								</div>
+							</Tabs.Item>
+							<Tabs.Item title="Transaction">
+								<div className="flex justify-center font-tokpedFont">
+									<div className="max-w-screen-xl w-full p-8">
+										<h1 className="pb-8 text-2xl font-semibold text-gray-500">
+											Transaction List
+										</h1>
+										<Tabs.Group
+											aria-label="Default tabs"
+											onActiveTabChange={(e) => getTransaction(e)}
+										>
+											<Tabs.Item active={true} title="All transaction">
+												{transaction?.length !== 0 ? (
+													transaction?.map((value, index) => {
+														return (
+															<button
+																onClick={() => findTransaction(value.invoice)}
+																className="p-6 mt-5 flex bg-white border border-gray-200 rounded-lg shadow w-full"
+																key={index}
+															>
+																<img
+																	src={value.product.img}
+																	alt=""
+																	className="h-32 w-32 object-cover rounded-lg mr-5"
+																/>
+																<div className="w-full">
+																	<div className="flex items-center space-x-2 mb-2 text-gray-500">
+																		<p>{value.createdAt.split("T")[0]}</p>
+																		<p className="text-xs my-1">
+																			{value.invoice}
+																		</p>
+																	</div>
+																	<div className="grid grid-cols-5">
+																		<div className="flex flex-col items-start col-span-4">
+																			{value.total_item === 1 ? (
+																				<h5 className="text-xl font-bold tracking-tight text-gray-500">
+																					{value.product_name}
+																				</h5>
+																			) : (
+																				<>
+																					<h5 className="text-xl font-bold tracking-tight text-gray-500">
+																						{value.product_name}
+																					</h5>
+																					<h4 className="text-gray-500 text-xs">
+																						+ {value.total_item - 1} item
+																					</h4>
+																				</>
+																			)}
+																			<div className="w-fit py-1 rounded-lg mt-2s">
+																				<Badge
+																					color={
+																						value.status === "Delivered"
+																							? "info"
+																							: value.status ===
+																									"Waiting Payment" ||
+																							  "Sent" ||
+																							  "On Process" ||
+																							  "Waiting Approval"
+																							? "warning"
+																							: value.status === "Canceled"
+																							? "failure"
+																							: ""
+																					}
+																				>
+																					{value.status}
+																				</Badge>
+																			</div>
+																		</div>
+																		<div className="col-span-1 flex flex-col items-end justify-center border-l-[1px]">
+																			<p className="text-sm text-gray-500">
+																				Total price
+																			</p>
+																			<p>
+																				Rp.{" "}
+																				{parseInt(
+																					value.total_price
+																				).toLocaleString()}
+																			</p>
+																		</div>
+																	</div>
+																	<div className="flex justify-end">
+																		{value.status === "Waiting Payment" ? (
+																			<div className="space-x-5">
+																				<button
+																					onClick={() =>
+																						setshow({
+																							...show,
+																							paymentProof: true,
+																						})
+																					}
+																					className="inline-flex items-center mt-4 px-3 py-2 text-sm font-medium text-center text-white bg-[#0095da] rounded-lg hover:bg-blue-800"
+																				>
+																					Upload payment proof
+																				</button>
+																				<button
+																					onClick={() => cancel(value.invoice)}
+																					className="inline-flex items-center mt-4 px-3 py-2 text-sm font-medium text-center border-[1px] text-red-900 border-[#0095da] bg-white rounded-lg hover:bg-blue-100"
+																				>
+																					Cancel
+																				</button>
+																			</div>
+																		) : value.status === "Sent" ? (
+																			<button
+																				onClick={() => received(value.invoice)}
+																				className="inline-flex items-center mt-4 px-3 py-2 text-sm font-medium text-center text-white bg-blue-700 rounded-lg hover:bg-blue-800"
+																			>
+																				Received
+																			</button>
+																		) : null}
+																	</div>
+																</div>
+															</button>
+														);
+													})
+												) : (
+													<div>
+														<img
+															src={require("../support/assets/49e58d5922019b8ec4642a2e2b9291c2.png")}
+															alt="no transaction found"
+															className="w-full z-50"
+														/>
+													</div>
+												)}
+											</Tabs.Item>
+											<Tabs.Item title="Waiting payment">
+												{transaction?.length !== 0 ? (
+													transaction?.map((value, index) => {
+														return (
+															<div
+																onClick={() => findTransaction(value.invoice)}
+																className="p-6 mt-5 flex bg-white border border-gray-200 rounded-lg shadow w-full"
+																key={index}
+															>
+																<img
+																	src={value.product.img}
+																	alt=""
+																	className="h-32 w-32 object-cover rounded-lg mr-5"
+																/>
+																<div className="w-full">
+																	<div className="flex items-center space-x-2 mb-2 text-gray-500">
+																		<p>{value.createdAt.split("T")[0]}</p>
+																		<p className="text-xs my-1">
+																			{value.invoice}
+																		</p>
+																	</div>
+																	<div className="grid grid-cols-5">
+																		<div className="flex flex-col items-start col-span-4">
+																			{value.total_item === 1 ? (
+																				<h5 className="text-xl font-bold tracking-tight text-gray-500">
+																					{value.product_name}
+																				</h5>
+																			) : (
+																				<>
+																					<h5 className="text-xl font-bold tracking-tight text-gray-500">
+																						{value.product_name}
+																					</h5>
+																					<h4 className="text-gray-500 text-xs">
+																						+ {value.total_item - 1} item
+																					</h4>
+																				</>
+																			)}
+																			<div className="w-fit py-1 rounded-lg mt-2s">
+																				<Badge
+																					color={
+																						value.status === "Delivered"
+																							? "info"
+																							: value.status ===
+																									"Waiting Payment" ||
+																							  "Sent" ||
+																							  "On Process" ||
+																							  "Waiting Approval"
+																							? "warning"
+																							: value.status === "Canceled"
+																							? "failure"
+																							: ""
+																					}
+																				>
+																					{value.status}
+																				</Badge>
+																			</div>
+																		</div>
+																		<div className="col-span-1 flex flex-col items-end justify-center border-l-[1px]">
+																			<p className="text-sm text-gray-500">
+																				Total price
+																			</p>
+																			<p>
+																				Rp.{" "}
+																				{parseInt(
+																					value.total_price
+																				).toLocaleString()}
+																			</p>
+																		</div>
+																	</div>
+																	<div className="flex justify-end">
+																		{value.status === "Waiting Payment" ? (
+																			<div className="space-x-5">
+																				<button
+																					onClick={() =>
+																						setshow({
+																							...show,
+																							paymentProof: true,
+																						})
+																					}
+																					className="inline-flex items-center mt-4 px-3 py-2 text-sm font-medium text-center text-white bg-[#0095da] rounded-lg hover:bg-blue-800"
+																				>
+																					Upload payment proof
+																				</button>
+																				<button
+																					onClick={() => cancel(value.invoice)}
+																					className="inline-flex items-center mt-4 px-3 py-2 text-sm font-medium text-center border-[1px] text-red-900 border-[#0095da] bg-white rounded-lg hover:bg-blue-100"
+																				>
+																					Cancel
+																				</button>
+																			</div>
+																		) : value.status === "Sent" ? (
+																			<button
+																				onClick={() => received(value.invoice)}
+																				className="inline-flex items-center mt-4 px-3 py-2 text-sm font-medium text-center text-white bg-blue-700 rounded-lg hover:bg-blue-800"
+																			>
+																				Received
+																			</button>
+																		) : null}
+																	</div>
+																</div>
+															</div>
+														);
+													})
+												) : (
+													<div>
+														<img
+															src={require("../support/assets/49e58d5922019b8ec4642a2e2b9291c2.png")}
+															alt="no transaction found"
+															className="w-full z-50"
+														/>
+													</div>
+												)}
+											</Tabs.Item>
+											<Tabs.Item title="On going">
+												{transaction?.length !== 0 ? (
+													transaction?.map((value, index) => {
+														return (
+															<div
+																onClick={() => findTransaction(value.invoice)}
+																className="p-6 mt-5 flex bg-white border border-gray-200 rounded-lg shadow w-full"
+																key={index}
+															>
+																<img
+																	src={value.product.img}
+																	alt=""
+																	className="h-32 w-32 object-cover rounded-lg mr-5"
+																/>
+																<div className="w-full">
+																	<div className="flex items-center space-x-2 mb-2 text-gray-500">
+																		<p>{value.createdAt.split("T")[0]}</p>
+																		<p className="text-xs my-1">
+																			{value.invoice}
+																		</p>
+																	</div>
+																	<div className="grid grid-cols-5">
+																		<div className="flex flex-col items-start col-span-4">
+																			{value.total_item === 1 ? (
+																				<h5 className="text-xl font-bold tracking-tight text-gray-500">
+																					{value.product_name}
+																				</h5>
+																			) : (
+																				<>
+																					<h5 className="text-xl font-bold tracking-tight text-gray-500">
+																						{value.product_name}
+																					</h5>
+																					<h4 className="text-gray-500 text-xs">
+																						+ {value.total_item - 1} item
+																					</h4>
+																				</>
+																			)}
+																			<div className="w-fit py-1 rounded-lg mt-2s">
+																				<Badge
+																					color={
+																						value.status === "Delivered"
+																							? "info"
+																							: value.status ===
+																									"Waiting Payment" ||
+																							  "Sent" ||
+																							  "On Process" ||
+																							  "Waiting Approval"
+																							? "warning"
+																							: value.status === "Canceled"
+																							? "failure"
+																							: ""
+																					}
+																				>
+																					{value.status}
+																				</Badge>
+																			</div>
+																		</div>
+																		<div className="col-span-1 flex flex-col items-end justify-center border-l-[1px]">
+																			<p className="text-sm text-gray-500">
+																				Total price
+																			</p>
+																			<p>
+																				Rp.{" "}
+																				{parseInt(
+																					value.total_price
+																				).toLocaleString()}
+																			</p>
+																		</div>
+																	</div>
+																	<div className="flex justify-end">
+																		{value.status === "Waiting Payment" ? (
+																			<div className="space-x-5">
+																				<button
+																					onClick={() =>
+																						setshow({
+																							...show,
+																							paymentProof: true,
+																						})
+																					}
+																					className="inline-flex items-center mt-4 px-3 py-2 text-sm font-medium text-center text-white bg-[#0095da] rounded-lg hover:bg-blue-800"
+																				>
+																					Upload payment proof
+																				</button>
+																				<button
+																					onClick={() => cancel(value.invoice)}
+																					className="inline-flex items-center mt-4 px-3 py-2 text-sm font-medium text-center border-[1px] text-red-900 border-[#0095da] bg-white rounded-lg hover:bg-blue-100"
+																				>
+																					Cancel
+																				</button>
+																			</div>
+																		) : value.status === "Sent" ? (
+																			<button
+																				onClick={() => received(value.invoice)}
+																				className="inline-flex items-center mt-4 px-3 py-2 text-sm font-medium text-center text-white bg-blue-700 rounded-lg hover:bg-blue-800"
+																			>
+																				Received
+																			</button>
+																		) : null}
+																	</div>
+																</div>
+															</div>
+														);
+													})
+												) : (
+													<div>
+														<img
+															src={require("../support/assets/49e58d5922019b8ec4642a2e2b9291c2.png")}
+															alt="no transaction found"
+															className="w-full z-50"
+														/>
+													</div>
+												)}
+											</Tabs.Item>
+											<Tabs.Item title="Done">
+												{transaction?.length !== 0 ? (
+													transaction?.map((value, index) => {
+														return (
+															<div
+																onClick={() => findTransaction(value.invoice)}
+																className="p-6 mt-5 flex bg-white border border-gray-200 rounded-lg shadow w-full"
+																key={index}
+															>
+																<img
+																	src={value.product.img}
+																	alt=""
+																	className="h-32 w-32 object-cover rounded-lg mr-5"
+																/>
+																<div className="w-full">
+																	<div className="flex items-center space-x-2 mb-2 text-gray-500">
+																		<p>{value.createdAt.split("T")[0]}</p>
+																		<p className="text-xs my-1">
+																			{value.invoice}
+																		</p>
+																	</div>
+																	<div className="grid grid-cols-5">
+																		<div className="flex flex-col items-start col-span-4">
+																			{value.total_item === 1 ? (
+																				<h5 className="text-xl font-bold tracking-tight text-gray-500">
+																					{value.product_name}
+																				</h5>
+																			) : (
+																				<>
+																					<h5 className="text-xl font-bold tracking-tight text-gray-500">
+																						{value.product_name}
+																					</h5>
+																					<h4 className="text-gray-500 text-xs">
+																						+ {value.total_item - 1} item
+																					</h4>
+																				</>
+																			)}
+																			<div className="w-fit py-1 rounded-lg mt-2s">
+																				<Badge
+																					color={
+																						value.status === "Delivered"
+																							? "info"
+																							: value.status ===
+																									"Waiting Payment" ||
+																							  "Sent" ||
+																							  "On Process" ||
+																							  "Waiting Approval"
+																							? "warning"
+																							: value.status === "Canceled"
+																							? "failure"
+																							: ""
+																					}
+																				>
+																					{value.status}
+																				</Badge>
+																			</div>
+																		</div>
+																		<div className="col-span-1 flex flex-col items-end justify-center border-l-[1px]">
+																			<p className="text-sm text-gray-500">
+																				Total price
+																			</p>
+																			<p>
+																				Rp.{" "}
+																				{parseInt(
+																					value.total_price
+																				).toLocaleString()}
+																			</p>
+																		</div>
+																	</div>
+																	<div className="flex justify-end">
+																		{value.status === "Waiting Payment" ? (
+																			<div className="space-x-5">
+																				<button
+																					onClick={() =>
+																						setshow({
+																							...show,
+																							paymentProof: true,
+																						})
+																					}
+																					className="inline-flex items-center mt-4 px-3 py-2 text-sm font-medium text-center text-white bg-[#0095da] rounded-lg hover:bg-blue-800"
+																				>
+																					Upload payment proof
+																				</button>
+																				<button
+																					onClick={() => cancel(value.invoice)}
+																					className="inline-flex items-center mt-4 px-3 py-2 text-sm font-medium text-center border-[1px] text-red-900 border-[#0095da] bg-white rounded-lg hover:bg-blue-100"
+																				>
+																					Cancel
+																				</button>
+																			</div>
+																		) : value.status === "Sent" ? (
+																			<button
+																				onClick={() => received(value.invoice)}
+																				className="inline-flex items-center mt-4 px-3 py-2 text-sm font-medium text-center text-white bg-blue-700 rounded-lg hover:bg-blue-800"
+																			>
+																				Received
+																			</button>
+																		) : null}
+																	</div>
+																</div>
+															</div>
+														);
+													})
+												) : (
+													<div>
+														<img
+															src={require("../support/assets/49e58d5922019b8ec4642a2e2b9291c2.png")}
+															alt="no transaction found"
+															className="w-full z-50"
+														/>
+													</div>
+												)}
+											</Tabs.Item>
+											<Tabs.Item title="Canceled">
+												{transaction?.length !== 0 ? (
+													transaction?.map((value, index) => {
+														return (
+															<div
+																onClick={() => findTransaction(value.invoice)}
+																className="p-6 mt-5 flex bg-white border border-gray-200 rounded-lg shadow w-full"
+																key={index}
+															>
+																<img
+																	src={value.product.img}
+																	alt=""
+																	className="h-32 w-32 object-cover rounded-lg mr-5"
+																/>
+																<div className="w-full">
+																	<div className="flex items-center space-x-2 mb-2 text-gray-500">
+																		<p>{value.createdAt.split("T")[0]}</p>
+																		<p className="text-xs my-1">
+																			{value.invoice}
+																		</p>
+																	</div>
+																	<div className="grid grid-cols-5">
+																		<div className="flex flex-col items-start col-span-4">
+																			{value.total_item === 1 ? (
+																				<h5 className="text-xl font-bold tracking-tight text-gray-500">
+																					{value.product_name}
+																				</h5>
+																			) : (
+																				<>
+																					<h5 className="text-xl font-bold tracking-tight text-gray-500">
+																						{value.product_name}
+																					</h5>
+																					<h4 className="text-gray-500 text-xs">
+																						+ {value.total_item - 1} item
+																					</h4>
+																				</>
+																			)}
+																			<div className="w-fit py-1 rounded-lg mt-2s">
+																				<Badge
+																					color={
+																						value.status === "Delivered"
+																							? "info"
+																							: value.status ===
+																									"Waiting Payment" ||
+																							  "Sent" ||
+																							  "On Process" ||
+																							  "Waiting Approval"
+																							? "warning"
+																							: value.status === "Canceled"
+																							? "failure"
+																							: ""
+																					}
+																				>
+																					{value.status}
+																				</Badge>
+																			</div>
+																		</div>
+																		<div className="col-span-1 flex flex-col items-end justify-center border-l-[1px]">
+																			<p className="text-sm text-gray-500">
+																				Total price
+																			</p>
+																			<p>
+																				Rp.{" "}
+																				{parseInt(
+																					value.total_price
+																				).toLocaleString()}
+																			</p>
+																		</div>
+																	</div>
+																	<div className="flex justify-end">
+																		{value.status === "Waiting Payment" ? (
+																			<div className="space-x-5">
+																				<button
+																					onClick={() =>
+																						setshow({
+																							...show,
+																							paymentProof: true,
+																						})
+																					}
+																					className="inline-flex items-center mt-4 px-3 py-2 text-sm font-medium text-center text-white bg-[#0095da] rounded-lg hover:bg-blue-800"
+																				>
+																					Upload payment proof
+																				</button>
+																				<button
+																					onClick={() => cancel(value.invoice)}
+																					className="inline-flex items-center mt-4 px-3 py-2 text-sm font-medium text-center border-[1px] text-red-900 border-[#0095da] bg-white rounded-lg hover:bg-blue-100"
+																				>
+																					Cancel
+																				</button>
+																			</div>
+																		) : value.status === "Sent" ? (
+																			<button
+																				onClick={() => received(value.invoice)}
+																				className="inline-flex items-center mt-4 px-3 py-2 text-sm font-medium text-center text-white bg-blue-700 rounded-lg hover:bg-blue-800"
+																			>
+																				Received
+																			</button>
+																		) : null}
+																	</div>
+																</div>
+															</div>
+														);
+													})
+												) : (
+													<div>
+														<img
+															src={require("../support/assets/49e58d5922019b8ec4642a2e2b9291c2.png")}
+															alt="no transaction found"
+															className="w-full z-50"
+														/>
+													</div>
+												)}
+											</Tabs.Item>
+										</Tabs.Group>
+									</div>
+								</div>
+							</Tabs.Item>
+						</Tabs.Group>
+					</div>
+
+					<div className="relative hidden lg:block">
 						<p className="absolute z-10 left-3 top-2 text-xs text-[#0095da] font-semibold tracking-wider">
 							Full name
 						</p>
@@ -178,7 +981,7 @@ export default function Profile(props) {
 							placeholder={props.state.profile.name}
 						/>
 					</div>
-					<div className="relative">
+					<div className="relative hidden lg:block">
 						<p className="absolute z-10 left-3 top-2 text-xs text-[#0095da] font-semibold tracking-wider">
 							Email
 						</p>
@@ -189,7 +992,7 @@ export default function Profile(props) {
 							placeholder={props.state.profile.email}
 						/>
 					</div>
-					<div className="relative">
+					<div className="relative hidden lg:block">
 						<p className="absolute z-10 left-3 top-2 text-xs text-[#0095da] font-semibold tracking-wider">
 							Phone number
 						</p>
@@ -200,7 +1003,7 @@ export default function Profile(props) {
 							disabled={true}
 						/>
 					</div>
-					<div className="relative">
+					<div className="relative hidden lg:block">
 						<button
 							onClick={() => setshow({ ...show, changePassword: true })}
 							className="absolute z-10 right-3 top-5 text-xs text-[#0095da] font-semibold tracking-wider"
@@ -214,7 +1017,7 @@ export default function Profile(props) {
 							placeholder="Password"
 						/>
 					</div>
-					<div className="relative">
+					<div className="relative hidden lg:block">
 						<p className="absolute z-10 left-3 top-2 text-xs text-[#0095da] font-semibold tracking-wider">
 							Gender
 						</p>
@@ -225,7 +1028,7 @@ export default function Profile(props) {
 							placeholder={props.state.profile.gender}
 						/>
 					</div>
-					<div className="relative">
+					<div className="relative hidden lg:block">
 						<p className="absolute z-10 left-3 top-2 text-xs text-[#0095da] font-semibold tracking-wider">
 							Birthdate
 						</p>
@@ -237,7 +1040,7 @@ export default function Profile(props) {
 						/>
 					</div>
 				</div>
-				<div className="flex justify-end max-w-screen-sm w-full mt-2">
+				<div className="lg:flex justify-end max-w-screen-sm w-full mt-2 hidden">
 					<button
 						onClick={() => setshow({ ...show, changeAddress: true })}
 						className="text-[#0095da] rounded-lg text-sm font-semibold tracking-wider"
@@ -245,7 +1048,7 @@ export default function Profile(props) {
 						manage your address
 					</button>
 				</div>
-				<div className="flex justify-start space-x-5">
+				<div className="lg:flex justify-start space-x-5 hidden">
 					<button
 						onClick={() => setshow({ ...show, edit: true })}
 						className="p-2 rounded-lg bg-[#0095da] text-white"
@@ -397,7 +1200,45 @@ export default function Profile(props) {
 						</form>
 					</Modal.Body>
 				</Modal>
-
+				<Modal
+					show={show.changeProfilePic}
+					size="md"
+					popup={true}
+					onClose={() => setshow({ ...show, changeProfilePic: false })}
+					id="name modal"
+				>
+					<Modal.Header />
+					<Modal.Body>
+						<div className="space-y-6 px-6 pb-4 sm:pb-6 lg:px-8 xl:pb-8">
+							<h3 className="text-xl font-medium text-gray-900 dark:text-white">
+								Change your profile picture
+							</h3>
+							<div className="space-y-2">
+								<div className="mb-2 block">
+									<Label htmlFor="password" value="Upload image" />
+								</div>
+								<input
+									type="file"
+									name="myImage"
+									accept="image/png, image/gif, image/jpeg, image/jpg"
+									onChange={(e) => validateImage(e)}
+									className="rounded-lg bg-slate-500 text-white"
+								/>
+								<p className="text-xs">Upload image with .jpg, .png, .jpeg</p>
+								<p className="text-xs">Max size 1MB</p>
+							</div>
+							<div className="w-full flex justify-end">
+								{show.loading ? (
+									<button>
+										<Spinner aria-label="Default status example" />
+									</button>
+								) : (
+									<Button onClick={() => onSubmitPP()}>Submit</Button>
+								)}
+							</div>
+						</div>
+					</Modal.Body>
+				</Modal>
 				<Modal
 					show={show.changePassword}
 					size="md"
@@ -712,6 +1553,129 @@ export default function Profile(props) {
 										);
 								  })
 								: null}
+						</div>
+					</Modal.Body>
+				</Modal>
+				<Modal
+					show={show.transactionDetail}
+					size="2xl"
+					onClose={() => setshow(false)}
+					id="transaction detail modal"
+				>
+					<Modal.Header>
+						<p>Transaction Detail</p>
+					</Modal.Header>
+					<Modal.Body>
+						<div className="mx-2">
+							<div className="border-b-8 pb-3">
+								<p className="font-bold tracking-wide">
+									{selected ? selected[0].status : null}
+								</p>
+								<hr />
+								<div className="flex justify-between">
+									<p>Invoice</p>
+									<p>{selected ? selected[0].invoice : null}</p>
+								</div>
+								<div className="flex justify-between">
+									<p>Date</p>
+									<p>
+										{selected
+											? `${new Date(selected[0].createdAt).toLocaleString(
+													"id-ID",
+													{
+														timeZone: "Asia/Jakarta",
+														dateStyle: "long",
+													}
+											  )},
+										  ${new Date(selected[0].createdAt).toLocaleString("id-ID", {
+												timeZone: "Asia/Jakarta",
+												timeStyle: "short",
+											})} WIB`
+											: null}
+									</p>
+								</div>
+							</div>
+							<div className="pt-5 space-y-3 border-b-8 pb-3">
+								<p className="font-bold">Product Details</p>
+								{selected?.map((value, index) => {
+									return (
+										<div
+											onClick={() => findTransaction(value.invoice)}
+											className="p-6 flex bg-white border border-gray-200 rounded-lg shadow w-full"
+											key={index}
+										>
+											<img
+												src={value.product.img}
+												alt=""
+												className="w-14 h-14 object-cover rounded-lg mr-5"
+											/>
+											<div className="w-full">
+												<div className="grid grid-cols-5">
+													<div className="flex flex-col items-start col-span-4">
+														<h5 className="font-bold tracking-tight text-gray-500">
+															{value.product_name}
+														</h5>
+														<p className="text-sm font-light">
+															{selected
+																? `
+															${value.qty / value.product.unit.price_at} (@${value.product.unit.price_at}${
+																		value.product.unit.name
+																  }) x ${value.product.price}
+															`
+																: null}
+														</p>
+													</div>
+													<div className="col-span-1 flex flex-col items-end justify-center border-l-[1px]">
+														<p className="text-sm text-gray-500">Total price</p>
+														<p>
+															Rp. {parseInt(value.total_price).toLocaleString()}
+														</p>
+													</div>
+												</div>
+											</div>
+										</div>
+									);
+								})}
+							</div>
+						</div>
+					</Modal.Body>
+				</Modal>
+				<Modal
+					show={show.paymentProof}
+					size="md"
+					popup={true}
+					onClose={() => setshow({ ...show, paymentProof: true })}
+					id="name modal"
+				>
+					<Modal.Header />
+					<Modal.Body>
+						<div className="space-y-6 px-6 pb-4 sm:pb-6 lg:px-8 xl:pb-8">
+							<h3 className="text-xl font-medium text-gray-900 dark:text-white">
+								Upload your payment proof
+							</h3>
+							<div className="space-y-2">
+								<div className="mb-2 block">
+									<Label htmlFor="password" value="Upload image" />
+								</div>
+								<input
+									type="file"
+									name="myImage"
+									accept="image/png, image/gif, image/jpeg, image/jpg"
+									onChange={(e) => validateImage(e)}
+									className="rounded-lg bg-slate-500 text-white"
+								/>
+								<p className="text-xs">Upload image with .jpg, .png, .jpeg</p>
+								<p className="text-xs">Max size 1MB</p>
+							</div>
+							<div className="w-full flex justify-end">
+								{show.loading ? (
+									<button>
+										<Spinner aria-label="Default status example" />
+									</button>
+								) : (
+									<Button onClick={() => onSubmitPaymentProof()}>Submit</Button>
+								)}
+							</div>
 						</div>
 					</Modal.Body>
 				</Modal>
