@@ -55,14 +55,14 @@ export default function LandingPage() {
 		desktop: {
 			breakpoint: {
 				max: 3000,
-				min: 1024,
+				min: 1200,
 			},
 			items: 1,
 			partialVisibilityGutter: 50,
 		},
 		mobile: {
 			breakpoint: {
-				max: 640,
+				max: 900,
 				min: 0,
 			},
 			items: 1,
@@ -157,8 +157,6 @@ export default function LandingPage() {
 				url: `/product/foryou`,
 				method: "GET",
 			});
-			console.log(data.data);
-
 			setrandom(data.data);
 		} catch (error) {
 			console.log(error);
@@ -205,7 +203,7 @@ export default function LandingPage() {
 		<>
 			<div className="pt-24 max-w-screen-xl mx-auto font-tokpedFont px-2">
 				<div className="flex justify-center mt-5">
-					<div className="h-56 sm:h-64 xl:h-64 w-full">
+					<div className="h-fit lg:h-56 sm:h-64 xl:h-64 w-full">
 						<Carousel
 							additionalTransfrom={0}
 							arrows={false}
@@ -250,16 +248,13 @@ export default function LandingPage() {
 						</Carousel>
 					</div>
 				</div>
-				<div className="grid grid-cols-10 gap-5 py-10">
+				<div className="grid lg:grid-cols-10 grid-cols-5 gap-1 lg:gap-5 py-10">
 					{category
 						? category.map((value, index) => {
 								return (
 									<button key={index} className="space-y-2 h-max">
 										<div
-											onClick={() =>
-												navigate(
-													`/category/category=${value.id}`)
-											}
+											onClick={() => navigate(`/category/category=${value.id}`)}
 											className="flex flex-col justify-center items-center space-y-1"
 										>
 											<img
@@ -267,7 +262,7 @@ export default function LandingPage() {
 												alt={value.name}
 												className="w-11/12 rounded-full overflow-visible"
 											/>
-											<p className=" font-medium font-tokpedFont text-sm">
+											<p className=" font-medium font-tokpedFont lg:text-sm text-xs">
 												{value.name}
 											</p>
 										</div>
@@ -300,25 +295,95 @@ export default function LandingPage() {
 										onClick={(e) => {
 											onGetDetail(value.branch.id, value.product.id);
 										}}
-										className="flex flex-col shadow-md w-48 h-fit bg-white border border-gray-200 rounded-lg"
+										className="flex flex-col shadow-md lg:w-48 w-28 lg:h-80 h-60 bg-white border border-gray-200 rounded-lg"
 									>
 										<img
-											className="rounded-t-lg h-44 object-cover mb-3"
+											className="rounded-t-lg lg:h-44 h-36 object-cover mb-3"
 											src={value.product.img}
 											alt="product"
 										/>
 										<div className="px-5 pb-5 flex flex-col justify-start items-start">
-											<h5 className="text-sm tracking-tight text-gray-900 ">
+											<h5 className="lg:text-sm text-xs tracking-tight text-gray-900">
 												{value.product.name.slice(0, 17)}...
 											</h5>
-											<div className="flex flex-col items-start justify-start">
-												<p className="text-lg font-bold text-gray-900 ">
-													Rp. {value.product.price.toLocaleString()}
-												</p>
-												<h4 className="text-xs font-thin">
-													Toko {value.branch.location}
-												</h4>
-											</div>
+											{value.product.discount_histories.length === 1 ? (
+												value.product.discount_histories[0].discount_id ===
+												3 ? (
+													<div className="flex flex-col justify-start items-start space-y-1 relative">
+														<p className="lg:text-md text-xs font-bold text-gray-900">
+															Rp.{" "}
+															{(
+																value.product.price -
+																(value.product.price *
+																	value.product.discount_histories[0].percent) /
+																	100
+															).toLocaleString()}
+														</p>
+														<div className="flex items-center space-x-2">
+															<p className="text-[10px] font-bold text-gray-900 line-through">
+																Rp. {value.product.price.toLocaleString()}
+															</p>
+															<Badge className="text-[9px]">
+																{value.product.discount_histories[0].percent}%
+															</Badge>
+														</div>
+														<h4 className="text-xs font-thin">
+															Toko {value.branch.location}
+														</h4>
+													</div>
+												) : value.product.discount_histories[0].discount_id ===
+												  2 ? (
+													<div className="flex flex-col justify-start items-start space-y-1 relative">
+														<p className="lg:text-md text-xs font-bold text-gray-900">
+															Rp.{" "}
+															{(
+																value.product.price -
+																(value.product.price *
+																	value.product.discount_histories[0].percent) /
+																	100
+															).toLocaleString()}
+														</p>
+														<div className="flex items-center space-x-2">
+															<p className="text-[10px] font-bold text-gray-900 line-through">
+																Rp. {value.product.price.toLocaleString()}
+															</p>
+															<Badge className="text-[9px]">
+																{value.product.discount_histories[0].percent}%
+															</Badge>
+														</div>
+														<p className="text-[10px] text-red-700">
+															Minimum{" "}
+															{value.product.discount_histories[0].min_purchase}{" "}
+															item
+														</p>
+														<h4 className="text-xs font-thin">
+															Toko {value.branch.location}
+														</h4>
+													</div>
+												) : value.product.discount_histories[0].discount_id ===
+												  1 ? (
+													<div className="flex flex-col justify-start items-start space-y-1">
+														<p className="lg:text-md text-xs font-bold text-gray-900">
+															Rp. {value.product.price.toLocaleString()}
+														</p>
+														<p className="text-[10px] text-red-700">
+															BUY 1 FREE 1
+														</p>
+														<h4 className="text-xs font-thin">
+															Toko {value.branch.location}
+														</h4>
+													</div>
+												) : null
+											) : (
+												<div className="flex flex-col justify-start items-start space-y-1">
+													<span className="text-md font-bold text-gray-900">
+														Rp. {value.product.price.toLocaleString()}
+													</span>
+													<h4 className="text-xs font-thin">
+														Toko {value.branch.location}
+													</h4>
+												</div>
+											)}
 										</div>
 									</button>
 								);
@@ -367,14 +432,14 @@ export default function LandingPage() {
 											onGetDetail(value.branch_id, value.product_id);
 										}}
 										key={index}
-										className="flex flex-col shadow-md w-48 h-80 bg-white border border-gray-200 rounded-lg"
+										className="flex flex-col shadow-md lg:w-48 w-28 lg:h-80 h-60 bg-white border border-gray-200 rounded-lg"
 									>
 										<img
 											className="rounded-t-lg h-44 object-cover mb-3"
 											src={value.product.img}
 											alt="product"
 										/>
-										<div className="px-5 pb-5 flex flex-col justify-start items-start space-y-1">
+										<div className="lg:px-5 lg:pb-5 pl-1 flex flex-col justify-start items-start space-y-1">
 											<h5 className="text-sm tracking-tight text-gray-900">
 												{value.product.name.slice(0, 17)}...
 											</h5>
@@ -382,7 +447,7 @@ export default function LandingPage() {
 												value.product.discount_histories[0].discount_id ===
 												3 ? (
 													<div className="flex flex-col justify-start items-start space-y-1 relative">
-														<p className="text-md font-bold text-gray-900">
+														<p className="lg:text-md text-xs font-bold text-gray-900">
 															Rp.{" "}
 															{(
 																value.product.price -
@@ -406,7 +471,7 @@ export default function LandingPage() {
 												) : value.product.discount_histories[0].discount_id ===
 												  2 ? (
 													<div className="flex flex-col justify-start items-start space-y-1 relative">
-														<p className="text-md font-bold text-gray-900">
+														<p className="lg:text-md text-xs font-bold text-gray-900">
 															Rp.{" "}
 															{(
 																value.product.price -
@@ -435,7 +500,7 @@ export default function LandingPage() {
 												) : value.product.discount_histories[0].discount_id ===
 												  1 ? (
 													<div className="flex flex-col justify-start items-start space-y-1">
-														<p className="text-md font-bold text-gray-900">
+														<p className="lg:text-md text-xs font-bold text-gray-900">
 															Rp. {value.product.price.toLocaleString()}
 														</p>
 														<p className="text-[10px] text-red-700">

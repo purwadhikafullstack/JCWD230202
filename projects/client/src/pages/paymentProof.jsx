@@ -83,7 +83,7 @@ export default function PaymentProof() {
 		setdisable(true);
 		try {
 			fd.append("images", img);
-			fd.append("data", JSON.stringify({invoice: invoice}));
+			fd.append("data", JSON.stringify({ invoice: invoice }));
 			const { data } = await REST_API({
 				url: "/transaction/uploadPayment",
 				method: "PATCH",
@@ -92,7 +92,7 @@ export default function PaymentProof() {
 			toast.success(data.message);
 			setTimeout(() => {
 				Navigate("/home");
-			},3000);
+			}, 3000);
 		} catch (error) {
 			toast.error("Upload Payment Failed");
 		} finally {
@@ -127,14 +127,20 @@ export default function PaymentProof() {
 							<h1 className=" font-tokpedFont font-semibold text-[16px]">
 								Mandiri Virtual Account
 							</h1>
-							<img alt="iconMandiri" src={IconMandiri} className=" h-[18px] w-[64px]"></img>
+							<img
+								alt="iconMandiri"
+								src={IconMandiri}
+								className=" h-[18px] w-[64px]"
+							></img>
 						</div>
 						<div className=" flex items-center justify-between  mx-4 flex-row h-[77px]">
 							<div className=" mt-4">
 								<p className=" mt-4 text-[14px] font-tokpedFont text-gray-500">
 									Virtual Account Number
 								</p>
-								<p className=" mt-2 text-[18px] font-tokpedFont font-semibold">8870887805667895</p>
+								<p className=" mt-2 text-[18px] font-tokpedFont font-semibold">
+									8870887805667895
+								</p>
 							</div>
 							<div className=" flex items-center h-[77px]">
 								<button
@@ -146,10 +152,15 @@ export default function PaymentProof() {
 							</div>
 						</div>
 						<div className=" text-left mb-4 mx-4 h-[77px]">
-							<p className=" pt-4 text-[14px] font-tokpedFont text-gray-500">Total Payment</p>
+							<p className=" pt-4 text-[14px] font-tokpedFont text-gray-500">
+								Total Payment
+							</p>
 							<div className=" flex justify-between w-full h-[29px]">
 								<p className=" mt-2 text-[18px] font-tokpedFont font-semibold">
-									Rp. {(Number(data?.total_price) + data?.shipping_cost).toLocaleString()}
+									Rp.{" "}
+									{(
+										Number(data?.total_price) + data?.shipping_cost
+									).toLocaleString()}
 								</p>
 								<button
 									onClick={() => onGetDetails(data?.invoice)}
@@ -175,7 +186,9 @@ export default function PaymentProof() {
 						</button>
 					</div>
 					<div className=" w-[600px] h-[21px]">
-						<p className=" font-tokpedFont font-semibold text-[18px] ">Payment Method</p>
+						<p className=" font-tokpedFont font-semibold text-[18px] ">
+							Payment Method
+						</p>
 					</div>
 					<div className=" mt-4 w-[600px] px-4 ">
 						<p className=" mt-11 h-[13px] font-tokpedFont font-semibold text-[12px]">
@@ -198,17 +211,32 @@ export default function PaymentProof() {
 										<AccordionIcon />
 									</AccordionButton>
 								</h2>
-								<AccordionPanel borderBottom={"1px"} borderBottomColor="gray.300">
+								<AccordionPanel
+									borderBottom={"1px"}
+									borderBottomColor="gray.300"
+								>
 									<div className=" text-[14px] mt-4 mb-6 pl-3 flex flex-col gap-2 font-tokpedFont ">
 										<p>1. Masukkan kartu ATM dan PIN </p>
 										<p>2. Pilih menu "Bayar/Beli" </p>
-										<p>3. Pilih menu "Lainnya", hingga menemukan menu "Multipayment"</p>
-										<p>4. Masukkan Kode Biller Tokonglomerat (88708), lalu pilih Benar </p>
 										<p>
-											5. Masukkan "Nomor Virtual Account" Tokonglomerat, lalu pilih tombol Benar
+											3. Pilih menu "Lainnya", hingga menemukan menu
+											"Multipayment"
 										</p>
-										<p>6. Masukkan Angka "1" untuk memilih tagihan, lalu pilih tombol Ya </p>
-										<p>7. Akan muncul konfirmasi pembayaran, lalu pilih tombol Ya </p>
+										<p>
+											4. Masukkan Kode Biller Tokonglomerat (88708), lalu pilih
+											Benar{" "}
+										</p>
+										<p>
+											5. Masukkan "Nomor Virtual Account" Tokonglomerat, lalu
+											pilih tombol Benar
+										</p>
+										<p>
+											6. Masukkan Angka "1" untuk memilih tagihan, lalu pilih
+											tombol Ya{" "}
+										</p>
+										<p>
+											7. Akan muncul konfirmasi pembayaran, lalu pilih tombol Ya{" "}
+										</p>
 										<p>8. Simpan struk sebagai bukti pembayaran Anda</p>
 									</div>
 								</AccordionPanel>
@@ -229,32 +257,43 @@ export default function PaymentProof() {
 										<AccordionIcon />
 									</AccordionButton>
 								</h2>
-								<AccordionPanel borderBottom={"1px"} borderBottomColor="gray.300">
+								<AccordionPanel
+									borderBottom={"1px"}
+									borderBottomColor="gray.300"
+								>
 									<div className=" text-[14px] mt-4 pb-[14px] pl-3 flex flex-col border-b-[1px] border-b-black gap-2 font-tokpedFont ">
-										<p>1. Login Livin' By Mandiri dengan memasukkan Username dan Password </p>
+										<p>
+											1. Login Livin' By Mandiri dengan memasukkan Username dan
+											Password{" "}
+										</p>
 										<p>2. Pilih menu "Pembayaran" </p>
 										<p>3. Pilih menu "Multipayment"</p>
 										<p>4. Pilih penyedia jasa "Tokonglomerat" </p>
 										<p>
-											5. Masukkan "Nomor Virtual Account" dan "Nominal" yang akan dibayarkan, lalu
-											pilih Lanjut
+											5. Masukkan "Nomor Virtual Account" dan "Nominal" yang
+											akan dibayarkan, lalu pilih Lanjut
 										</p>
 										<p>6. Setelah muncul tagihan, pilih Konfirmasi </p>
 										<p>7. Masukkan PIN / Challenge Code Token </p>
 										<p>8. Transaksi selesai, simpan bukti bayar Anda</p>
 									</div>
 									<p className="mt-2 text-[14px] font-tokpedFont">
-										Jangan gunakan fitur "Simpan Daftar Transfer" untuk pembayaran melalui Internet
-										Banking karena dapat mengganggu proses pembayaran berikutnya.
+										Jangan gunakan fitur "Simpan Daftar Transfer" untuk
+										pembayaran melalui Internet Banking karena dapat mengganggu
+										proses pembayaran berikutnya.
 									</p>
 									<p className="mt-4 text-[14px] font-tokpedFont">
-										Untuk menghapus daftar transfer tersimpan ikuti langkah berikut:
+										Untuk menghapus daftar transfer tersimpan ikuti langkah
+										berikut:
 									</p>
 									<div className=" text-[14px] mt-2 pb-6 pl-3 flex flex-col gap-2 font-tokpedFont ">
 										<p>1. Login Livin' By Mandiri</p>
 										<p>2. Pilih ke menu Pembayaran </p>
 										<p>3. Pilih menu Daftar Pembayaran</p>
-										<p>4. Pilih pada pembayaran yang tersimpan, lalu pilih menu untuk hapus </p>
+										<p>
+											4. Pilih pada pembayaran yang tersimpan, lalu pilih menu
+											untuk hapus{" "}
+										</p>
 									</div>
 								</AccordionPanel>
 							</AccordionItem>
@@ -274,9 +313,12 @@ export default function PaymentProof() {
 								Leave This Page ?
 							</AlertDialogHeader>
 							<AlertDialogCloseButton />
-							<AlertDialogBody className=" font-tokpedFont text-slate-500" textAlign={"center"}>
-								after exiting you will be redirected to the user transaction page to check your
-								payment details
+							<AlertDialogBody
+								className=" font-tokpedFont text-slate-500"
+								textAlign={"center"}
+							>
+								after exiting you will be redirected to the user transaction
+								page to check your payment details
 							</AlertDialogBody>
 							<AlertDialogFooter className=" flex justify-evenly gap-5">
 								<Button
@@ -350,7 +392,9 @@ export default function PaymentProof() {
 							<div className=" ">
 								<p className=" font-semibold text-[16px]">Shopping Summary</p>
 								<div className=" mt-4 flex justify-between text-[14px] font-tokpedFont border-b-4 items-center h-[37px] ">
-									<p className=" text-[14px] ">Total price ({details?.length} Products)</p>
+									<p className=" text-[14px] ">
+										Total price ({details?.length} Products)
+									</p>
 									<p className=" flex gap-1 text-[14px]">
 										Rp. {Number(data?.total_price).toLocaleString()}{" "}
 									</p>
@@ -364,7 +408,9 @@ export default function PaymentProof() {
 															<p className="">
 																{index + 1}. {val.product_name}
 															</p>
-															<p className=" font-semibold">quantity: {val.qty}</p>
+															<p className=" font-semibold">
+																quantity: {val.qty}
+															</p>
 														</div>
 													);
 											  })
@@ -388,15 +434,22 @@ export default function PaymentProof() {
 											details ? details[0].courier.split("+")[1] : null
 										}`}</p>
 										<p className=" font-tokpedFont text-slate-500 text text-[12px]">
-											{`Estimasi ${details ? details[0]?.courier.split("+")[2] : null} Hari`}
+											{`Estimasi ${
+												details ? details[0]?.courier.split("+")[2] : null
+											} Hari`}
 										</p>
 									</div>
-									<div>{`Rp. ${Number(data?.shipping_cost).toLocaleString()}`}</div>
+									<div>{`Rp. ${Number(
+										data?.shipping_cost
+									).toLocaleString()}`}</div>
 								</div>
 								<div className=" border-t-4 flex justify-between h-[37px] items-end ">
 									<p className=" font-semibold text-[16px] ">Total Payment</p>
 									<p className=" font-semibold text-[16px] ">
-										Rp. {(Number(data?.total_price) + data?.shipping_cost).toLocaleString()}
+										Rp.{" "}
+										{(
+											Number(data?.total_price) + data?.shipping_cost
+										).toLocaleString()}
 									</p>
 								</div>
 							</div>

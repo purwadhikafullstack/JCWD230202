@@ -35,9 +35,7 @@ export default function ProductCategory() {
 			const { data } = await REST_API({
 				url: `product/sortby?category=${
 					params.product.split("&")[0].split("=")[1]
-				}&page=${page}&sortby=${
-					sortby ? sortby : ""
-				}`,
+				}&page=${page}&sortby=${sortby ? sortby : ""}`,
 				method: "GET",
 			});
 			setproduct(data.data);
@@ -53,9 +51,7 @@ export default function ProductCategory() {
 			const { data } = await REST_API({
 				url: `product/sortby?category=${
 					params.product.split("&")[0].split("=")[1]
-				}&page=${page}&sortby=${
-					sortby ? sortby : ""
-				}`,
+				}&page=${page}&sortby=${sortby ? sortby : ""}`,
 				method: "GET",
 			});
 			setproduct(data.data);
@@ -68,7 +64,9 @@ export default function ProductCategory() {
 	let onGetPage = async () => {
 		try {
 			const { data } = await REST_API({
-				url: `product/pageCategory?category=${params.product.split("&")[0].split("=")[1]}
+				url: `product/pageCategory?category=${
+					params.product.split("&")[0].split("=")[1]
+				}
 				`,
 				method: "GET",
 			});
@@ -90,7 +88,7 @@ export default function ProductCategory() {
 				method: "GET",
 			});
 			setdetail(data.data[0]);
-			setunit(data.data[0].product)
+			setunit(data.data[0].product);
 			setquantity(1);
 			setshow(true);
 		} catch (error) {
@@ -128,11 +126,9 @@ export default function ProductCategory() {
 		}
 	};
 
-	
-
 	useEffect(() => {
 		getCategory();
-		onGetData(1)
+		onGetData(1);
 		onGetPage();
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, []);
@@ -155,7 +151,9 @@ export default function ProductCategory() {
 													alt={value.name}
 													className="w-11/12 rounded-full overflow-visible"
 												/>
-												<p className=" font-medium font-tokpedFont text-sm">{value.name}</p>
+												<p className=" font-medium font-tokpedFont text-sm">
+													{value.name}
+												</p>
 											</a>
 										</button>
 									);
@@ -181,11 +179,20 @@ export default function ProductCategory() {
 							? product.map((value, index) => {
 									return (
 										<button
-											onClick={() => onGetDetail(value.branch_products[0].branch_id, value.id)}
+											onClick={() =>
+												onGetDetail(
+													value.branch_products[0].branch_id,
+													value.id
+												)
+											}
 											key={index}
 											className="flex flex-col shadow-xl h-full w-full bg-white border border-gray-200 rounded-lg dark:bg-gray-800 dark:border-gray-700"
 										>
-											<img className="rounded-t-lg h-44 w-full" src={value.img} alt="product" />
+											<img
+												className="rounded-t-lg h-44 w-full"
+												src={value.img}
+												alt="product"
+											/>
 											<div className="px-5 py-5 text-left">
 												<h5 className="text-lg font-semibold tracking-tight text-gray-900 dark:text-white">
 													{value.name}
@@ -211,7 +218,9 @@ export default function ProductCategory() {
 													<button
 														onClick={() => onSortby(value, order)}
 														className={`px-3 py-2 leading-tight text-gray-500 bg-white border border-gray-300 ${
-															selectedpage === value ? "!bg-red-700 text-white" : null
+															selectedpage === value
+																? "!bg-red-700 text-white"
+																: null
 														} hover:bg-slate-300  dark:bg-gray-800 dark:border-gray-700 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white`}
 													>
 														{value}
@@ -238,8 +247,14 @@ export default function ProductCategory() {
 					<h1 className=" text-[20px] font-bold  text-orange-700">
 						Rp. {detail ? detail.product.price.toLocaleString() : null}
 					</h1>
-					<h2 className=" mt-1 text-[16px] font-semibold">{detail ? detail.product.name : null}</h2>
-					<p className=" mt-1 text-[12px] text-slate-400 "> per {unit? unit.unit.price_at: null} {unit ? unit.unit.name : null}</p>
+					<h2 className=" mt-1 text-[16px] font-semibold">
+						{detail ? detail.product.name : null}
+					</h2>
+					<p className=" mt-1 text-[12px] text-slate-400 ">
+						{" "}
+						per {unit ? unit.unit.price_at : null}{" "}
+						{unit ? unit.unit.name : null}
+					</p>
 					<h2 className=" mt-1 text-[16px] font-semibold">Description</h2>
 					<p className=" text-[12px] mt-2 text-slate-400">
 						{detail ? detail.product.description : null}
@@ -313,7 +328,9 @@ export default function ProductCategory() {
 							/>
 							<button
 								value={"+"}
-								disabled={quantity >= (detail ? detail.stock : null) ? true : false}
+								disabled={
+									quantity >= (detail ? detail.stock : null) ? true : false
+								}
 								onClick={() => setquantity(quantity + 1)}
 								className=" text-green-500 font-bold"
 							>
@@ -322,7 +339,8 @@ export default function ProductCategory() {
 						</div>
 						{detail && detail.stock <= 5 ? (
 							<div className=" flex justify-center items-center ml-4 font-semibold">
-								Stock: <p className="text-orange-700  px-2">{detail.stock} left</p>
+								Stock:{" "}
+								<p className="text-orange-700  px-2">{detail.stock} left</p>
 							</div>
 						) : null}
 					</div>
@@ -335,7 +353,11 @@ export default function ProductCategory() {
 							className="font-medium w-full text-sm px-5 py-2.5 rounded-lg text-white bg-[#0095DA] hover:bg-gray-300 "
 						>
 							{disable ? (
-								<LoadingSpin size={"30px"} primaryColor={"#38ADE3"} secondaryColor={"gray"} />
+								<LoadingSpin
+									size={"30px"}
+									primaryColor={"#38ADE3"}
+									secondaryColor={"gray"}
+								/>
 							) : (
 								"Add to cart"
 							)}

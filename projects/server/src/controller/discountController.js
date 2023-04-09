@@ -59,31 +59,52 @@ module.exports = {
 			let where;
 			const admin = await db.user.findOne({
 				where: { uid },
-				include: { model: db.branch },
+				include: { model: db.branch, required: false },
 			});
-
-			console.log(admin.branch.id, "test");
-			if (status == 0) where = { branch_id: admin.branch.id };
-			if (status == 1)
-				where = {
-					[Op.and]: [
-						{ branch_id: admin.branch.id },
-						{ status: "Waiting Approval" },
-					],
-				};
-			if (status == 2)
-				where = where = {
-					[Op.and]: [{ branch_id: admin.branch.id }, { status: "Active" }],
-				};
-			if (status == 3)
-				where = where = {
-					[Op.and]: [{ branch_id: admin.branch.id }, { status: "Declined" }],
-				};
-			data = await db.discount_history.findAll({
-				where,
-				include: { model: db.product },
-			});
-			new HTTPStatus(res, data).success("Discount list").send();
+			if (admin.role == "super admin") {
+				if (status == 0)
+					data = await db.discount_history.findAll({
+						include: [{ model: db.product }, { model: db.branch }],
+					});
+				if (status == 1)
+					data = await db.discount_history.findAll({
+						where: { status: "Waiting Approval" },
+						include: [{ model: db.product }, { model: db.branch }],
+					});
+				if (status == 2)
+					data = await db.discount_history.findAll({
+						where: { status: "Active" },
+						include: [{ model: db.product }, { model: db.branch }],
+					});
+				if (status == 3)
+					data = await db.discount_history.findAll({
+						where: { status: "Declined" },
+						include: [{ model: db.product }, { model: db.branch }],
+					});
+				new HTTPStatus(res, data).success("Discount list").send();
+			} else {
+				if (status == 0) where = { branch_id: admin.branch.id };
+				if (status == 1)
+					where = {
+						[Op.and]: [
+							{ branch_id: admin.branch.id },
+							{ status: "Waiting Approval" },
+						],
+					};
+				if (status == 2)
+					where = where = {
+						[Op.and]: [{ branch_id: admin.branch.id }, { status: "Active" }],
+					};
+				if (status == 3)
+					where = where = {
+						[Op.and]: [{ branch_id: admin.branch.id }, { status: "Declined" }],
+					};
+				data = await db.discount_history.findAll({
+					where,
+					include: { model: db.product },
+				});
+				new HTTPStatus(res, data).success("Discount list").send();
+			}
 		} catch (error) {
 			new HTTPStatus(res, error).error(error.message).send();
 		}
@@ -101,10 +122,14 @@ module.exports = {
 		const { page } = req.query;
 		try {
 			const totalPage = await db.product.count({
-				where: { name: { [Op.substring]: name } },
+				where: {
+					[Op.and]: [{ name: { [Op.substring]: name } }, { status: "Active" }],
+				},
 			});
 			const data = await db.product.findAll({
-				where: { name: { [Op.substring]: name } },
+				where: {
+					[Op.and]: [{ name: { [Op.substring]: name } }, { status: "Active" }],
+				},
 				offset: page == 1 ? 0 : (page - 1) * 12,
 				limit: 12,
 			});
