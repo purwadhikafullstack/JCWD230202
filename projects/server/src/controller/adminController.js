@@ -1058,7 +1058,7 @@ module.exports = {
 
 			if (sort !== "") {
 				data = await db.branch_product.findAll({
-					where: { branch_id: admin_branch_id, status: "active" },
+					where: { branch_id: admin_branch_id, status: "Active" },
 					include: [
 						{
 							model: db.product,
@@ -1078,7 +1078,7 @@ module.exports = {
 				});
 			} else {
 				data = await db.branch_product.findAll({
-					where: { branch_id: admin_branch_id, status: "active" },
+					where: { branch_id: admin_branch_id, status: "Active" },
 					include: [
 						{
 							model: db.product,
@@ -1181,7 +1181,7 @@ module.exports = {
 							model: db.product,
 							where: {
 								category_id: category,
-								status: "active",
+								status: "Active",
 							},
 						},
 						{ model: db.branch },
@@ -1202,7 +1202,7 @@ module.exports = {
 							model: db.product,
 							where: {
 								category_id: category,
-								status: "active",
+								status: "Active",
 							},
 						},
 						{ model: db.branch },
