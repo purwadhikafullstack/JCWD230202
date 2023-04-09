@@ -287,7 +287,7 @@ module.exports = {
 			if (!user) {
 				const branch = 1;
 				const data = await db.branch_product.count({
-					where: { branch_id: branch },
+					where: { [Op.and]: [{ branch_id: branch }, { status: "Active" }] },
 				});
 				res.status(200).send({
 					isError: false,
@@ -302,7 +302,7 @@ module.exports = {
 					);
 					const branch = proximity[0].id;
 					const data = await db.branch_product.count({
-						where: { branch_id: branch },
+						where: { [Op.and]: [{ branch_id: branch }, { status: "Active" }] },
 					});
 					res.status(200).send({
 						isError: false,
@@ -312,7 +312,7 @@ module.exports = {
 				} else {
 					const branch = 1;
 					const data = await db.branch_product.count({
-						where: { branch_id: branch },
+						where: { [Op.and]: [{ branch_id: branch }, { status: "Active" }] },
 					});
 					res.status(200).send({
 						isError: false,
@@ -385,6 +385,7 @@ module.exports = {
 				const branch = 1;
 				const data = await db.branch_product.count({
 					where: { [Op.and]: [{ branch_id: branch }, { status: "Active" }] },
+					required: false,
 					include: {
 						model: db.product,
 						where: { [Op.and]: [{ category_id: category }, { status: "Active" }] },
@@ -404,6 +405,7 @@ module.exports = {
 					const branch = proximity[0].id;
 					const data = await db.branch_product.count({
 						where: { [Op.and]: [{ branch_id: branch }, { status: "Active" }] },
+						required: false,
 						include: {
 							model: db.product,
 							where: { [Op.and]: [{ category_id: category }, { status: "Active" }] },
@@ -418,6 +420,7 @@ module.exports = {
 					const branch = 1;
 					const data = await db.branch_product.count({
 						where: { [Op.and]: [{ branch_id: branch }, { status: "Active" }] },
+						required: false,
 						include: {
 							model: db.product,
 							where: { [Op.and]: [{ category_id: category }, { status: "Active" }] },
@@ -462,6 +465,7 @@ module.exports = {
 								{ status: "Active" },
 							],
 						},
+						required: false,
 						include: [
 							{
 								model: db.branch_product,
@@ -490,6 +494,7 @@ module.exports = {
 								{ status: "Active" },
 							],
 						},
+						required: false,
 						include: [
 							{
 								model: db.branch_product,
@@ -513,6 +518,7 @@ module.exports = {
 						where: {
 							category_id: category,
 						},
+						required: false,
 						include: [
 							{
 								model: db.branch_product,
@@ -548,6 +554,7 @@ module.exports = {
 									{ status: "Active" },
 								],
 							},
+							required: false,
 							include: [
 								{
 									model: db.branch_product,
@@ -576,6 +583,7 @@ module.exports = {
 									{ status: "Active" },
 								],
 							},
+							required: false,
 							include: [
 								{
 									model: db.branch_product,
@@ -604,6 +612,7 @@ module.exports = {
 									{ status: "Active" },
 								],
 							},
+							required: false,
 							include: [
 								{
 									model: db.branch_product,
@@ -634,6 +643,7 @@ module.exports = {
 									{ status: "Active" },
 								],
 							},
+							required: false,
 							include: [
 								{
 									model: db.branch_product,
@@ -662,6 +672,7 @@ module.exports = {
 									{ status: "Active" },
 								],
 							},
+							required: false,
 							include: [
 								{
 									model: db.branch_product,
@@ -690,6 +701,7 @@ module.exports = {
 									{ status: "Active" },
 								],
 							},
+							required: false,
 							include: [
 								{
 									model: db.branch_product,
