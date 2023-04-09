@@ -3,6 +3,7 @@ import { AiFillEye, AiFillEyeInvisible } from "react-icons/ai";
 import Tokonglomerat from "../support/assets/new_login.png";
 import { toast, Toaster } from "react-hot-toast";
 import LoadingSpin from "react-loading-spin";
+import { useNavigate } from "react-router-dom";
 // import { useNavigate } from "react-router-dom";
 // import axios from "axios";
 
@@ -14,6 +15,8 @@ function LoginAdmin(props) {
 
 	const email = useRef();
 	const password = useRef();
+
+	const Navigate = useNavigate();
 
 	// const Navigate = useNavigate();
 
@@ -70,7 +73,7 @@ function LoginAdmin(props) {
 	return (
 		<div className="  max-h-screen overflow-hidden ">
 			<div className="  flex justify-center content-center mt-[32px] font-bold text-4xl font-mandalaFont text-[#0095DA] ">
-				tokonglomerat
+				<button onClick={() => Navigate("/home")}>tokonglomerat</button>
 			</div>
 			<div className=" flex flex-col xl:max-w-[816px] h-screen xl:h-[612px] mt-8 xl:mt-[42px] mx-auto relative ">
 				<img

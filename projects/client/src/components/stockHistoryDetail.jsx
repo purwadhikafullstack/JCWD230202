@@ -510,7 +510,7 @@ function StockHistoryDetail(props) {
 					className="w-8 p-1 border-0"
 				/>
 				<button
-					className="bg-red-500  border-y-[1px] border-r-[1px] p-2 rounded-r-lg"
+					className="bg-[#0095DA] border-y-[1px] border-r-[1px] p-2 rounded-r-lg"
 					onClick={() =>
 						onGetData(
 							selectedpage + 1,

@@ -71,7 +71,7 @@ function Overview(props) {
 		});
 	};
 
-	useEffect(async () => {
+	useEffect(() => {
 		onGetData();
 	}, []);
 	return (
@@ -123,52 +123,9 @@ function Overview(props) {
 					</h1>
 					<h1 className="text-center text-3xl font-tokpedFont ml-2">Income</h1>
 				</div>
-				<div className="h-[600px] w-[1000px] max-[640px]:w-full max-[640px]:h-full mx-auto pt-10 bg-slate-50">
+				<div className="!h-[400px] w-full max-[640px]:w-full max-[640px]:h-full mx-auto bg-slate-50">
 					<canvas id="myChart"></canvas>
 				</div>
-
-				{/* <div className=" max-[640px]:flex-col bg-slate-100 max-[640px]:w-full   flex justify-around">
-					<div class="max-w-sm rounded overflow-hidden shadow-lg w-56 text-center max-[640px]:items-center">
-						<div class="px-6 py-4">
-							<Statistic title="Active Users" value={user} />
-						</div>
-						<div class="px-6 pt-4 pb-2">
-							<span class="inline-block bg-gray-200 rounded-full px-3 py-1 text-sm font-semibold text-gray-700 mr-2 mb-2">
-								More ...
-							</span>
-						</div>
-					</div>
-					<div class="max-w-sm rounded overflow-hidden shadow-lg w-56 text-center">
-						<div class="px-6 py-4">
-							<Statistic title="Total Transaction" value={transaction} />
-						</div>
-						<div class="px-6 pt-4 pb-2">
-							<span class="inline-block bg-gray-200 rounded-full px-3 py-1 text-sm font-semibold text-gray-700 mr-2 mb-2">
-								More ...
-							</span>
-						</div>
-					</div>
-					<div class="max-w-sm rounded overflow-hidden shadow-lg w-56 text-center">
-						<div class="px-6 py-4">
-							<Statistic title="Active Users" value={112893} />
-						</div>
-						<div class="px-6 pt-4 pb-2">
-							<span class="inline-block bg-gray-200 rounded-full px-3 py-1 text-sm font-semibold text-gray-700 mr-2 mb-2">
-								More ...
-							</span>
-						</div>
-					</div>
-					<div class="max-w-sm rounded overflow-hidden shadow-lg w-56 text-center">
-						<div class="px-6 py-4">
-							<Statistic title="Active Users" value={112893} />
-						</div>
-						<div class="px-6 pt-4 pb-2">
-							<span class="inline-block bg-gray-200 rounded-full px-3 py-1 text-sm font-semibold text-gray-700 mr-2 mb-2">
-								More ...
-							</span>
-						</div>
-					</div>
-				</div> */}
 			</div>
 			<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 		</div>
