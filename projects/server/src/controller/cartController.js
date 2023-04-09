@@ -29,7 +29,7 @@ module.exports = {
 
 			const branch_product = await db.branch_product.findOne({
 				where: {
-					[Op.and]: [{ branch_id: branch_id }, { product_id: product_id }],
+					[Op.and]: [{ branch_id: branch_id }, { product_id: product_id }, {status: "Active"}],
 				},
 			});
 
@@ -46,7 +46,7 @@ module.exports = {
 			if (cart.length > 0) {
 				const branch = await db.branch_product.findOne({
 					where: {
-						[Op.and]: [{ branch_id: branch_id }, { product_id: product_id }],
+						[Op.and]: [{ branch_id: branch_id }, { product_id: product_id }, {status: "Active"}],
 					},
 				});
 

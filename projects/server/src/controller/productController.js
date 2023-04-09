@@ -193,6 +193,7 @@ module.exports = {
 						},
 						{ model: db.branch, attributes: ["id", "location"] },
 					],
+					limit: 10,
 					group: ["product.id"],
 					order: [
 						[sequelize.fn("COUNT", sequelize.col("product_name")), "DESC"],
@@ -237,6 +238,7 @@ module.exports = {
 						},
 						{ model: db.branch, attributes: ["id", "location"] },
 					],
+					limit: 10,
 					group: ["product.id"],
 					order: [
 						[sequelize.fn("COUNT", sequelize.col("product_name")), "DESC"],
@@ -327,7 +329,7 @@ module.exports = {
 			if (!user) {
 				const branch = 1;
 				const data = await db.branch_product.count({
-					where: { branch_id: branch },
+					where: { [Op.and]: [{ branch_id: branch }, { status: "Active" }] },
 				});
 				res.status(200).send({
 					isError: false,
@@ -342,7 +344,7 @@ module.exports = {
 					);
 					const branch = proximity[0].id;
 					const data = await db.branch_product.count({
-						where: { branch_id: branch },
+						where: { [Op.and]: [{ branch_id: branch }, { status: "Active" }] },
 					});
 					res.status(200).send({
 						isError: false,
@@ -352,7 +354,7 @@ module.exports = {
 				} else {
 					const branch = 1;
 					const data = await db.branch_product.count({
-						where: { branch_id: branch },
+						where: { [Op.and]: [{ branch_id: branch }, { status: "Active" }] },
 					});
 					res.status(200).send({
 						isError: false,
@@ -371,7 +373,9 @@ module.exports = {
 	},
 	getCategory: async (req, res) => {
 		try {
-			const data = await db.category.findAll();
+			const data = await db.category.findAll({
+				where: { status: "Active" },
+			});
 			res.status(200).send({
 				isError: false,
 				message: "Get All Category",
@@ -390,7 +394,11 @@ module.exports = {
 		try {
 			const data = await db.branch_product.findAll({
 				where: {
-					[Op.and]: [{ branch_id: branch }, { product_id: product }],
+					[Op.and]: [
+						{ branch_id: branch },
+						{ product_id: product },
+						{ status: "Active" },
+					],
 				},
 				include: [
 					{ model: db.branch },
@@ -425,12 +433,13 @@ module.exports = {
 			if (!user) {
 				const branch = 1;
 				const data = await db.branch_product.count({
-					where: {
-						branch_id: branch,
-					},
+					where: { [Op.and]: [{ branch_id: branch }, { status: "Active" }] },
+					required: false,
 					include: {
 						model: db.product,
-						where: { category_id: category },
+						where: {
+							[Op.and]: [{ category_id: category }, { status: "Active" }],
+						},
 					},
 				});
 				res.status(201).send({
@@ -446,12 +455,13 @@ module.exports = {
 					);
 					const branch = proximity[0].id;
 					const data = await db.branch_product.count({
-						where: {
-							branch_id: branch,
-						},
+						where: { [Op.and]: [{ branch_id: branch }, { status: "Active" }] },
+						required: false,
 						include: {
 							model: db.product,
-							where: { category_id: category },
+							where: {
+								[Op.and]: [{ category_id: category }, { status: "Active" }],
+							},
 						},
 					});
 					res.status(201).send({
@@ -462,12 +472,13 @@ module.exports = {
 				} else {
 					const branch = 1;
 					const data = await db.branch_product.count({
-						where: {
-							branch_id: branch,
-						},
+						where: { [Op.and]: [{ branch_id: branch }, { status: "Active" }] },
+						required: false,
 						include: {
 							model: db.product,
-							where: { category_id: category },
+							where: {
+								[Op.and]: [{ category_id: category }, { status: "Active" }],
+							},
 						},
 					});
 					res.status(201).send({
@@ -502,12 +513,20 @@ module.exports = {
 				if (sort[0] === "name") {
 					const data = await db.product.findAll({
 						where: {
-							category_id: category,
+							[Op.and]: [
+								{
+									category_id: category,
+								},
+								{ status: "Active" },
+							],
 						},
+						required: false,
 						include: [
 							{
 								model: db.branch_product,
-								where: { branch_id: branch },
+								where: {
+									[Op.and]: [{ branch_id: branch }, { status: "Active" }],
+								},
 								include: {
 									model: db.branch,
 								},
@@ -525,12 +544,20 @@ module.exports = {
 				} else if (sort[0] === "price") {
 					const data = await db.product.findAll({
 						where: {
-							category_id: category,
+							[Op.and]: [
+								{
+									category_id: category,
+								},
+								{ status: "Active" },
+							],
 						},
+						required: false,
 						include: [
 							{
 								model: db.branch_product,
-								where: { branch_id: branch },
+								where: {
+									[Op.and]: [{ branch_id: branch }, { status: "Active" }],
+								},
 								include: {
 									model: db.branch,
 								},
@@ -550,10 +577,13 @@ module.exports = {
 						where: {
 							category_id: category,
 						},
+						required: false,
 						include: [
 							{
 								model: db.branch_product,
-								where: { branch_id: branch },
+								where: {
+									[Op.and]: [{ branch_id: branch }, { status: "Active" }],
+								},
 								include: {
 									model: db.branch,
 								},
@@ -578,12 +608,20 @@ module.exports = {
 					if (sort[0] === "name") {
 						const data = await db.product.findAll({
 							where: {
-								category_id: category,
+								[Op.and]: [
+									{
+										category_id: category,
+									},
+									{ status: "Active" },
+								],
 							},
+							required: false,
 							include: [
 								{
 									model: db.branch_product,
-									where: { branch_id: branch },
+									where: {
+										[Op.and]: [{ branch_id: branch }, { status: "Active" }],
+									},
 									include: {
 										model: db.branch,
 									},
@@ -601,12 +639,20 @@ module.exports = {
 					} else if (sort[0] === "price") {
 						const data = await db.product.findAll({
 							where: {
-								category_id: category,
+								[Op.and]: [
+									{
+										category_id: category,
+									},
+									{ status: "Active" },
+								],
 							},
+							required: false,
 							include: [
 								{
 									model: db.branch_product,
-									where: { branch_id: branch },
+									where: {
+										[Op.and]: [{ branch_id: branch }, { status: "Active" }],
+									},
 									include: {
 										model: db.branch,
 									},
@@ -624,12 +670,20 @@ module.exports = {
 					} else if (sort === "") {
 						const data = await db.product.findAll({
 							where: {
-								category_id: category,
+								[Op.and]: [
+									{
+										category_id: category,
+									},
+									{ status: "Active" },
+								],
 							},
+							required: false,
 							include: [
 								{
 									model: db.branch_product,
-									where: { branch_id: branch },
+									where: {
+										[Op.and]: [{ branch_id: branch }, { status: "Active" }],
+									},
 									include: {
 										model: db.branch,
 									},
@@ -649,12 +703,20 @@ module.exports = {
 					if (sort[0] === "name") {
 						const data = await db.product.findAll({
 							where: {
-								category_id: category,
+								[Op.and]: [
+									{
+										category_id: category,
+									},
+									{ status: "Active" },
+								],
 							},
+							required: false,
 							include: [
 								{
 									model: db.branch_product,
-									where: { branch_id: branch },
+									where: {
+										[Op.and]: [{ branch_id: branch }, { status: "Active" }],
+									},
 									include: {
 										model: db.branch,
 									},
@@ -672,12 +734,20 @@ module.exports = {
 					} else if (sort[0] === "price") {
 						const data = await db.product.findAll({
 							where: {
-								category_id: category,
+								[Op.and]: [
+									{
+										category_id: category,
+									},
+									{ status: "Active" },
+								],
 							},
+							required: false,
 							include: [
 								{
 									model: db.branch_product,
-									where: { branch_id: branch },
+									where: {
+										[Op.and]: [{ branch_id: branch }, { status: "Active" }],
+									},
 									include: {
 										model: db.branch,
 									},
@@ -695,12 +765,20 @@ module.exports = {
 					} else if (sort === "") {
 						const data = await db.product.findAll({
 							where: {
-								category_id: category,
+								[Op.and]: [
+									{
+										category_id: category,
+									},
+									{ status: "Active" },
+								],
 							},
+							required: false,
 							include: [
 								{
 									model: db.branch_product,
-									where: { branch_id: branch },
+									where: {
+										[Op.and]: [{ branch_id: branch }, { status: "Active" }],
+									},
 									include: {
 										model: db.branch,
 									},
