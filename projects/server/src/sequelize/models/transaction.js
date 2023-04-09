@@ -23,13 +23,14 @@ module.exports = (sequelize, DataTypes) => {
 			shipping_cost: DataTypes.INTEGER,
 			user_address: DataTypes.TEXT,
 			courier: DataTypes.STRING,
+			invoice: DataTypes.STRING,
 			status: {
 				type: DataTypes.STRING,
 				defaultValue: "Waiting Payment",
 			},
 			payment_proof: DataTypes.STRING,
 			invoice: DataTypes.STRING,
-			expired: DataTypes.DATE
+			expired: DataTypes.DATE,
 		},
 		{
 			sequelize,

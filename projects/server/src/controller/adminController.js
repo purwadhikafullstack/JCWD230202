@@ -12,7 +12,7 @@ module.exports = {
 	salesReport: async (req, res) => {
 		const token = req.uid;
 
-		const { filter, report, sort } = req.query;
+		const { filter, report, sort, page } = req.query;
 		const filterBy = filter ? filter.split("/") : "";
 		const sortBy = sort ? sort.split("-") : "";
 
@@ -29,7 +29,6 @@ module.exports = {
 
 			let role = admin.role;
 
-			
 			if (role === "branch admin") {
 				admin_branch_id = admin.branch.id;
 			}
@@ -62,6 +61,8 @@ module.exports = {
 								group: ["user_id"],
 								include: { model: db.user, attributes: ["name"] },
 								order: [["createdAt", sortBy[1]]], //sort nya masuk kesini
+								offset: page == 1 ? 0 : (page - 1) * 5,
+								limit: 5,
 							});
 							//1.1.b report user using date range and make the list from income asc/desc
 						} else if (sortBy[0] === "income") {
@@ -87,6 +88,8 @@ module.exports = {
 								group: ["user_id"],
 								include: { model: db.user, attributes: ["name"] },
 								order: [["total_price", sortBy[1]]], //sort nya masuk kesini
+								offset: page == 1 ? 0 : (page - 1) * 5,
+								limit: 5,
 							});
 							//1.1.c report by user with date range and without sort
 						} else {
@@ -111,6 +114,8 @@ module.exports = {
 										],
 									},
 								},
+								offset: page == 1 ? 0 : (page - 1) * 5,
+								limit: 5,
 							});
 						}
 					} else {
@@ -130,6 +135,8 @@ module.exports = {
 								group: ["user_id"],
 								include: { model: db.user, attributes: ["name"] },
 								order: [["createdAt", sortBy[1]]], //sort nya masuk kesini
+								offset: page == 1 ? 0 : (page - 1) * 5,
+								limit: 5,
 							});
 							// 1.2.b report by user without any date range filter but sort with income asc/desc
 						} else if (sortBy[0] === "income") {
@@ -146,6 +153,8 @@ module.exports = {
 								group: ["user_id"],
 								include: { model: db.user, attributes: ["name"] },
 								order: [["total_price", sortBy[1]]], //sort nya masuk kesini
+								offset: page == 1 ? 0 : (page - 1) * 5,
+								limit: 5,
 							});
 							//1.2.c report by user without any date range and without sort
 						} else {
@@ -161,6 +170,8 @@ module.exports = {
 								],
 								group: ["user_id"],
 								include: { model: db.user, attributes: ["name"] },
+								offset: page == 1 ? 0 : (page - 1) * 5,
+								limit: 5,
 							});
 						}
 					}
@@ -197,6 +208,8 @@ module.exports = {
 
 								group: ["invoice"],
 								order: [["createdAt", sortBy[1]]],
+								offset: page == 1 ? 0 : (page - 1) * 5,
+								limit: 5,
 							});
 							//2.1.b transaction  sort with income (asc/desc)
 						} else if (sortBy[0] === "income") {
@@ -225,6 +238,8 @@ module.exports = {
 								},
 								group: ["invoice"],
 								order: [["total_price", sortBy[1]]],
+								offset: page == 1 ? 0 : (page - 1) * 5,
+								limit: 5,
 							});
 							//2.1.c
 						} else {
@@ -238,6 +253,8 @@ module.exports = {
 										],
 									},
 								},
+								offset: page == 1 ? 0 : (page - 1) * 5,
+								limit: 5,
 							});
 						}
 						//2.2
@@ -264,6 +281,8 @@ module.exports = {
 
 								group: ["invoice"],
 								order: [["createdAt", sortBy[1]]],
+								offset: page == 1 ? 0 : (page - 1) * 5,
+								limit: 5,
 							});
 							// 2.2.b transaction  sort with income (asc/desc)
 						} else if (sortBy[0] === "income") {
@@ -285,6 +304,8 @@ module.exports = {
 								},
 								group: ["invoice"],
 								order: [["total_price", sortBy[1]]],
+								offset: page == 1 ? 0 : (page - 1) * 5,
+								limit: 5,
 							});
 							//2.2.c
 						} else {
@@ -305,6 +326,8 @@ module.exports = {
 									status: "delivered",
 								},
 								group: ["invoice"],
+								offset: page == 1 ? 0 : (page - 1) * 5,
+								limit: 5,
 							});
 						}
 					}
@@ -337,6 +360,8 @@ module.exports = {
 								},
 								group: ["product_name", "location"],
 								order: [["income_money", sortBy[1]]],
+								offset: page == 1 ? 0 : (page - 1) * 5,
+								limit: 5,
 							});
 							// 3.1.b product without any sort
 						} else {
@@ -362,6 +387,8 @@ module.exports = {
 									},
 								},
 								group: ["product_name", "location"],
+								offset: page == 1 ? 0 : (page - 1) * 5,
+								limit: 5,
 							});
 						}
 						// 3.2
@@ -381,6 +408,8 @@ module.exports = {
 								include: { model: db.branch, attributes: ["location"] },
 								group: ["product_name", "location"],
 								order: [["income_money", sortBy[1]]],
+								offset: page == 1 ? 0 : (page - 1) * 5,
+								limit: 5,
 							});
 							//3.2.b product without any sort
 						} else {
@@ -396,6 +425,8 @@ module.exports = {
 
 								include: { model: db.branch, attributes: ["location"] },
 								group: ["product_name", "location"],
+								offset: page == 1 ? 0 : (page - 1) * 5,
+								limit: 5,
 							});
 						}
 					}
@@ -429,6 +460,8 @@ module.exports = {
 								group: ["user_id"],
 								include: { model: db.user, attributes: ["name"] },
 								order: [["createdAt", sortBy[1]]], //sort nya masuk kesini
+								offset: page == 1 ? 0 : (page - 1) * 5,
+								limit: 5,
 							});
 							//1.1.b report user using date range and make the list from income asc/desc
 						} else if (sortBy[0] === "income") {
@@ -455,6 +488,8 @@ module.exports = {
 								group: ["user_id"],
 								include: { model: db.user, attributes: ["name"] },
 								order: [["total_price", sortBy[1]]], //sort nya masuk kesini
+								offset: page == 1 ? 0 : (page - 1) * 5,
+								limit: 5,
 							});
 							//1.1.c report by user with date range and without sort
 						} else {
@@ -480,6 +515,8 @@ module.exports = {
 									},
 									branch_id: admin_branch_id,
 								},
+								offset: page == 1 ? 0 : (page - 1) * 5,
+								limit: 5,
 							});
 						}
 					} else {
@@ -502,6 +539,8 @@ module.exports = {
 								group: ["user_id"],
 								include: { model: db.user, attributes: ["name"] },
 								order: [["createdAt", sortBy[1]]], //sort nya masuk kesini
+								offset: page == 1 ? 0 : (page - 1) * 5,
+								limit: 5,
 							});
 							// 1.2.b report by user without any date range filter but sort with income asc/desc
 						} else if (sortBy[0] === "income") {
@@ -521,6 +560,8 @@ module.exports = {
 								group: ["user_id"],
 								include: { model: db.user, attributes: ["name"] },
 								order: [["total_price", sortBy[1]]], //sort nya masuk kesini
+								offset: page == 1 ? 0 : (page - 1) * 5,
+								limit: 5,
 							});
 							//1.2.c report by user without any date range and without sort
 						} else {
@@ -539,6 +580,8 @@ module.exports = {
 								},
 								group: ["user_id"],
 								include: { model: db.user, attributes: ["name"] },
+								offset: page == 1 ? 0 : (page - 1) * 5,
+								limit: 5,
 							});
 						}
 					}
@@ -575,6 +618,8 @@ module.exports = {
 
 								group: ["invoice"],
 								order: [["createdAt", sortBy[1]]],
+								offset: page == 1 ? 0 : (page - 1) * 5,
+								limit: 5,
 							});
 							//2.1.b transaction  sort with income (asc/desc)
 						} else if (sortBy[0] === "income") {
@@ -603,6 +648,8 @@ module.exports = {
 								},
 								group: ["invoice"],
 								order: [["total_price", sortBy[1]]],
+								offset: page == 1 ? 0 : (page - 1) * 5,
+								limit: 5,
 							});
 							//2.1.c
 						} else {
@@ -617,6 +664,8 @@ module.exports = {
 									},
 									branch_id: admin_branch_id,
 								},
+								offset: page == 1 ? 0 : (page - 1) * 5,
+								limit: 5,
 							});
 						}
 						//2.2
@@ -644,6 +693,8 @@ module.exports = {
 
 								group: ["invoice"],
 								order: [["createdAt", sortBy[1]]],
+								offset: page == 1 ? 0 : (page - 1) * 5,
+								limit: 5,
 							});
 							// 2.2.b transaction  sort with income (asc/desc)
 						} else if (sortBy[0] === "income") {
@@ -666,6 +717,8 @@ module.exports = {
 								},
 								group: ["invoice"],
 								order: [["total_price", sortBy[1]]],
+								offset: page == 1 ? 0 : (page - 1) * 5,
+								limit: 5,
 							});
 							//2.2.c
 						} else {
@@ -675,6 +728,8 @@ module.exports = {
 									branch_id: admin_branch_id,
 								},
 								group: ["invoice"],
+								offset: page == 1 ? 0 : (page - 1) * 5,
+								limit: 5,
 							});
 						}
 					}
@@ -707,6 +762,8 @@ module.exports = {
 								},
 								group: ["product_name"],
 								order: [["income_money", sortBy[1]]],
+								offset: page == 1 ? 0 : (page - 1) * 5,
+								limit: 5,
 							});
 							// product without any sort
 						} else {
@@ -733,6 +790,8 @@ module.exports = {
 									branch_id: admin_branch_id,
 								},
 								group: ["product_name"],
+								offset: page == 1 ? 0 : (page - 1) * 5,
+								limit: 5,
 							});
 						}
 					} else {
@@ -753,6 +812,8 @@ module.exports = {
 								include: { model: db.branch, attributes: ["location"] },
 								group: ["product_name"],
 								order: [["income_money", sortBy[1]]],
+								offset: page == 1 ? 0 : (page - 1) * 5,
+								limit: 5,
 							});
 							// product without any sort
 						} else {
@@ -771,16 +832,14 @@ module.exports = {
 
 								include: { model: db.branch, attributes: ["location"] },
 								group: ["product_name"],
+								offset: page == 1 ? 0 : (page - 1) * 5,
+								limit: 5,
 							});
 						}
 					}
 				}
 			}
-			res.status(200).send({
-				isError: false,
-				message: "Get Sales Report Success",
-				data,
-			});
+			new HTTPStatus(res, data).success("Get Sales Report Success").send();
 		} catch (error) {
 			res.status(404).send({
 				isError: true,
@@ -801,7 +860,7 @@ module.exports = {
 
 				include: [
 					{ model: db.branch },
-					{ model: db.product },
+					{ model: db.product, where: { status: "Active" } },
 					{ model: db.user },
 				],
 			});
@@ -825,7 +884,6 @@ module.exports = {
 		try {
 			let { email, password, branch_id } = req.body;
 			let token = req.uid;
-			console.log(token, "ini uid");
 
 			let admin = await db.user.findOne(
 				{
@@ -836,10 +894,8 @@ module.exports = {
 				{ transaction: t }
 			);
 
-
 			let role = admin.role;
 			// console.log(role, "role");
-
 
 			if (role === "super admin") {
 				if (!email.length || !password.length) {
@@ -859,7 +915,10 @@ module.exports = {
 					{ transaction: t }
 				);
 
-				let adminBranchLocation = resFindBranchById.dataValues.location;
+				if (resFindBranchById === null)
+					throw new Error("Please select an available branch");
+
+				let adminBranchLocation = resFindBranchById.location;
 
 				var resCreateAdmin = await db.user.create(
 					{
@@ -867,7 +926,7 @@ module.exports = {
 						email,
 						password: await hashPassword(password),
 						role: "branch admin",
-						status: true,
+						status: "verified",
 					},
 					{ transaction: t }
 				);
@@ -999,10 +1058,11 @@ module.exports = {
 
 			if (sort !== "") {
 				data = await db.branch_product.findAll({
-					where: { branch_id: admin_branch_id },
+					where: { branch_id: admin_branch_id, status: "Active" },
 					include: [
 						{
 							model: db.product,
+							where: { status: "Active" },
 							order: ["name", "ASC"],
 						},
 						{ model: db.branch },
@@ -1019,10 +1079,11 @@ module.exports = {
 				});
 			} else {
 				data = await db.branch_product.findAll({
-					where: { branch_id: admin_branch_id },
+					where: { branch_id: admin_branch_id, status: "Active" },
 					include: [
 						{
 							model: db.product,
+							where: { status: "Active" },
 						},
 						{ model: db.branch },
 					],
@@ -1121,7 +1182,7 @@ module.exports = {
 						{
 							model: db.product,
 							where: {
-								category_id: category,
+								[Op.and]: [{ category_id: category }, { status: "Active" }],
 							},
 						},
 						{ model: db.branch },
@@ -1141,7 +1202,7 @@ module.exports = {
 						{
 							model: db.product,
 							where: {
-								category_id: category,
+								[Op.and]: [{ category_id: category }, { status: "Active" }],
 							},
 						},
 						{ model: db.branch },
@@ -1185,11 +1246,10 @@ module.exports = {
 			res.status(400).send({
 				isError: true,
 				message: error.message,
-				data: data.error,
+				data: error,
 			});
 		}
 	},
-
 	stockHistory2: async (req, res) => {
 		try {
 			const { search } = req.query;
@@ -1239,12 +1299,21 @@ module.exports = {
 			});
 		}
 	},
-
 	stockHistoryDetail: async (req, res) => {
 		try {
-			let { ProductId, branchId } = req.query;
-			let { filter, sort } = req.query;
-			console.log(filter, sort, "iniiii");
+			let { filter, sort, page, ProductId, branchId } = req.query;
+			console.log(
+				filter,
+				"ini filter",
+				sort,
+				"ini sort",
+				page,
+				"ini page",
+				ProductId,
+				"ini product id",
+				branchId,
+				"ini branch"
+			);
 			const sortBy = sort ? sort.split("-") : "";
 			const filterBy = filter ? filter.split("/") : "";
 			const token = req.uid;
@@ -1277,6 +1346,8 @@ module.exports = {
 							},
 							include: [{ model: db.branch }, { model: db.product }],
 							order: [["createdAt", sortBy[1]]],
+							offset: page == 1 ? 0 : (page - 1) * 5,
+							limit: 5,
 						});
 					} else {
 						data = await db.stock_history.findAll({
@@ -1288,6 +1359,8 @@ module.exports = {
 								},
 							},
 							include: [{ model: db.branch }, { model: db.product }],
+							offset: page == 1 ? 0 : (page - 1) * 5,
+							limit: 5,
 						});
 					}
 				} else {
@@ -1299,6 +1372,8 @@ module.exports = {
 							},
 							include: [{ model: db.branch }, { model: db.product }],
 							order: [["createdAt", sortBy[1]]],
+							offset: page == 1 ? 0 : (page - 1) * 5,
+							limit: 5,
 						});
 					} else {
 						data = await db.stock_history.findAll({
@@ -1307,6 +1382,8 @@ module.exports = {
 								branch_id: admin_branch_id,
 							},
 							include: [{ model: db.branch }, { model: db.product }],
+							offset: page == 1 ? 0 : (page - 1) * 5,
+							limit: 5,
 						});
 					}
 				}
@@ -1323,6 +1400,8 @@ module.exports = {
 							},
 							include: [{ model: db.branch }, { model: db.product }],
 							order: [["createdAt", sortBy[1]]],
+							offset: page == 1 ? 0 : (page - 1) * 5,
+							limit: 5,
 						});
 					} else {
 						data = await db.stock_history.findAll({
@@ -1334,6 +1413,8 @@ module.exports = {
 								},
 							},
 							include: [{ model: db.branch }, { model: db.product }],
+							offset: page == 1 ? 0 : (page - 1) * 5,
+							limit: 5,
 						});
 					}
 				} else {
@@ -1345,6 +1426,8 @@ module.exports = {
 							},
 							include: [{ model: db.branch }, { model: db.product }],
 							order: [["createdAt", sortBy[1]]],
+							offset: page == 1 ? 0 : (page - 1) * 5,
+							limit: 5,
 						});
 					} else {
 						data = await db.stock_history.findAll({
@@ -1353,6 +1436,8 @@ module.exports = {
 								branch_id: branchId,
 							},
 							include: [{ model: db.branch }, { model: db.product }],
+							offset: page == 1 ? 0 : (page - 1) * 5,
+							limit: 5,
 						});
 					}
 				}
@@ -1378,8 +1463,8 @@ module.exports = {
 				message: error.message,
 				data: error.data,
 			});
-		}},
-
+		}
+	},
 
 	updateCategoryImage: async (req, res) => {
 		const { id } = req.params;
@@ -1429,12 +1514,167 @@ module.exports = {
 				where: {
 					[Op.and]: [{ branch_id: admin.branch.id }, { product_id: id }],
 				},
-				include: { model: db.product },
+				include: { model: db.product, where: { status: "Active" } },
 			});
 			new HTTPStatus(res, data).success("Get product details for edit").send();
 		} catch (error) {
 			new HTTPStatus(res, error).error(error.message).send();
+		}
+	},
+	getTransactionPerMonth: async (req, res) => {
+		let { year } = req.query;
+		let income = [];
+		let monthSent = [];
+		let token = req.uid;
+		let admin_branch_id;
+		let total_user;
+		let total_transaction;
+		let transactionLength;
+		let total_branch;
+		let count = 0;
 
+		let admin = await db.user.findOne({
+			where: {
+				uid: token.uid,
+			},
+			include: { model: db.branch },
+		});
+
+		let role = admin.role;
+
+		if (role === "branch admin") {
+			admin_branch_id = admin.branch.id;
+		}
+
+		try {
+			if (role === "super admin") {
+				let month = await db.transaction.findAll({
+					attributes: [
+						[sequelize.fn("MONTH", sequelize.col("createdAt")), "month"],
+						[sequelize.fn("year", sequelize.col("createdAt")), "year"],
+						[sequelize.fn("SUM", sequelize.col("total_price")), "total_income"],
+					],
+					group: [sequelize.fn("MONTH", sequelize.col("createdAt"))],
+				});
+
+				total_user = await db.user.count({
+					where: {
+						status: "verified",
+						role: "user",
+					},
+				});
+
+				total_branch = await db.branch.count();
+
+				total_transaction = await db.transaction.findAll({
+					attributes: [[sequelize.fn("count", sequelize.col("id")), "count"]],
+					group: ["invoice"],
+				});
+
+				transactionLength = total_transaction.length;
+
+				function getMonthName(monthNumber) {
+					const monthNames = [
+						"January",
+						"February",
+						"March",
+						"April",
+						"May",
+						"June",
+						"July",
+						"August",
+						"September",
+						"October",
+						"November",
+						"December",
+					];
+					return monthNames[monthNumber - 1];
+				}
+				month.forEach((val) => {
+					// console.log(val.dataValues.year, "test");
+					if (val.dataValues.year == year) {
+						income.push(parseInt(val.dataValues.total_income));
+						count += parseInt(val.dataValues.total_income);
+						monthSent.push(getMonthName(val.dataValues.month));
+					}
+				});
+			} else if (role === "branch admin") {
+				let month = await db.transaction.findAll({
+					attributes: [
+						[sequelize.fn("MONTH", sequelize.col("createdAt")), "month"],
+						[sequelize.fn("year", sequelize.col("createdAt")), "year"],
+						[sequelize.fn("SUM", sequelize.col("total_price")), "total_income"],
+					],
+					where: {
+						branch_id: admin_branch_id,
+					},
+					group: [sequelize.fn("MONTH", sequelize.col("createdAt"))],
+				});
+
+				total_user = await db.user.count({
+					where: {
+						status: "verified",
+						role: "user",
+					},
+				});
+
+				total_branch = await db.branch.count();
+
+				total_transaction = await db.transaction.count({
+					where: {
+						branch_id: admin_branch_id,
+					},
+					group: ["invoice"],
+				});
+
+				transactionLength = total_transaction.length;
+
+				function getMonthName(monthNumber) {
+					const monthNames = [
+						"January",
+						"February",
+						"March",
+						"April",
+						"May",
+						"June",
+						"July",
+						"August",
+						"September",
+						"October",
+						"November",
+						"December",
+					];
+					return monthNames[monthNumber - 1];
+				}
+				month.forEach((val) => {
+					// console.log(val.dataValues.year, "test");
+					if (val.dataValues.year == year) {
+						income.push(parseInt(val.dataValues.total_income));
+						count += parseInt(val.dataValues.total_income);
+						monthSent.push(getMonthName(val.dataValues.month));
+					}
+				});
+			}
+			// let year = await db.transaction.findAll({
+			// 	attributes: [
+			// 		[sequelize.fn("year", sequelize.col("createdAt")), "year"],
+			// 		[sequelize.fn("SUM", sequelize.col("total_price")), "total_income"],
+			// 	],
+			// 	group: [sequelize.fn("MONTH", sequelize.col("createdAt"))],
+			// });
+
+			new HTTPStatus(res, {
+				income,
+				monthSent,
+				total_user,
+				transactionLength,
+				total_branch,
+				count,
+			})
+				.success("Get Transaction Per Month Success")
+				.send();
+		} catch (error) {
+			new HTTPStatus(res, error).error(error.message).send();
 		}
 	},
 };

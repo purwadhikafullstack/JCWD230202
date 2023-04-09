@@ -23,7 +23,7 @@ module.exports = {
 				img,
 				user_addresses,
 				role,
-				status
+				status,
 			} = await db.user.findOne({
 				where: { uid },
 				include: { model: db.user_address },
@@ -373,6 +373,41 @@ module.exports = {
 			res.status(201).send({
 				isError: false,
 				message: "Update Products Success!",
+				data: null,
+			});
+		} catch (error) {
+			deleteFiles(req.files.images[0].path);
+			res.status(400).send({
+				isError: true,
+				message: error.message,
+				data: error,
+			});
+		}
+	},
+	editPaymentProof: async (req, res) => {
+		const { uid } = req.uid;
+
+		try {
+			let { id } = await db.user.findOne({
+				where: {
+					uid,
+				},
+			});
+			await db.transaction.update(
+				{
+					payment_proof: req.files.images[0].path,
+					status: "Waiting Approval",
+				},
+				{
+					where: {
+						user_id: id,
+					},
+				}
+			);
+
+			res.status(201).send({
+				isError: false,
+				message: "Payment proof uploaded",
 				data: null,
 			});
 		} catch (error) {

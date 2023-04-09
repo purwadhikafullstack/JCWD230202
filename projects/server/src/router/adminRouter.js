@@ -92,6 +92,14 @@ Router.delete(
 	productController.deleteCategory
 );
 Router.get("/get-product-edit", tokenVerify, adminController.getProductEdit);
+
+// Router.patch("/edit-product", tokenVerify, productController.editProduct);
+Router.get(
+	"/get-transaction-month",
+	tokenVerify,
+	adminController.getTransactionPerMonth
+);
+
 Router.patch(
 	"/edit-product",
 	tokenVerify,

@@ -56,6 +56,11 @@ function BranchAdminRegister() {
 
 			inputEmail.current.value = "";
 			inputPassword.current.value = "";
+
+			setTimeout(() => {
+				window.location.href =
+					"http://localhost:3000/admin/branch-admin-register";
+			}, 500);
 		} catch (error) {
 			toast.error(error.response.data.message);
 		} finally {
@@ -173,7 +178,7 @@ function BranchAdminRegister() {
 
 				<button
 					type="submit"
-					className="inline-flex w-full items-center justify-center px-8 py-4 font-sans font-semibold tracking-wide hover:bg-gray-300 text-white bg-red-700 rounded-lg h-[60px]"
+					className="inline-flex w-full items-center justify-center px-8 py-4 font-sans font-semibold tracking-wide hover:bg-gray-300 text-white bg-[#0095DA]  rounded-lg h-[60px]"
 					disabled={disable}
 					onClick={() => onSubmit()}
 				>

@@ -6,7 +6,7 @@ import { Button } from "flowbite-react";
 export default function FooterBar() {
 	return (
 		<footer className="border-t-8 border-[#0095da] mt-36 mb-5">
-			<div className="hidden pt-3 px-72 text-sm lg:grid grid-cols-5">
+			<div className="hidden pt-3 px-64 text-sm lg:grid grid-cols-5">
 				<div className="space-y-1">
 					<h2 className="font-semibold pb-1">BANTUAN</h2>
 					<p>Pembayaran</p>

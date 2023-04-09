@@ -32,6 +32,7 @@ export default function Checkout(props) {
 	const [qty, setqty] = useState();
 	const [total_price, settotal_price] = useState();
 	const [product_id, setproduct_id] = useState();
+	const [discount_history_id, setdiscount_history_id] = useState();
 	const [disablePayment, setdisablePayment] = useState();
 	const [address, setaddress] = useState();
 	const [rakir, setrakir] = useState({
@@ -56,30 +57,70 @@ export default function Checkout(props) {
 			});
 			let total = 0;
 			let berat = 0;
-			let product_name = []
-			let qty = []
-			let total_price = []
-			let product_id = []
+			let product_name = [];
+			let qty = [];
+			let total_price = [];
+			let product_id = [];
+			let discount_history = [];
 			data.data.forEach((value, index) => {
-				total += value.qty * value.product.price;
-				berat += value.qty * 1000;
-				product_name.push(value.product.name)
-				qty.push(value.qty)
-				total_price.push(value.qty*value.product.price)
-				product_id.push(value.product_id)
+				berat += value.qty * 100;
+				product_name.push(value.product.name);
+				qty.push(value.qty);
+				product_id.push(value.product_id);
+				if (value.product.discount_histories[0]) {
+					discount_history.push(value.product?.discount_histories[0]?.id);
+					if (value.product?.discount_histories[0]?.discount_id === 1) {
+						total += value.product.price * (value.qty - Math.floor(value.qty / 2));
+						total_price.push(value.product.price * (value.qty - Math.floor(value.qty / 2)));
+					} else if (
+						value.product?.discount_histories[0]?.discount_id === 2 &&
+						value.qty >= value.product?.discount_histories[0]?.min_purchase
+					) {
+						total +=
+							value.total_price -
+							value.product.price *
+								value.qty *
+								(value.product?.discount_histories[0]?.percent / 100);
+						total_price.push(
+							value.total_price -
+								value.product.price *
+									value.qty *
+									(value.product?.discount_histories[0]?.percent / 100)
+						);
+					} else if (value.product?.discount_histories[0]?.discount_id === 3) {
+						total +=
+							value.total_price -
+							value.product.price *
+								value.qty *
+								(value.product?.discount_histories[0]?.percent / 100);
+						total_price.push(
+							value.total_price -
+								value.product.price *
+									value.qty *
+									(value.product?.discount_histories[0]?.percent / 100)
+						);
+					} else {
+						total += value.total_price;
+						total_price.push(value.total_price);
+					}
+				} else {
+					discount_history.push(null);
+					total_price.push(value.total_price);
+					total += value.total_price;
+				}
 			});
-
-			setbranch_id(data.data[0].branch_id)
-			setproduct_name(product_name)
-			setqty(qty)
-			settotal_price(total_price)
-			setproduct_id(product_id)
+			setdiscount_history_id(discount_history);
+			setbranch_id(data.data[0].branch_id);
+			setproduct_name(product_name);
+			setqty(qty);
+			settotal_price(total_price);
+			setproduct_id(product_id);
 			setsum(total);
 			setweight(berat);
 			setdata(data.data);
 			setorigin(data.data[0].branch.city_code.split(".")[0]);
 		} catch (error) {
-			console.log(error);
+			error.response.data.message ? toast.error(error.response.data.message) : toast.error(error)		;
 		}
 	};
 
@@ -91,7 +132,6 @@ export default function Checkout(props) {
 				method: "POST",
 				data: { origin: origin, destination: destination, weight: weight },
 			});
-			console.log(jne.data.data[0].costs);
 			setJNE(jne.data.data[0].costs);
 
 			let pos = await REST_API({
@@ -99,7 +139,6 @@ export default function Checkout(props) {
 				method: "POST",
 				data: { origin: origin, destination: destination, weight: weight },
 			});
-			console.log(pos.data.data[0].costs);
 			setPOS(pos.data.data[0].costs);
 
 			let tiki = await REST_API({
@@ -107,20 +146,19 @@ export default function Checkout(props) {
 				method: "POST",
 				data: { origin: origin, destination: destination, weight: weight },
 			});
-			console.log(tiki.data.data[0].costs);
 			setTIKI(tiki.data.data[0].costs);
 
 			setTimeout(() => {
 				setdisable(false);
 			}, 1000);
 		} catch (error) {
-			console.log(error);
+			error.response.data.message ? toast.error(error.response.data.message) : toast.error(error)		;
 		}
 	};
 
 	let onSelectedCourier = async (value) => {
 		setcosts(Number(value.split("+")[3]));
-		setcourier(value)
+		setcourier(value);
 	};
 
 	const deleteAddress = async (id) => {
@@ -132,7 +170,7 @@ export default function Checkout(props) {
 			props.func.getProfile();
 			toast.success("Address deleted");
 		} catch (error) {
-			console.log(error);
+			error.response.data.message ? toast.error(error.response.data.message) : toast.error(error)		;
 		}
 	};
 
@@ -146,11 +184,16 @@ export default function Checkout(props) {
 			toast.success("Main address updated");
 			setaddress("");
 			setdestination(0);
-			getCourier();
+			onGetCart()
 			setshow({ ...show, changeAddress: false });
 		} catch (error) {
-			console.log(error);
+			error.response.data.message ? toast.error(error.response.data.message) : toast.error(error)		;
 		}
+	};
+
+	const addAddress = async () => {
+		setshow({ ...show, addAddress: true, changeAddress: false });
+		rakirProvince();
 	};
 	const rakirProvince = async () => {
 		try {
@@ -160,7 +203,7 @@ export default function Checkout(props) {
 			});
 			setrakir({ ...rakir, province: data.data });
 		} catch (error) {
-			console.log(error);
+			error.response.data.message ? toast.error(error.response.data.message) : toast.error(error)		;
 		}
 	};
 	const rakirCity = async (province) => {
@@ -171,7 +214,7 @@ export default function Checkout(props) {
 			});
 			setrakir({ ...rakir, city: data.data });
 		} catch (error) {
-			console.log(error);
+			error.response.data.message ? toast.error(error.response.data.message) : toast.error(error)		;
 		}
 	};
 	const onSubmitAddAddress = async (data) => {
@@ -188,7 +231,7 @@ export default function Checkout(props) {
 			props.func.getProfile();
 			toast.success("Address added");
 		} catch (error) {
-			console.log(error);
+			error.response.data.message ? toast.error(error.response.data.message) : toast.error(error)		;
 		} finally {
 			setshow({ ...show, loading: false, addAddress: false });
 		}
@@ -198,45 +241,53 @@ export default function Checkout(props) {
 		setaddress(value);
 		let dest = value.city.split(".")[0];
 		setdestination(dest);
-		getCourier();
+		setcourier("")
+		setcosts(0)
+		onGetCart()
 		setshow({ ...show, changeAddress: false });
 	};
 
 	const selectedMainAddress = async () => {
 		setaddress("");
 		setdestination(0);
-		getCourier();
+		setcourier("")
+		setcosts(0)
+		onGetCart()
 		setshow({ ...show, changeAddress: false });
 	};
 
 	const onSubmit = async () => {
-			setdisablePayment(true)
+		setdisablePayment(true);
 		try {
-			const {data} = await REST_API.post('/transaction/add',{
+			const { data } = await REST_API.post("/transaction/add", {
 				product_name: product_name,
 				qty: qty,
 				total_price: total_price,
-				user_address: address? address.address : props.state.profile.address?.main_address[0]?.address,
+				user_address: address
+					? address.address
+					: props.state.profile.address?.main_address[0]?.address,
 				courier: courier,
 				branch_id: branch_id,
-				product_id: product_id
-			})
-			toast.success(data.message)
+				product_id: product_id,
+				shipping_cost: costs,
+				discount_history_id: discount_history_id,
+			});
+			toast.success(data.message);
 			setTimeout(() => {
-				Navigate("/uploadpayment")
-			})
+				Navigate("/uploadpayment");
+			}, 3000);
 		} catch (error) {
-			console.log(error)
+			error.response.data.message ? toast.error(error.response.data.message) : toast.error(error)		;
 			toast.error(error.response.data.message);
-		}finally{
-			setdisablePayment(false)
+		} finally {
+			setdisablePayment(false);
 		}
-	}
+	};
 
 	useEffect(() => {
 		onGetCart();
-		rakirProvince();
 	}, []);
+
 	return (
 		<div className=" max-w-screen h-max pb-10 flex justify-center flex-col">
 			<div className=" w-screen border-b">
@@ -311,7 +362,11 @@ export default function Checkout(props) {
 																<button
 																	key={index}
 																	disabled={disable}
-																	value={value.cost[0] ? `JNE+${value.service}+${value.cost[0].etd}+${value.cost[0].value}`  : null}
+																	value={
+																		value.cost[0]
+																			? `JNE+${value.service}+${value.cost[0].etd}+${value.cost[0].value}`
+																			: null
+																	}
 																	onClick={(e) => onSelectedCourier(e.target.value)}
 																	className=" flex justify-between w-[270px] h-[60px] pt-3"
 																>
@@ -336,7 +391,11 @@ export default function Checkout(props) {
 																<button
 																	key={index}
 																	disabled={disable}
-																	value={value.cost[0] ? `POS+${value.service}+${value.cost[0].etd}+${value.cost[0].value}` : null}
+																	value={
+																		value.cost[0]
+																			? `POS+${value.service}+${value.cost[0].etd}+${value.cost[0].value}`
+																			: null
+																	}
 																	onClick={(e) => onSelectedCourier(e.target.value)}
 																	className=" flex justify-between h-[60px] w-[270px] pt-3"
 																>
@@ -363,7 +422,11 @@ export default function Checkout(props) {
 															<button
 																key={index}
 																disabled={disable}
-																value={value.cost[0] ? `TIKI+${value.service}+${value.cost[0].etd}+${value.cost[0].value}` : null}
+																value={
+																	value.cost[0]
+																		? `TIKI+${value.service}+${value.cost[0].etd}+${value.cost[0].value}`
+																		: null
+																}
 																onClick={(e) => onSelectedCourier(e.target.value)}
 																className=" flex justify-between h-[60px] w-[270px] pt-3"
 															>
@@ -405,7 +468,7 @@ export default function Checkout(props) {
 											<div className=" font-semibold text-[14px] h-[46px] flex justify-start items-center ">
 												Toko {value.branch.location}
 											</div>
-											<div className=" h-[156px] flex flex-row pt-5 border-b">
+											<div className=" h-[156px] flex justify-between flex-row pt-5 border-b">
 												<div className=" h-[135px] w-[364px] flex ">
 													<img
 														alt="Image_Product"
@@ -425,20 +488,85 @@ export default function Checkout(props) {
 														<p className=" pl-[15px] font-semibold font-tokpedFont text-[14px]">
 															Rp. {value.product.price.toLocaleString()}
 														</p>
+
 														<p className=" pl-[15px] flex gap-1 font-tokpedFont text-[14px]">
-															Quantity :{" "}
+															Quantity :
 															<p className=" font-tokpedFont font-semibold text-[14px]">
 																{value.qty}
 															</p>
 														</p>
 													</div>
 												</div>
+												{value.product.discount_histories[0] ? (
+													value.qty >= value.product.discount_histories[0].min_purchase ? (
+														<div className=" flex gap-2 items-end mb-2">
+															<p className=" font-tokpedFont font-semibold text-[14px]">Promo :</p>
+															<p className=" font-tokpedFont font-semibold text-[12px] rounded-md bg-green-400 text-white p-1 ">
+																{value.product.discount_histories.map((value, index) => {
+																	return (
+																		<>
+																			{value.discount_id === 1
+																				? `${value.discount.name}`
+																				: value.discount_id === 2
+																				? `${value.discount.name} ${value.min_purchase}`
+																				: value.discount_id === 3
+																				? `${value.discount.name} ${value.percent}%`
+																				: null}
+																		</>
+																	);
+																})}
+															</p>
+														</div>
+													) : null
+												) : null}
 											</div>
 											<div className=" h-14 my-[6px] flex justify-between items-center">
 												<p className=" font-semibold text-[14px]">Subtotal</p>
-												<p className=" font-semibold text-[14px]">
-													Rp. {(value.product.price * value.qty).toLocaleString()}{" "}
-												</p>
+												<div className=" flex flex-row gap-2">
+													{value.product.discount_histories[0] ? (
+														value.qty >= value.product.discount_histories[0].min_purchase ? (
+															<>
+																{value.product.discount_histories.map((val, idx) => {
+																	return val.discount_id === 1 ? (
+																		<>
+																			<p className=" line-through font-semibold text-[14px]">
+																				Rp. {(value.product.price * value.qty).toLocaleString()}{" "}
+																			</p>
+																			<p className=" font-semibold text-[14px]">
+																				Rp.
+																				{(
+																					value.product.price *
+																					(value.qty - Math.floor(value.qty / 2))
+																				).toLocaleString()}{" "}
+																			</p>
+																		</>
+																	) : val.discount_id === 2 || val.discount_id === 3 ? (
+																		<>
+																			<p className=" line-through font-semibold text-[14px]">
+																				Rp. {(value.product.price * value.qty).toLocaleString()}{" "}
+																			</p>
+																			<p className=" font-semibold text-[14px]">
+																				Rp.{" "}
+																				{(
+																					value.total_price -
+																					value.product.price * value.qty * (val.percent / 100)
+																				).toLocaleString()}{" "}
+																			</p>
+																		</>
+																	) : null;
+																})}
+															</>
+														) : (
+															<p className=" font-semibold text-[14px]">
+																Rp. {(value.product.price * value.qty).toLocaleString()}{" "}
+															</p>
+														)
+													) : (
+														<p className=" font-semibold text-[14px]">
+															Rp. {(value.product.price * value.qty).toLocaleString()}{" "}
+														</p>
+													)}
+												</div>
 											</div>
 										</div>
 										{/* ORDER END HERE */}
@@ -456,7 +584,7 @@ export default function Checkout(props) {
 						</div>
 						<div>
 							<p className=" flex gap-1 text-[14px]">Rp. {sum.toLocaleString()} </p>
-							{costs ? <p className=" mt-2 text-[14px]">Rp. {costs.toLocaleString()}</p> : null}
+							{costs  ? <p className=" mt-2 text-[14px]">Rp. {costs.toLocaleString()}</p> : null}
 						</div>
 					</div>
 					<div className=" border-t flex justify-between h-[37px] items-end ">
@@ -467,13 +595,25 @@ export default function Checkout(props) {
 						Dengan mengaktifkan asuransi, Saya menyetujui{" "}
 						<p className=" text-red-700">syarat dan ketentuan yang berlaku.</p>
 					</p>
-					<button onClick={() => onSubmit() } className=" mt-6 h-12 w-full text-white bg-[#0095DA] rounded-lg ">{disablePayment ? (
-									<LoadingSpin size={"30px"} primaryColor={"#38ADE3"} secondaryColor={"gray"} />
-								) : (
-									"Checkout"
-								)}</button>
+					{!courier ? (
+						<p className=" mt-2 text-red-700 text-[12px] font-tokpedFont font-semibold">
+							*Please Input Your Courier Methode {" "}
+						</p>
+					) : null}
+					<button
+						disabled={!courier ? true : false}
+						onClick={() => onSubmit()}
+						className=" mt-6 h-12 w-full text-white bg-[#0095DA] rounded-lg "
+					>
+						{disablePayment ? (
+							<LoadingSpin size={"30px"} primaryColor={"#38ADE3"} secondaryColor={"gray"} />
+						) : (
+							"Pay Bill"
+						)}
+					</button>
 				</div>
 			</div>
+			{/* ---------------------------------------------------------MODAL-----------------------------------------------------------------------------------------------------------------------  */}
 			<Modal
 				show={show.addAddress}
 				size="md"
@@ -582,7 +722,7 @@ export default function Checkout(props) {
 							</h3>
 							<button
 								className=" rounded-md border-[#0095DA] text-[#0095DA] border p-2 hover:bg-slate-200"
-								onClick={() => setshow({ ...show, addAddress: true, changeAddress: false })}
+								onClick={() => addAddress()}
 							>
 								Add Address
 							</button>

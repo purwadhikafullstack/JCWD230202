@@ -8,11 +8,6 @@ import { useNavigate } from "react-router-dom";
 function StockHistory() {
 	const [data, setData] = useState([]);
 
-	// const [date, setDate] = useState({
-	// 	from: "",
-	// 	to: "",
-	// });
-
 	const [dateFrom, setDateFrom] = useState("");
 	const [dateTo, setDateTo] = useState("");
 	const [selectedDate, setSelectedDate] = useState({
@@ -47,7 +42,7 @@ function StockHistory() {
 				},
 			}
 		);
-		console.log(response.data.data);
+		// console.log(response.data.data);
 		setData(response.data.data);
 	};
 
@@ -168,13 +163,13 @@ function StockHistory() {
 					{console.log(dateTo, "ini to")}
 				</div>
 			</div> */}
-			<div className="grid grid-cols-4 gap-7 h-auto">
+			<div className="grid md:grid-cols-4 grid-cols-2 gap-7 h-auto">
 				{data.length !== 0 ? (
 					data.map((value, index) => {
 						return (
 							<div
 								key={index}
-								className="flex flex-col shadow-md justify-between w-full max-w-sms h-64 bg-white border border-gray-200 rounded-lg dark:bg-gray-800 dark:border-gray-700 mt-10"
+								className="flex flex-col shadow-md justify-between w-full max-w-sms h-72 bg-white border border-gray-200 rounded-lg dark:bg-gray-800 dark:border-gray-700 mt-10 "
 							>
 								<img
 									className="rounded-t-lg h-32"
