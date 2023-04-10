@@ -197,7 +197,7 @@ module.exports = {
 									[sequelize.fn("sum", sequelize.col("qty")), "total_qty"],
 								],
 								where: {
-									status: "delivered",
+									status: "Delivered",
 									createdAt: {
 										[Op.between]: [
 											new Date(filterBy[0]),
@@ -228,7 +228,7 @@ module.exports = {
 									],
 								],
 								where: {
-									status: "delivered",
+									status: "Delivered",
 									createdAt: {
 										[Op.between]: [
 											new Date(filterBy[0]),
@@ -245,7 +245,7 @@ module.exports = {
 						} else {
 							data = await db.transaction.findAll({
 								where: {
-									status: "delivered",
+									status: "Delivered",
 									createdAt: {
 										[Op.between]: [
 											new Date(filterBy[0]),
@@ -276,7 +276,7 @@ module.exports = {
 									[sequelize.fn("sum", sequelize.col("qty")), "total_qty"],
 								],
 								where: {
-									status: "delivered",
+									status: "Delivered",
 								},
 
 								group: ["invoice"],
@@ -300,7 +300,7 @@ module.exports = {
 									],
 								],
 								where: {
-									status: "delivered",
+									status: "Delivered",
 								},
 								group: ["invoice"],
 								order: [["total_price", sortBy[1]]],
@@ -323,7 +323,7 @@ module.exports = {
 									],
 								],
 								where: {
-									status: "delivered",
+									status: "Delivered",
 								},
 								group: ["invoice"],
 								offset: page == 1 ? 0 : (page - 1) * 5,
@@ -350,7 +350,7 @@ module.exports = {
 
 								include: { model: db.branch, attributes: ["location"] },
 								where: {
-									status: "delivered",
+									status: "Delivered",
 									createdAt: {
 										[Op.between]: [
 											new Date(filterBy[0]),
@@ -378,7 +378,7 @@ module.exports = {
 
 								include: { model: db.branch, attributes: ["location"] },
 								where: {
-									status: "delivered",
+									status: "Delivered",
 									createdAt: {
 										[Op.between]: [
 											new Date(filterBy[0]),
@@ -606,7 +606,7 @@ module.exports = {
 									[sequelize.fn("sum", sequelize.col("qty")), "total_qty"],
 								],
 								where: {
-									status: "delivered",
+									status: "Delivered",
 									createdAt: {
 										[Op.between]: [
 											new Date(filterBy[0]),
@@ -637,7 +637,7 @@ module.exports = {
 									],
 								],
 								where: {
-									status: "delivered",
+									status: "Delivered",
 									createdAt: {
 										[Op.between]: [
 											new Date(filterBy[0]),
@@ -655,7 +655,7 @@ module.exports = {
 						} else {
 							data = await db.transaction.findAll({
 								where: {
-									status: "delivered",
+									status: "Delivered",
 									createdAt: {
 										[Op.between]: [
 											new Date(filterBy[0]),
@@ -687,7 +687,7 @@ module.exports = {
 									[sequelize.fn("sum", sequelize.col("qty")), "total_qty"],
 								],
 								where: {
-									status: "delivered",
+									status: "Delivered",
 									branch_id: admin_branch_id,
 								},
 
@@ -712,7 +712,7 @@ module.exports = {
 									],
 								],
 								where: {
-									status: "delivered",
+									status: "Delivered",
 									branch_id: admin_branch_id,
 								},
 								group: ["invoice"],
@@ -724,7 +724,7 @@ module.exports = {
 						} else {
 							data = await db.transaction.findAll({
 								where: {
-									status: "delivered",
+									status: "Delivered",
 									branch_id: admin_branch_id,
 								},
 								group: ["invoice"],
@@ -751,7 +751,7 @@ module.exports = {
 
 								include: { model: db.branch, attributes: ["location"] },
 								where: {
-									status: "delivered",
+									status: "Delivered",
 									createdAt: {
 										[Op.between]: [
 											new Date(filterBy[0]),
@@ -780,7 +780,7 @@ module.exports = {
 
 								include: { model: db.branch, attributes: ["location"] },
 								where: {
-									status: "delivered",
+									status: "Delivered",
 									createdAt: {
 										[Op.between]: [
 											new Date(filterBy[0]),
@@ -882,7 +882,7 @@ module.exports = {
 	adminRegister: async (req, res) => {
 		const t = await sequelize.transaction();
 		try {
-			let { email, password, branch_id } = req.body;
+			let { email, password, branch_id } = req.body; // console.log(email, password, branch_id, "test");
 			let token = req.uid;
 
 			let admin = await db.user.findOne(
@@ -895,7 +895,6 @@ module.exports = {
 			);
 
 			let role = admin.role;
-			// console.log(role, "role");
 
 			if (role === "super admin") {
 				if (!email.length || !password.length) {
@@ -926,7 +925,7 @@ module.exports = {
 						email,
 						password: await hashPassword(password),
 						role: "branch admin",
-						status: "verified",
+						status: "Verified",
 					},
 					{ transaction: t }
 				);
@@ -1230,17 +1229,17 @@ module.exports = {
 			const token = req.uid;
 			let admin_branch_id;
 
-			let admin = await db.user.findOne({
+			let admin = await db.user.findAll({
 				where: {
 					uid: token.uid,
 				},
-				include: { model: db.branch },
+				// include: { model: db.branch },
 			});
 
 			res.status(200).send({
 				isError: false,
-				message: "Get Data Product Success",
-				data: { admin },
+				message: "Get Role Admin Success",
+				data: admin,
 			});
 		} catch (error) {
 			res.status(400).send({
@@ -1559,7 +1558,7 @@ module.exports = {
 
 				total_user = await db.user.count({
 					where: {
-						status: "verified",
+						status: "Verified",
 						role: "user",
 					},
 				});
@@ -1613,7 +1612,7 @@ module.exports = {
 
 				total_user = await db.user.count({
 					where: {
-						status: "verified",
+						status: "Verified",
 						role: "user",
 					},
 				});
