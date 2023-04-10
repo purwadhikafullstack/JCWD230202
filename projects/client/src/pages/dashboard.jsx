@@ -21,32 +21,36 @@ export default function Dashboard(props) {
 	let Navigate = useNavigate();
 	let Location = useLocation();
 
-	let onGetRole = async (role) => {
-		try {
-			let token = localStorage.getItem("token");
-			let response = await axios.get("http://localhost:8000/admin/checkRole", {
-				headers: {
-					token,
-				},
-			});
-			// console.log(response.data.data.admin.role);
-			if (response.data.data.admin.role === "user") {
-				setAdmin(false);
-			}
-		} catch (error) {
-			return Navigate("/home");
-		}
-	};
+	// let onGetRole = async (role) => {
+	// 	try {
+	// 		console.log(role);
+	// 		let token = localStorage.getItem("token");
+	// 		let response = await axios.get("http://localhost:8000/admin/checkRole", {
+	// 			headers: {
+	// 				token,
+	// 			},
+	// 		});
+	// 		console.log(response, "nganu");
+	// 		if (response.data.data.admin.role === "user") {
+	// 			setAdmin(false);
+	// 		}
+	// 	} catch (error) {
+	// 		// return Navigate("/home");
+	// 	}
+	// };
 
 	useEffect(() => {
-		onGetRole(props.state.profile.role);
+		// onGetRole(props.state.profile.role);
 		if (Location.pathname === "/admin") Navigate("/admin/overview");
 	}, []);
 
-	if (admin === false) {
+	// if (admin === false) {
+	// 	return Navigate("/home");
+	// }
+
+	if (props.state.profile.role === "user") {
 		return Navigate("/home");
 	}
-
 	return (
 		<div>
 			<nav className="bg-white flex justify-between px-4 fixed top-0 z-50 w-full h-14 min-[640px]:hidden ">
