@@ -123,7 +123,6 @@ module.exports = {
 				password: await hashPassword(password),
 				phone_number,
 			});
-
 			const template = await fs.readFile(path.resolve(__dirname, '../template/confirmation.html'), 'utf-8')
 			
 			const templateToCompile = await handlebars.compile(template);
