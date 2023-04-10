@@ -9,6 +9,7 @@ const { Op } = require("sequelize");
 const deleteFiles = require("../helper/deleteFiles");
 const { sequelize } = require("../sequelize/models");
 const { default: axios } = require("axios");
+const path = require("path");
 
 module.exports = {
 	getUser: async (req, res) => {
@@ -122,15 +123,12 @@ module.exports = {
 				password: await hashPassword(password),
 				phone_number,
 			});
-
-			const template = await fs.readFile(
-				"./template/confirmation.html",
-				"utf-8"
-			);
+			const template = await fs.readFile(path.resolve(__dirname, '../template/confirmation.html'), 'utf-8')
+			
 			const templateToCompile = await handlebars.compile(template);
 			const newTemplate = templateToCompile({
 				name,
-				url: `http://localhost:3000/activation/${dataToSend.dataValues.uid}`,
+				url: `https://jcwd230202.purwadhikabootcamp.com/activation/${dataToSend.dataValues.uid}`,
 			});
 
 			await transporter.sendMail({
@@ -317,15 +315,13 @@ module.exports = {
 				});
 
 			const name = findEmail.dataValues.name;
-
-			const template = await fs.readFile(
-				"./template/resetPassword.html",
-				"utf-8"
-			);
+			
+			const template = await fs.readFile(path.resolve(__dirname, '../template/resetPassword.html'), 'utf-8')
+			
 			const templateToCompile = await handlebars.compile(template);
 			const newTemplate = templateToCompile({
 				name,
-				url: `http://localhost:3000/updatePassword/${findEmail.dataValues.uid}`,
+				url: `https://jcwd230202.purwadhikabootcamp.com/updatePassword/${findEmail.dataValues.uid}`,
 			});
 
 			await transporter.sendMail({
@@ -359,7 +355,7 @@ module.exports = {
 			});
 			await db.user.update(
 				{
-					img: req.files.images[0].path,
+					img: `Public/images/${req.files.images[0].filename}`,
 				},
 				{
 					where: {
@@ -395,7 +391,7 @@ module.exports = {
 			});
 			await db.transaction.update(
 				{
-					payment_proof: req.files.images[0].path,
+					payment_proof: `Public/images/${req.files.images[0].filename}`,
 					status: "Waiting Approval",
 				},
 				{
