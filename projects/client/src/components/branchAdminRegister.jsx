@@ -75,10 +75,10 @@ function BranchAdminRegister() {
 			inputEmail.current.value = "";
 			inputPassword.current.value = "";
 
-			// setTimeout(() => {
-			// 	window.location.href =
-			// 		"http://localhost:3000/admin/branch-admin-register";
-			// }, 2500);
+			setTimeout(() => {
+				window.location.href =
+					"http://localhost:3000/admin/branch-admin-register";
+			}, 2500);
 		} catch (error) {
 			toast.error(error.response.data.message);
 		} finally {

@@ -18,14 +18,10 @@
 		"dialect": "mysql"
 	},
 	"production": {
-		"username": "root",
-		"password": "jcwd2302",
-		"database": "toko",
+		"username": "jcwd230202",
+		"password": "group02",
+		"database": "jcwd230202",
 		"host": "127.0.0.1",
-		"dialect": "mysql",
-		"dialectOptions": {
-			"useUTC": false
-		},
-		"timezone": "+07:00"
+		"dialect": "mysql"
 	}
 }
