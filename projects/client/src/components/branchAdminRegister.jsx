@@ -4,6 +4,7 @@ import toast, { Toaster } from "react-hot-toast";
 
 import LoadingSpin from "react-loading-spin";
 import axios from "axios";
+import REST_API from "../support/services/RESTApiService";
 
 function BranchAdminRegister() {
 	const [showPassword, setshowPassword] = useState();
@@ -18,14 +19,19 @@ function BranchAdminRegister() {
 
 	let getBranchAvailable = async () => {
 		try {
-			let response = await axios.get(
-				`http://localhost:8000/admin/branch-admin-available`,
-				{
-					headers: {
-						token: localStorage.getItem("token"),
-					},
-				}
-			);
+			// let response = await axios.get(
+			// 	`http://localhost:8000/admin/branch-admin-available`,
+			// 	{
+			// 		headers: {
+			// 			token: localStorage.getItem("token"),
+			// 		},
+			// 	}
+			// );
+
+			let response = await REST_API({
+				url: "/admin/branch-admin-available",
+				method: "GET",
+			});
 
 			console.log(response.data.data);
 			setBranch(response.data.data);
@@ -39,28 +45,40 @@ function BranchAdminRegister() {
 	let onSubmit = async () => {
 		try {
 			setdisable(true);
-			let { data } = await axios.post(
-				"http://localhost:8000/admin/register",
-				{
+			// let { data } = await axios.post(
+			// 	"http://localhost:8000/admin/register",
+			// 	{
+			// 		email: inputEmail.current.value,
+			// 		password: inputPassword.current.value,
+			// 		branch_id: inputBranch.current.value,
+			// 	},
+			// 	{
+			// 		headers: {
+			// 			token: localStorage.getItem("token"),
+			// 		},
+			// 	}
+			// );
+
+			let { data } = await REST_API({
+				url: "/admin/register",
+				method: "POST",
+				data: {
 					email: inputEmail.current.value,
 					password: inputPassword.current.value,
 					branch_id: inputBranch.current.value,
 				},
-				{
-					headers: {
-						token: localStorage.getItem("token"),
-					},
-				}
-			);
+			});
+
+			console.log(data);
 			toast.success(data.message);
 
 			inputEmail.current.value = "";
 			inputPassword.current.value = "";
 
-			setTimeout(() => {
-				window.location.href =
-					"http://localhost:3000/admin/branch-admin-register";
-			}, 500);
+			// setTimeout(() => {
+			// 	window.location.href =
+			// 		"http://localhost:3000/admin/branch-admin-register";
+			// }, 2500);
 		} catch (error) {
 			toast.error(error.response.data.message);
 		} finally {
