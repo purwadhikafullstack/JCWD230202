@@ -28,7 +28,7 @@ function StockHistoryDetail(props) {
 
 	let onGetData = async (page, branchId, filter, sort) => {
 		try {
-			console.log(page, "ini page yg masuk");
+			// console.log(page, "ini page yg masuk");
 			let { data } = await REST_API({
 				url: `/admin/product-history-detail?page=${page}&ProductId=${idParam.id}&branchId=${branchId}&sort=${sort}&filter=${filter}`,
 				method: "GET",
