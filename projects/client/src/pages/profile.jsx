@@ -20,7 +20,19 @@ import REST_API from "../support/services/RESTApiService";
 
 export default function Profile(props) {
 	const [date, setdate] = useState();
+	const [address, setaddress] = useState();
+	const [selectedaddress, setselectedaddress] = useState({
+		id: null,
+		address: null,
+		province: null,
+		city: null,
+		receiver_name: null,
+		receiver_phone: null,
+		main_address: null,
+	});
 	const [img, setimg] = useState();
+	const [transaction, settransaction] = useState(null);
+	const [selected, setselected] = useState();
 	const [rakir, setrakir] = useState({
 		province: null,
 		city: null,
@@ -31,6 +43,7 @@ export default function Profile(props) {
 		loading: false,
 		changePassword: false,
 		changeAddress: false,
+		editAddress: false,
 		changeProfilePic: false,
 		addAddress: false,
 		oldPassword: false,
@@ -38,6 +51,7 @@ export default function Profile(props) {
 		confirmPassword: false,
 		transactionDetail: false,
 		paymentProof: false,
+		popUpDeleteAddress: false,
 	});
 
 	const {
@@ -46,9 +60,6 @@ export default function Profile(props) {
 		formState: { errors },
 		setValue,
 	} = useForm();
-
-	const [transaction, settransaction] = useState(null);
-	const [selected, setselected] = useState();
 
 	const getTransaction = async (status) => {
 		try {
@@ -143,7 +154,6 @@ export default function Profile(props) {
 			setshow({ ...show, loading: false, edit: false });
 		}
 	};
-
 	const onSubmitChangePassword = async (data) => {
 		const err = { msg: "Please input the same password" };
 		setshow({ ...show, loading: true });
@@ -182,7 +192,6 @@ export default function Profile(props) {
 			toast.error("Upload image failed");
 		}
 	};
-
 	const deleteAddress = async (id) => {
 		try {
 			await REST_API({
@@ -195,7 +204,51 @@ export default function Profile(props) {
 			console.log(error);
 		}
 	};
-	// const editAddress = async (data) => {};
+	const findAddress = async (id) => {
+		try {
+			const { data } = await REST_API({
+				url: `/user/find-address?id=${id}`,
+				method: "GET",
+			});
+			setselectedaddress({
+				...selectedaddress,
+				id: data.data.id,
+				address: data.data.address,
+				province: data.data.province,
+				city: data.data.city,
+				receiver_name: data.data.receiver_name,
+				receiver_phone: data.data.receiver_phone,
+				main_address: data.data.main_address,
+			});
+		} catch (error) {
+			console.log(error);
+		} finally {
+			setshow({ ...show, editAddress: true, changeAddress: false });
+		}
+	};
+	const editAddress = async (data) => {
+		try {
+			await REST_API({
+				url: `/user/editAddress`,
+				method: "PATCH",
+				data: {
+					id: selectedaddress.id,
+					address: selectedaddress.address,
+					province: selectedaddress.province,
+					city: selectedaddress.city,
+					receiver_name: selectedaddress.receiver_name,
+					receiver_phone: selectedaddress.receiver_phone,
+					main_address: selectedaddress.main_address,
+				},
+			});
+			toast.success("Address changed");
+		} catch (error) {
+			toast.error("Something went wrong");
+		} finally {
+			props.func.getProfile();
+			setshow({ ...show, editAddress: false });
+		}
+	};
 	const makeDefault = async (id) => {
 		try {
 			await REST_API({
@@ -230,7 +283,6 @@ export default function Profile(props) {
 			console.log(error);
 		}
 	};
-
 	const validateImage = (e) => {
 		const err = {
 			msg1: "Select 1 Image only!",
@@ -245,17 +297,20 @@ export default function Profile(props) {
 			toast.error(error);
 		}
 	};
-
 	const onSubmitAddAddress = async (data) => {
 		setshow({ ...show, loading: true });
 		try {
-			await REST_API.post("/user/add-address", {
-				city: data.city,
-				province: data.province,
-				address: data.address,
-				receiver_name: data.receiver_name,
-				receiver_phone: data.receiver_phone,
-				main_address: rakir.main_address,
+			await REST_API({
+				url: "/user/add-address",
+				method: "POST",
+				data: {
+					city: data.city,
+					province: data.province,
+					address: data.address,
+					receiver_name: data.receiver_name,
+					receiver_phone: data.receiver_phone,
+					main_address: rakir.main_address,
+				},
 			});
 			props.func.getProfile();
 			toast.success("Address added");
@@ -281,7 +336,7 @@ export default function Profile(props) {
 					<img
 						src={
 							props.state.profile.profile_picture
-								? `http://localhost:8000/${props.state.profile.profile_picture}`
+								? `https://jcwd230202.purwadhikabootcamp.com/${props.state.profile.profile_picture}`
 								: ""
 						}
 						alt="Profile"
@@ -1447,6 +1502,146 @@ export default function Profile(props) {
 					</Modal.Body>
 				</Modal>
 				<Modal
+					show={show.editAddress}
+					size="md"
+					popup={true}
+					onClose={() => setshow({ ...show, editAddress: false })}
+					id="name modal"
+					className="z-50"
+				>
+					<Modal.Header />
+					<Modal.Body>
+						<form
+							onSubmit={handleSubmit(editAddress)}
+							className="space-y-6 px-6 pb-4 sm:pb-6 lg:px-8 xl:pb-8"
+						>
+							<h3 className="text-xl font-medium text-gray-900 dark:text-white">
+								Edit your address
+							</h3>
+							<div className="space-y-2">
+								<div className="mb-2 block">
+									<Label htmlFor="password" value="Select province" />
+								</div>
+								<select
+									name="province"
+									className="border-gray-300 rounded-lg bg-gray-50 w-full"
+									onChange={(e) => {
+										rakirCity(e.target.value.split(".")[0]);
+										setselectedaddress({
+											...selectedaddress,
+											province: e.target.value,
+										});
+									}}
+								>
+									<option value="selected">
+										{selectedaddress?.province?.split(".")[1]}
+									</option>
+									{rakir.province?.map((value, index) => {
+										return (
+											<option
+												value={`${value.province_id}.${value.province}`}
+												key={index}
+											>
+												{value.province}
+											</option>
+										);
+									})}
+								</select>
+								<div className="mb-2 block">
+									<Label value="Select city" />
+								</div>
+								<select
+									name="city"
+									className="border-gray-300 rounded-lg bg-gray-50 w-full"
+									onChange={(e) =>
+										setselectedaddress({
+											...selectedaddress,
+											city: e.target.value,
+										})
+									}
+								>
+									<option value="selected">
+										{selectedaddress?.city?.split(".")[1]}
+									</option>
+									{rakir.city?.map((value, index) => {
+										return (
+											<option
+												value={`${value.city_id}.${value.city_name}`}
+												key={index}
+											>
+												{value.type} {value.city_name}
+											</option>
+										);
+									})}
+								</select>
+								<div className="mb-2 block">
+									<Label htmlFor="address" value="Address details" />
+								</div>
+								<Textarea
+									rows="4"
+									type="text"
+									defaultValue={selectedaddress?.address}
+									onChange={(e) =>
+										setselectedaddress({
+											...selectedaddress,
+											address: e.target.value,
+										})
+									}
+									required={true}
+								/>
+								<div className="mb-2 block">
+									<Label htmlFor="conatcts" value="Contact person" />
+								</div>
+								<TextInput
+									defaultValue={selectedaddress?.receiver_name}
+									onChange={(e) =>
+										setselectedaddress({
+											...selectedaddress,
+											receiver_name: e.target.value,
+										})
+									}
+								/>
+								<div className="mb-2 block">
+									<Label htmlFor="conatcts" value="Phone number" />
+								</div>
+								<TextInput
+									defaultValue={selectedaddress?.receiver_phone}
+									onChange={(e) =>
+										setselectedaddress({
+											...selectedaddress,
+											receiver_phone: e.target.value,
+										})
+									}
+								/>
+								<div className="flex items-center gap-2">
+									<Checkbox
+										id="rememberEditAddress"
+										defaultValue={selectedaddress?.main_address}
+										onChange={() =>
+											setselectedaddress({
+												...selectedaddress,
+												main_address: selectedaddress.main_address
+													? false
+													: true,
+											})
+										}
+									/>
+									<Label htmlFor="remember">Make main address</Label>
+								</div>
+							</div>
+							<div className="w-full flex justify-end">
+								{show.loading ? (
+									<button>
+										<Spinner aria-label="Default status example" />
+									</button>
+								) : (
+									<Button type="submit">Submit</Button>
+								)}
+							</div>
+						</form>
+					</Modal.Body>
+				</Modal>
+				<Modal
 					show={show.changeAddress}
 					size="3xl"
 					popup={true}
@@ -1535,14 +1730,25 @@ export default function Profile(props) {
 															>
 																Make default
 															</Button>
-															<Button color="success" size="xs" className="p-0">
+															<Button
+																onClick={() => findAddress(value.id)}
+																color="success"
+																size="xs"
+																className="p-0"
+															>
 																Edit
 															</Button>
 															<Button
 																size="xs"
 																color="failure"
 																className="p-0"
-																onClick={() => deleteAddress(value.id)}
+																onClick={() => {
+																	setaddress(value.id);
+																	setshow({
+																		...show,
+																		popUpDeleteAddress: true,
+																	});
+																}}
 															>
 																Delete
 															</Button>
@@ -1674,6 +1880,49 @@ export default function Profile(props) {
 									</button>
 								) : (
 									<Button onClick={() => onSubmitPaymentProof()}>Submit</Button>
+								)}
+							</div>
+						</div>
+					</Modal.Body>
+				</Modal>
+				<Modal
+					show={show.popUpDeleteAddress}
+					size="md"
+					onClose={() => setshow({ ...show, popUpDeleteAddress: false })}
+					id="name modal"
+				>
+					<Modal.Header />
+					<Modal.Body>
+						<div className="space-y-6 px-6 pb-4 sm:pb-6 lg:px-8 xl:pb-8">
+							<h3 className="text-lg font-medium text-gray-900 dark:text-white">
+								Delete this address?
+							</h3>
+							<div className="w-full flex justify-end space-x-2">
+								{show.loading ? (
+									<button>
+										<Spinner aria-label="Default status example" />
+									</button>
+								) : (
+									<Button
+										onClick={() =>
+											setshow({ ...show, popUpDeleteProduct: false })
+										}
+										color="failure"
+									>
+										No
+									</Button>
+								)}
+								{show.loading ? (
+									<button>
+										<Spinner aria-label="Default status example" />
+									</button>
+								) : (
+									<Button
+										onClick={() => deleteAddress(address)}
+										color="success"
+									>
+										Yes
+									</Button>
 								)}
 							</div>
 						</div>

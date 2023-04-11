@@ -93,7 +93,12 @@ Router.delete(
 );
 Router.get("/get-product-edit", tokenVerify, adminController.getProductEdit);
 
-// Router.patch("/edit-product", tokenVerify, productController.editProduct);
+Router.patch("/edit-product", tokenVerify, productController.editProduct);
+Router.patch(
+	"/edit-product-no-img",
+	tokenVerify,
+	productController.editProductNoImg
+);
 Router.get(
 	"/get-transaction-month",
 	tokenVerify,
