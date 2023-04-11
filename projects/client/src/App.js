@@ -118,7 +118,8 @@ function App() {
 			password = "";
 			getProfile();
 			setTimeout(() => {
-				window.location.href = "http://localhost:3000/admin";
+				window.location.href =
+					"https://jcwd230202.purwadhikabootcamp.com/admin";
 			}, 1000);
 		} catch (error) {
 			toast.error(error.response.message);
