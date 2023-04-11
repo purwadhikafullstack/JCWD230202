@@ -116,12 +116,12 @@ function Login(props) {
 							)}
 						</button>
 
-						<a
+						{/* <a
 							className=" justify-center underline text-[14px] text-[#0095DA] flex mt-[12px] "
 							href="/loginadmin"
 						>
 							Log in as admin
-						</a>
+						</a> */}
 
 						<div className=" mt-[15px] flex items-center justify-center text-slate-400 text-[12px] ">
 							<p>Don't have an account Tokonglomerat?</p>
