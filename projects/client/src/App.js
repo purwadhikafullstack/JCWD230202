@@ -88,7 +88,7 @@ function App() {
 			password = "";
 			getProfile();
 			setTimeout(() => {
-				window.location.href = "http://localhost:3000/home";
+				window.location.href = "https://jcwd230202.purwadhikabootcamp.com/home";
 			}, 3000);
 		} catch (error) {
 			toast.error(error.response.data.message);
