@@ -26,22 +26,39 @@ module.exports = {
 	},
 	discountListSort: async (req, res) => {
 		const { uid } = req.uid;
-		const { sort, name } = req.query;
+		const { sort, name, status } = req.query;
+		let where;
 		try {
 			const admin = await db.user.findOne({
 				where: { uid },
 				include: { model: db.branch },
 			});
 			let data;
+			if (status == 0) where = { branch_id: admin.branch.id };
+			if (status == 1)
+				where = {
+					[Op.and]: [
+						{ branch_id: admin.branch.id },
+						{ status: "Waiting Approval" },
+					],
+				};
+			if (status == 2)
+				where = where = {
+					[Op.and]: [{ branch_id: admin.branch.id }, { status: "Active" }],
+				};
+			if (status == 3)
+				where = where = {
+					[Op.and]: [{ branch_id: admin.branch.id }, { status: "Declined" }],
+				};
 			if (name !== "") {
 				data = await db.discount_history.findAll({
-					where: { branch_id: admin.branch.id },
+					where,
 					include: { model: db.product },
 					order: [[{ model: db.product }, "name", sort]],
 				});
 			} else {
 				data = await db.discount_history.findAll({
-					where: { branch_id: admin.branch.id },
+					where,
 					include: { model: db.product },
 					order: [[sort.split("-")[0], sort.split("-")[1]]],
 				});

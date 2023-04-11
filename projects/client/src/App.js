@@ -28,7 +28,6 @@ import PaymentProof from "./pages/paymentProof";
 import TransactionAdmin from "./components/transaction";
 import Overview from "./components/overview";
 import ProfileSideBar from "./components/profileSideBar";
-import SuperAdminDiscountManagement from "./pages/superAdminDiscountManagement";
 
 function App() {
 	const navigate = useNavigate();
@@ -52,7 +51,6 @@ function App() {
 				url: "/user/profile",
 				method: "GET",
 			});
-
 			setprofile({
 				...profile,
 				id: data.data.id,
@@ -210,15 +208,7 @@ function App() {
 
 					<Route
 						path="discount-management"
-						element={
-							profile ? (
-								profile.role === "branch admin" ? (
-									<DiscountManagement />
-								) : profile.role === "super admin" ? (
-									<SuperAdminDiscountManagement />
-								) : null
-							) : null
-						}
+						element={<DiscountManagement state={{ profile }} />}
 					/>
 
 					<Route

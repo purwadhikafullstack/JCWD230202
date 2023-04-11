@@ -47,7 +47,7 @@ export default function ProfileSideBar(props) {
 					<img
 						src={
 							props.state.profile.profile_picture
-								? `http://localhost:8000/${props.state.profile.profile_picture}`
+								? `https://jcwd230202.purwadhikabootcamp.com/${props.state.profile.profile_picture}`
 								: ""
 						}
 						alt="Profile"

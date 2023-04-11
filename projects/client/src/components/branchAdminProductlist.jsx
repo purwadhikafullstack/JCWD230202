@@ -1,4 +1,5 @@
 import { GrNext, GrPrevious, GrEdit } from "react-icons/gr";
+import { TbReload } from "react-icons/tb";
 import REST_API from "../support/services/RESTApiService";
 import { useState, useEffect } from "react";
 import {
@@ -13,9 +14,9 @@ import {
 import toast, { Toaster } from "react-hot-toast";
 
 function BranchAdminProductList() {
+	const [addedStock, setaddedStock] = useState(0);
 	const [deletedPorductId, setDeletedProductId] = useState();
 	const [product, setproduct] = useState();
-	// const [page, setpage] = useState();
 	const [selectedpage, setselectedpage] = useState(1);
 	const [category, setCategory] = useState();
 	const [selectedCategory, setSelectedCategory] = useState();
@@ -214,16 +215,43 @@ function BranchAdminProductList() {
 
 	const editProduct = async () => {
 		setshow({ ...show, loading: true });
-		const fd = new FormData();
-		fd.append("images", img);
-		fd.append("data", JSON.stringify(selectedProduct));
+
 		try {
-			await REST_API({
-				url: "/admin/edit-product",
-				method: "PATCH",
-				data: fd,
-			});
-			toast.success("Product updated");
+			if (img) {
+				const fd = new FormData();
+				fd.append("images", img);
+				fd.append(
+					"data",
+					JSON.stringify({
+						branch_id: selectedProduct.branch_id,
+						id: selectedProduct.id,
+						name: selectedProduct.name,
+						stock: selectedProduct.stock + addedStock,
+						price: selectedProduct.price,
+						description: selectedProduct.description,
+					})
+				);
+				await REST_API({
+					url: "/admin/edit-product",
+					method: "PATCH",
+					data: fd,
+				});
+				toast.success("Product updated");
+			} else {
+				await REST_API({
+					url: "/admin/edit-product-no-img",
+					method: "PATCH",
+					data: {
+						branch_id: selectedProduct.branch_id,
+						id: selectedProduct.id,
+						name: selectedProduct.name,
+						stock: selectedProduct.stock + addedStock,
+						price: selectedProduct.price,
+						description: selectedProduct.description,
+					},
+				});
+				toast.success("Product updated no image");
+			}
 		} catch (error) {
 			console.log(error);
 		} finally {
@@ -266,9 +294,8 @@ function BranchAdminProductList() {
 	}, []);
 
 	return (
-
 		<div className=" w-full px-2 md:px-10">
-
+			{console.log(addedStock)}
 			<button
 				onClick={() => {
 					getAllProduct(1);
@@ -419,7 +446,6 @@ function BranchAdminProductList() {
 			</div>
 
 			<div className="mt-24 flex justify-center items-center my-5 pb-10 ">
-
 				<label className="p-1">page</label>
 				<button
 					className="bg-[#0095DA] text-white border-y-[1px] border-l-[1px] p-2 rounded-l-lg"
@@ -445,7 +471,6 @@ function BranchAdminProductList() {
 				/>
 				<button
 					className="bg-[#0095DA] text-white  border-y-[1px] border-r-[1px] p-2 rounded-r-lg"
-
 					onClick={
 						selectedCategory
 							? () =>
@@ -730,16 +755,78 @@ function BranchAdminProductList() {
 								<div className="mb-2 block">
 									<Label htmlFor="stock" value="Edit product stock" />
 								</div>
-								<TextInput
-									defaultValue={selectedProduct?.stock}
-									onChange={(e) =>
-										setSelectedProduct({
-											...selectedProduct,
-											stock: e.target.value,
-										})
-									}
-									type="text"
-								/>
+								<div className="grid grid-cols-4 space-x-3">
+									<TextInput
+										defaultValue={selectedProduct?.stock}
+										disabled
+										className="w-full"
+										type="text"
+									/>
+									<div className="flex col-span-3 space-x-2">
+										<button
+											onClick={() =>
+												setaddedStock(addedStock > 0 ? -100 : addedStock - 100)
+											}
+											className="border rounded-md text-xs px-2 bg-[#0095da] text-white"
+										>
+											-100
+										</button>
+										<button
+											onClick={() =>
+												setaddedStock(addedStock > 0 ? -10 : addedStock - 10)
+											}
+											className="border rounded-md text-xs px-2 bg-[#0095da] text-white"
+										>
+											-10
+										</button>
+										<button
+											onClick={() =>
+												setaddedStock(addedStock > 0 ? -1 : addedStock - 1)
+											}
+											className="border rounded-md text-xs px-2 bg-[#0095da] text-white"
+										>
+											-
+										</button>
+										<div className="relative">
+											<TextInput
+												value={addedStock}
+												disabled
+												className="w-full"
+												type="text"
+											/>
+											<button
+												onClick={() => setaddedStock(0)}
+												className="absolute right-2 top-3"
+											>
+												<TbReload />
+											</button>
+										</div>
+										<button
+											onClick={() =>
+												setaddedStock(addedStock < 0 ? 1 : addedStock + 1)
+											}
+											className="border rounded-md text-xs px-2 bg-[#0095da] text-white"
+										>
+											+
+										</button>
+										<button
+											onClick={() =>
+												setaddedStock(addedStock < 0 ? 10 : addedStock + 10)
+											}
+											className="border rounded-md text-xs px-2 bg-[#0095da] text-white"
+										>
+											+10
+										</button>
+										<button
+											onClick={() =>
+												setaddedStock(addedStock < 0 ? 100 : addedStock + 100)
+											}
+											className="border rounded-md text-xs px-2 bg-[#0095da] text-white"
+										>
+											+100
+										</button>
+									</div>
+								</div>
 								<div className="mb-2 block">
 									<Label htmlFor="stock" value="Edit product price" />
 								</div>
@@ -795,7 +882,17 @@ function BranchAdminProductList() {
 									<Spinner aria-label="Default status example" />
 								</button>
 							) : (
-								<Button onClick={() => editProduct()}>Submit</Button>
+								<Button
+									onClick={() => {
+										setSelectedProduct({
+											...selectedProduct,
+											stock: selectedProduct.stock + addedStock,
+										});
+										editProduct();
+									}}
+								>
+									Submit
+								</Button>
 							)}
 						</div>
 					</div>
