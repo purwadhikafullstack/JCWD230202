@@ -45,7 +45,7 @@ function Login(props) {
 					className=" hidden xl:block w-[816px] h-full "
 					src={tokonglomerat}
 				/>
-				<div className=" absolute inset-0 xl:h-fit flex justify-center content-center   ">
+				<div className=" absolute inset-0 xl:h-fit flex justify-center content-center md:h-fit">
 					<div
 						autoComplete="off"
 						className="w-full xl:my-[50px] max-w-[400px] p-[41px] bg-white rounded-lg drop-shadow-2xl "
@@ -116,12 +116,12 @@ function Login(props) {
 							)}
 						</button>
 
-						<a
+						{/* <a
 							className=" justify-center underline text-[14px] text-[#0095DA] flex mt-[12px] "
 							href="/loginadmin"
 						>
 							Log in as admin
-						</a>
+						</a> */}
 
 						<div className=" mt-[15px] flex items-center justify-center text-slate-400 text-[12px] ">
 							<p>Don't have an account Tokonglomerat?</p>

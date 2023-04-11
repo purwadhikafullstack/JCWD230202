@@ -937,7 +937,7 @@ export default function TransactionAdmin(props) {
 						{paymentProof === null ? (
 							<img alt="NoImage" src={NoImage} />
 						) : (
-							<img alt="Payment Proof" src={`http://localhost:8000/${paymentProof}`} />
+							<img alt="Payment Proof" src={`http://jcwd230202.purwadhikabootcamp.com/${paymentProof}`} />
 						)}
 					</div>
 					<div className=" flex justify-center pb-5 gap-4">

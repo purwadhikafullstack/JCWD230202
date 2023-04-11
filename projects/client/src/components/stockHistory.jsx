@@ -4,6 +4,7 @@ import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import { Empty } from "antd";
 import { useNavigate } from "react-router-dom";
+import REST_API from "../support/services/RESTApiService";
 
 function StockHistory() {
 	const [data, setData] = useState([]);
@@ -20,28 +21,38 @@ function StockHistory() {
 
 	let onGetDataKey = async (e, value) => {
 		if (e.key === "Enter") {
-			let response = await axios.get(
-				`http://localhost:8000/admin/history-stock?search=${value}`,
-				{
-					headers: {
-						token: localStorage.getItem("token"),
-					},
-				}
-			);
+			// let response = await axios.get(
+			// 	`http://localhost:8000/admin/history-stock?search=${value}`,
+			// 	{
+			// 		headers: {
+			// 			token: localStorage.getItem("token"),
+			// 		},
+			// 	}
+			// );
+
+			let response = await REST_API({
+				url: `/admin/history-stock?search=${value}`,
+				method: "GET",
+			});
 
 			setData(response.data.data);
 		}
 	};
 
 	let onGetData = async (value, filter, sort = "") => {
-		let response = await axios.get(
-			`http://localhost:8000/admin/history-stock?search=${value}`,
-			{
-				headers: {
-					token: localStorage.getItem("token"),
-				},
-			}
-		);
+		// let response = await axios.get(
+		// 	`http://localhost:8000/admin/history-stock?search=${value}`,
+		// 	{
+		// 		headers: {
+		// 			token: localStorage.getItem("token"),
+		// 		},
+		// 	}
+		// );
+
+		let response = await REST_API({
+			url: `/admin/history-stock?search=${value}`,
+			method: "GET",
+		});
 		// console.log(response.data.data);
 		setData(response.data.data);
 	};
