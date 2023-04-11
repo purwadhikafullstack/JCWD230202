@@ -28,7 +28,6 @@ import PaymentProof from "./pages/paymentProof";
 import TransactionAdmin from "./components/transaction";
 import Overview from "./components/overview";
 import ProfileSideBar from "./components/profileSideBar";
-import SuperAdminDiscountManagement from "./pages/superAdminDiscountManagement";
 
 function App() {
 	const navigate = useNavigate();
@@ -52,7 +51,6 @@ function App() {
 				url: "/user/profile",
 				method: "GET",
 			});
-
 			setprofile({
 				...profile,
 				id: data.data.id,
@@ -88,7 +86,7 @@ function App() {
 			password = "";
 			getProfile();
 			setTimeout(() => {
-				window.location.href = "http://localhost:3000/home";
+				window.location.href = "https://jcwd230202.purwadhikabootcamp.com/home";
 			}, 3000);
 		} catch (error) {
 			toast.error(error.response.data.message);
@@ -118,7 +116,8 @@ function App() {
 			password = "";
 			getProfile();
 			setTimeout(() => {
-				window.location.href = "http://localhost:3000/admin";
+				window.location.href =
+					"https://jcwd230202.purwadhikabootcamp.com/admin";
 			}, 1000);
 		} catch (error) {
 			toast.error(error.response.message);
@@ -209,15 +208,7 @@ function App() {
 
 					<Route
 						path="discount-management"
-						element={
-							profile ? (
-								profile.role === "branch admin" ? (
-									<DiscountManagement />
-								) : profile.role === "super admin" ? (
-									<SuperAdminDiscountManagement />
-								) : null
-							) : null
-						}
+						element={<DiscountManagement state={{ profile }} />}
 					/>
 
 					<Route

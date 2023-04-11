@@ -46,6 +46,42 @@ module.exports = {
 			new HTTPStatus(res, error).error(error.message, 400).send();
 		}
 	},
+	editProductNoImg: async (req, res) => {
+		const { branch_id, id, name, stock, price, description } = req.body;
+		const t = await sequelize.transaction();
+		try {
+			await db.product.update(
+				{
+					name,
+					price,
+					description,
+				},
+				{ where: { id } },
+				{ transaction: t }
+			);
+			await db.branch_product.update(
+				{
+					stock,
+				},
+				{ where: { [Op.and]: [{ branch_id }, { product_id: id }] } },
+				{ transaction: t }
+			);
+			await db.stock_history.create(
+				{
+					stock,
+					branch_id: branch_id,
+					product_id: id,
+				},
+				{ transaction: t }
+			);
+			await t.commit();
+			new HTTPStatus(res).success("Product created").send();
+		} catch (error) {
+			await t.rollback();
+			deleteFiles(req.files.images[0].path);
+			new HTTPStatus(res, error).error(error.message, 400).send();
+		}
+	},
 	getCategoryEdit: async (req, res) => {
 		const { id } = req.query;
 		try {

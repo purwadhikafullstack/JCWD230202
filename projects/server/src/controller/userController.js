@@ -497,7 +497,7 @@ module.exports = {
 			const { data } = await axios.get(
 				"https://api.rajaongkir.com/starter/province",
 				{
-					headers: { key: "1625ecd94b7c4d9ecc661a5e0500bf2f" },
+					headers: { key: "d7acd6e75f2be4840040ef9ededd90d3" },
 				}
 			);
 			res.status(200).send({
@@ -525,7 +525,7 @@ module.exports = {
 			const { data } = await axios.get(
 				`https://api.rajaongkir.com/starter/city?province=${province}`,
 				{
-					headers: { key: "1625ecd94b7c4d9ecc661a5e0500bf2f" },
+					headers: { key: "d7acd6e75f2be4840040ef9ededd90d3" },
 				}
 			);
 			res.status(201).send({
@@ -539,6 +539,64 @@ module.exports = {
 				message: error.message,
 				data: error,
 			});
+		}
+	},
+	findAddress: async (req, res) => {
+		const { id } = req.query;
+		try {
+			const data = await db.user_address.findByPk(id);
+			new HTTPStatus(res, data).success("Find Address").send();
+		} catch (error) {
+			new HTTPStatus(res, error).error(error.message).send();
+		}
+	},
+	editAddress: async (req, res) => {
+		const t = await sequelize.transaction();
+		const { uid } = req.uid;
+		const {
+			id,
+			address,
+			province,
+			city,
+			receiver_name,
+			receiver_phone,
+			main_address,
+		} = req.body;
+		try {
+			const user = await db.user.findOne({ where: { uid } });
+			const { data } = await axios.get(
+				`https://api.opencagedata.com/geocode/v1/json?q=${city
+					.split(".")[1]
+					.replace(
+						/ /g,
+						"+"
+					)}&key=58ed1690dc1141a1bfb80cfb21b1d18a&language=en&pretty=1`
+			);
+			if (main_address) {
+				await db.user_address.update(
+					{ main_address: false },
+					{ where: { [Op.and]: [{ main_address }, { user_id: user.id }] } },
+					{ transaction: t }
+				);
+			}
+			await db.user_address.update(
+				{
+					province,
+					city,
+					address,
+					receiver_name,
+					receiver_phone,
+					main_address,
+					lat: data.results[0].geometry.lat,
+					lng: data.results[0].geometry.lng,
+				},
+				{ where: { id } },
+				{ transaction: t }
+			);
+			t.commit();
+			new HTTPStatus(res).success("Address updated").send();
+		} catch (error) {
+			new HTTPStatus(res, error).success(error.message).send();
 		}
 	},
 	addAddress: async (req, res) => {

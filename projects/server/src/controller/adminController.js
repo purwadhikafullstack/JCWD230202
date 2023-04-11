@@ -1554,6 +1554,9 @@ module.exports = {
 						[sequelize.fn("SUM", sequelize.col("total_price")), "total_income"],
 					],
 					group: [sequelize.fn("MONTH", sequelize.col("createdAt"))],
+					where: {
+						status: "Delivered",
+					},
 				});
 
 				total_user = await db.user.count({
@@ -1568,6 +1571,9 @@ module.exports = {
 				total_transaction = await db.transaction.findAll({
 					attributes: [[sequelize.fn("count", sequelize.col("id")), "count"]],
 					group: ["invoice"],
+					where: {
+						status: "Delivered",
+					},
 				});
 
 				transactionLength = total_transaction.length;
@@ -1606,6 +1612,7 @@ module.exports = {
 					],
 					where: {
 						branch_id: admin_branch_id,
+						status: "Delivered",
 					},
 					group: [sequelize.fn("MONTH", sequelize.col("createdAt"))],
 				});
@@ -1622,6 +1629,7 @@ module.exports = {
 				total_transaction = await db.transaction.count({
 					where: {
 						branch_id: admin_branch_id,
+						status: "Delivered",
 					},
 					group: ["invoice"],
 				});
