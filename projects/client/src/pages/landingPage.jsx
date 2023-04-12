@@ -646,7 +646,7 @@ export default function LandingPage() {
 							type="submit"
 							disabled={disable}
 							onClick={() => onSubmit()}
-							className="font-medium w-full text-sm px-5 py-2.5 rounded-lg text-white bg-red-700 hover:bg-red-800 "
+							className="font-medium w-full text-sm px-5 py-2.5 rounded-lg text-white bg-[#0095da] hover:bg-blue-800 "
 						>
 							{disable ? (
 								<LoadingSpin
