@@ -19,6 +19,8 @@ export default function DiscountManagement(props) {
 	const [page, setpage] = useState();
 	const [selectedpage, setselectedpage] = useState(1);
 	const [selectedtab, setselectedtab] = useState(0);
+
+	const [date, setdate] = useState();
 	const [type, settype] = useState();
 	const [all, setall] = useState();
 	const [productname, setproductname] = useState();
@@ -481,6 +483,74 @@ export default function DiscountManagement(props) {
 						</div>
 					</Tabs.Item>
 				</Tabs.Group>
+				<div className="rounded-lg max-w-screen-xl relative">
+					<div className="sticky w-full max-w-screen-xl grid grid-cols-6 bg-[#0095da] text-white px-3 rounded-md text-lg py-2 z-40">
+						<Dropdown label="Type" inline={true}>
+							<Dropdown.Item onClick={() => sortBy("discount_id-asc")}>
+								Ascending
+							</Dropdown.Item>
+							<Dropdown.Item onClick={() => sortBy("discount_id-desc")}>
+								Descending
+							</Dropdown.Item>
+						</Dropdown>
+						<Dropdown label="Minimum Purchase" inline={true}>
+							<Dropdown.Item onClick={() => sortBy("min_purchase-asc")}>
+								Ascending
+							</Dropdown.Item>
+							<Dropdown.Item onClick={() => sortBy("min_purchase-desc")}>
+								Descending
+							</Dropdown.Item>
+						</Dropdown>
+						<Dropdown label="Percent(%)" inline={true}>
+							<Dropdown.Item onClick={() => sortBy("percent-asc")}>
+								Ascending
+							</Dropdown.Item>
+							<Dropdown.Item onClick={() => sortBy("percent-desc")}>
+								Descending
+							</Dropdown.Item>
+						</Dropdown>
+						<Dropdown label="Product" inline={true}>
+							<Dropdown.Item onClick={() => sortBy("asc", 1)}>
+								Ascending
+							</Dropdown.Item>
+							<Dropdown.Item onClick={() => sortBy("desc", 1)}>
+								Descending
+							</Dropdown.Item>
+						</Dropdown>
+						<Dropdown label="Expired" inline={true}>
+							<Dropdown.Item onClick={() => sortBy("expired-asc")}>
+								Ascending
+							</Dropdown.Item>
+							<Dropdown.Item onClick={() => sortBy("expired-desc")}>
+								Descending
+							</Dropdown.Item>
+						</Dropdown>
+						<p className="inline">Status</p>
+					</div>
+					<div className="space-y-2 pt-4 max-w-screen-xl w-full">
+						{all?.map((value, index) => {
+							return (
+								<div
+									className="grid grid-cols-6 border-[2px] px-2 py-1 rounded-md"
+									key={index}
+								>
+									<h3 className="w-full">
+										{value.discount_id === 1
+											? "BUY 1 GET 1"
+											: value.discount_id === 2
+											? "Minimum Purchased"
+											: "Custom Discount"}
+									</h3>
+									<h3 className="w-full">{value.min_purchase}</h3>
+									<h3 className="w-full">{value.percent}</h3>
+									<h3 className="w-full">{value.product.name}</h3>
+									<h3 className="w-full">{value.expired}</h3>
+									<h3 className="w-full">{value.status}</h3>
+								</div>
+							);
+						})}
+					</div>
+				</div>
 			</div>
 			<Modal
 				show={show.createDiscount}

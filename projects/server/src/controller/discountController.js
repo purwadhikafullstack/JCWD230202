@@ -28,6 +28,7 @@ module.exports = {
 		const { uid } = req.uid;
 		const { sort, name, status } = req.query;
 		let where;
+
 		let data;
 		try {
 			const admin = await db.user.findOne({
