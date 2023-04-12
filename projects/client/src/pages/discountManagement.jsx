@@ -503,7 +503,11 @@ export default function DiscountManagement(props) {
 								onChange={(e) => {
 									setnewDiscount({
 										...newDiscount,
-										expired: `${e.$y}-${e.$M}-${e.$D}`,
+										expired: `${e.$d.toLocaleString("id-ID", {
+											year: "numeric",
+										})}-${e.$d.toLocaleString("id-ID", {
+											month: "2-digit",
+										})}-${e.$d.toLocaleString("id-ID", { day: "2-digit" })}`,
 									});
 								}}
 								format="YYYY/MM/DD"
